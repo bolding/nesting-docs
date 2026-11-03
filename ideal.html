@@ -389,10 +389,24 @@ correction needs three more remaps per tracer.</li>
 <li><strong>The rest is small:</strong> the flux register 1–4 ms, the 3D transports 1 ms, the ring velocities 2 ms per 3D step.</li>
 <li><strong>The shelf pays most</strong>: as a child it remaps its ring, as a parent its children's rim.</li>
 <li><strong>It scales with the processes</strong> (35–40 % less work per process on twice as many), as the remaps run where the interface is.</li>
-<li><strong>Numpy is the limit.</strong> The remaps are vectorised numpy (PPM included); a compiled kernel, a merge of the two lists of interfaces
-per column, is expected to be 10–20 times faster. That is the step before NEAB in 3D, where the rim and ring hold about
-1,000 columns per interface with 30 layers.</li></ul>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels.</p></figcaption></figure>
+</ul>
+<h3 id="v7-kernel">A compiled remap kernel</h3>
+<p>The remap is now a Fortran kernel in pyGETM (<code>_pygetm.vertical_remap</code>): one pass down each column, a merge of the two
+lists of interfaces, with the same PCM or PPM reconstruction and limiter as the numpy version. One call handles all columns
+and tracers of an exchange. It equals the numpy remap to 4e-15 and is 15–16 times faster (18,000 columns, 14 tracers: PPM
+120 ms against 1,960 ms). All IDEAL results are unchanged: heat in the closed basin 5e-11, uniform to 3e-13, V2 and V6 to
+every digit.</p>
+<div class="tablewrap num"><table><thead><tr><th>3D exchange work per 3D step, 2 processes per level</th><th>numpy</th><th>compiled</th><th>share of the run, compiled</th></tr></thead><tbody>
+<tr><td>T, S: channel / shelf / strait</td><td>12 / 26 / 17 ms</td><td>5 / 13 / 8 ms</td><td>4 / 9 / 6 %</td></tr>
+<tr><td>14 tracers: channel / shelf / strait</td><td>66 / 124 / 72 ms</td><td>16 / 36 / 25 ms</td><td>8 / 17 / 12 %</td></tr>
+</tbody></table></div>
+<p>The exchange's work falls 2–4 times, not 15: a profile puts the kernel at about 40 % of what remains. The rest is the numpy
+around it: gathering the columns from pyGETM's 3D arrays at the interface cells and reversing their layer order, the r × r
+child columns of the rim, the stretch, the ring's limiter and the messages. A kernel that reads and writes the 3D arrays
+at a list of cells itself could gain another 1.5–2 times on the exchange, 2–8 % of a run: worth it for many tracers (FABM),
+not urgent for T and S. The waiting for partner levels, the largest item for the channel, is load balance: the 3D cost per
+level is not yet in <code>nesting-balance</code>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy and the compiled kernel, T and S or 14 tracers, 2 or 4 processes per level.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>

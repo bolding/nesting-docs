@@ -276,7 +276,8 @@ limited to the range of the two.</td></tr>
 <p>The concentrations of the rim and the ring are remapped with every interface kept at its depth below the surface (only
 the bottom layer is cut or extended), so that flat isopycnals stay flat over a sloping bottom, and with a limited
 piecewise-parabolic reconstruction (PPM, Colella and Woodward 1984) inside each source layer, which carries a thin
-pycnocline from coarse onto fine layers 5–20 times more accurately than a constant. The amounts of the flux
+pycnocline from coarse onto fine layers 5–20 times more accurately than a constant. The remap runs in a compiled
+kernel in pyGETM (<code>_pygetm.vertical_remap</code>), 15 times faster than the numpy version. The amounts of the flux
 register and the transports are remapped with the stretch, which keeps their sums exactly. With all of it, a closed basin
 conserves its heat content to 1e-9 over 48 h, and a uniform field stays uniform to round-off
 (<a href="ideal.html#threed">IDEAL</a>). How it got there: <a href="issues.html#rim-content">exact rim content</a>,
@@ -305,6 +306,8 @@ parent's water under a child</td></tr>
 <code>before_state_update</code>, <code>after_state_update</code>, <code>on_stage</code> (after <code>transports_2d</code>,
 <code>elevation</code>, <code>momentum_3d</code>, <code>tracers</code>) and <code>on_finish</code>.</td><td>All exchanges between the levels happen here</td></tr>
 <tr><td><code>operators.py</code></td><td><code>Advection(..., flux_u=, flux_v=)</code>; <code>apply_3d_batch(..., get_flux=)</code>, the tracer amount through every face and layer</td><td>Python side of the face fluxes (2D and 3D)</td></tr>
+<tr><td><code>src/vertical_remap.F90</code>, <code>_pygetm.pyx</code>, <code>CMakeLists.txt</code></td><td>The vertical remap kernel
+(<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>
 <tr><td><code>tracer.py</code></td><td><code>TracerCollection.face_fluxes</code>: per tracer the arrays the 3D advection adds to</td><td>The 3D flux register</td></tr>
 <tr><td><code>momentum.py</code></td><td>Transport damping (An) is defined at EXTERNAL faces. <b>Bug fix:</b> the damping was multiplied by the time step twice (also upstream).</td>
 <td>Sponge at a child's interface; stability</td></tr>

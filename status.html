@@ -199,10 +199,11 @@ channel and about 6× on the shelf over the slope.</li>
 level, mostly from the coarser levels' layers.</li>
 <li>IDEAL V6, a dye front through the levels: conserved to 4e-9; new extrema 1e-5 in the children after limiting the ring
 correction, 2e-4 in the parent from the flux correction.</li>
-<li>IDEAL V7, the cost: the 3D exchange is 10–21 % of a run with T and S, 20–37 % with 14 tracers; 85 % of it the remaps.</li>
+<li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
+8–17 % with 14 tracers.</li>
 <li>The fork follows pyGETM v0.9.29 (merged 3 November 2026).</li></ul></div>
 <div><h4>Open</h4><ul>
-<li>A compiled remap kernel: the remaps are 85 % of the 3D exchange, which adds 31 % to a run with T and S (IDEAL V7).</li>
+<li>The 3D exchange's gathering of columns inside the compiled kernel (another 1.5–2× on the exchange); the 3D cost per level in <code>nesting-balance</code>.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
 <li>The adaptive coordinates in nested runs (left for later).</li>
 <li>Limited slopes and time interpolation in the 3D ring; a compiled remap kernel.</li>
