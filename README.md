@@ -16,6 +16,8 @@ volume and tracer content are conserved, in 2D and in 3D between levels with dif
   - [IDEAL](https://bolding.github.io/nesting-docs/ideal.html) (`ideal.html`)
   - [DKm](https://bolding.github.io/nesting-docs/dkm.html) (`dkm.html`)
   - [NEAB](https://bolding.github.io/nesting-docs/neab.html) (`neab.html`)
+- [Guides](https://bolding.github.io/nesting-docs/guides.html) (`guides.html`): how to run the tools and scripts, with examples
+  (bathymetry, nesting-balance, the model runs, boundaries, analysis, animations)
 - [Issues](https://bolding.github.io/nesting-docs/issues.html) (`issues.html`): the problems found along the way, how they were found and
   solved, and what is still open. The example pages link to the issues that concern them.
 - [Status](https://bolding.github.io/nesting-docs/status.html) (`status.html`)
