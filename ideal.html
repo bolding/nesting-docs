@@ -180,7 +180,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a></nav>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a></nav>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -352,18 +352,47 @@ extremum. pyGETM's advection (SUPERBEE) creates none in a single model: the 333 
 <tr><td>shelf</td><td>3e-10</td><td>9e-8</td><td>0.030</td></tr>
 <tr><td>strait</td><td>(max 0.06)</td><td>7e-46</td><td>0.001</td></tr>
 <tr><td>nested, PCM</td><td>channel / shelf / strait</td><td>4e-7 / 3.6e-4 / –</td><td>4.5e-5 / 4.5e-5 / 1.2e-4</td><td>0.036 / 0.030 / 0.001</td></tr>
+<tr><td rowspan="3"><strong>nested, PPM, the child detail limited</strong></td><td>channel</td><td>1.9e-4</td><td>4.0e-5</td><td>0.036</td></tr>
+<tr><td>shelf</td><td>1.2e-5</td><td>1.1e-6</td><td>0.030</td></tr>
+<tr><td>strait</td><td>(max 0.06)</td><td>6e-11</td><td>0.001</td></tr>
 </tbody></table></div>
 <ul><li><strong>The dye is conserved</strong> over all levels to 4e-9 at most (2e-10 at the end), with every part of the coupling on.</li>
-<li><strong>New extrema are small but real:</strong> up to 3.6e-4 on the shelf. They come from the ring's child-detail correction (an addition,
-not limited to the local range): without it the shelf and strait stay within 1e-7. A smaller undershoot of 4e-5 in the
-channel, the same in every run, comes from the flux correction on the parent's side.</li>
+<li><strong>New extrema are small but real:</strong> up to 3.6e-4 on the shelf, from the ring's child-detail correction (an addition):
+without it the shelf and strait stay within 1e-7. Limiting the corrected ring value to the range of the parent's value and the
+child's adjacent one (now the default) brings the shelf to 1.2e-5 and the strait to 6e-11. What remains is on the parent's side:
+the channel, 1.9e-4 above and 4e-5 below, from the flux correction.</li>
 <li><strong>PPM and PCM do not differ here.</strong> The front stays within 0.03–0.04 of the reference's surface dye.</li>
 <li><strong>A weak test so far:</strong> the tidal excursion is only 3–5 km, so the fronts cross the interfaces but do not travel far into the
 next level (the dye reaches 0.06 in the strait). A mean current would test it harder.</li></ul>
-<p class="seeissues">Issues found and solved along the way: <a href="issues.html#ring-extrema">The ring's child-detail correction can create new extrema</a>.</p>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_extrema.png" aria-label="Open New extrema over time full size"><img src="fig/ideal/3d/v6_extrema.png" alt="New extrema over time" loading="lazy"></button><figcaption><strong>New extrema over time</strong><p>max(dye) − 1 (above) and −min(dye) (below) per level; positive values are outside the initial range [0, 1].</p></figcaption></figure>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#ring-extrema">The ring's child-detail correction created new extrema</a>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_extrema_limited.png" aria-label="Open New extrema over time full size"><img src="fig/ideal/3d/v6_extrema_limited.png" alt="New extrema over time" loading="lazy"></button><figcaption><strong>New extrema over time</strong><p>max(dye) − 1 (above) and −min(dye) (below) per level, with the child detail limited and unlimited; positive values are outside the initial range [0, 1].</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_section.png" aria-label="Open The fronts after 48 h full size"><img src="fig/ideal/3d/v6_section.png" alt="The fronts after 48 h" loading="lazy"></button><figcaption><strong>The fronts after 48 h</strong><p>Surface dye along y = 90 km: the 333 m reference (black) and the nested runs, each level over the cells it computes; dashed: the interfaces.</p></figcaption></figure>
 <figure class="fig wide"><div class="plate static"><img src="fig/ideal/3d/v6_anim.gif" alt="48 hours of V6" loading="lazy"></div><figcaption><strong>48 hours of V6</strong><p>Every 30 minutes: the mixed-layer depth and the surface dye, every level over the cells it computes. Also as <a href="fig/ideal/3d/v6_anim.mp4">MP4</a>.</p></figcaption></figure>
+</section>
+<section id="v7" class="chapter"><header class="chap"><span class="eyebrow">V7</span><h2>What the 3D exchange costs</h2></header>
+<p class="lede">Every part of the 3D coupler has its own timer, separating its work from the time it waits for the partner level. The
+V5 setup over 24 h (478 3D steps), with temperature and salinity, and with 12 more passive tracers (14 in all), on 2 and on
+4 processes per level, against the same runs without the 3D coupling.</p>
+<div class="tablewrap num"><table><thead><tr><th>Run</th><th>Level</th><th>3D exchange per 3D step, work</th><th>waiting</th><th>share of the run</th><th>run time vs. no 3D coupling</th></tr></thead><tbody>
+<tr><td rowspan="3">T, S; 2 processes per level</td><td>channel</td><td>12 ms</td><td>31 ms</td><td>10 %</td><td rowspan="3">+31 %</td></tr>
+<tr><td>shelf</td><td>26 ms</td><td>5 ms</td><td>21 %</td></tr>
+<tr><td>strait</td><td>17 ms</td><td>12 ms</td><td>14 %</td></tr>
+<tr><td rowspan="3">14 tracers; 2 processes per level</td><td>channel</td><td>66 ms</td><td>88 ms</td><td>20 %</td><td rowspan="3">+80 %</td></tr>
+<tr><td>shelf</td><td>124 ms</td><td>33 ms</td><td>37 %</td></tr>
+<tr><td>strait</td><td>72 ms</td><td>93 ms</td><td>22 %</td></tr>
+<tr><td>T, S; 4 processes per level</td><td>channel / shelf / strait</td><td>8 / 17 / 11 ms</td><td>24 / 6 / 9 ms</td><td>9 / 19 / 12 %</td><td></td></tr>
+<tr><td>14 tracers; 4 processes per level</td><td>channel / shelf / strait</td><td>35 / 74 / 45 ms</td><td>54 / 12 / 47 ms</td><td>16 / 33 / 20 %</td><td></td></tr>
+</tbody></table></div>
+<ul><li><strong>The vertical remaps are about 85 % of the work:</strong> the rim (on the parent) and the ring (on the child). They grow linearly with
+the number of tracers, about 4 ms per tracer and 3D step on the shelf. The ring is the dearest part: its child-detail
+correction needs three more remaps per tracer.</li>
+<li><strong>The rest is small:</strong> the flux register 1–4 ms, the 3D transports 1 ms, the ring velocities 2 ms per 3D step.</li>
+<li><strong>The shelf pays most</strong>: as a child it remaps its ring, as a parent its children's rim.</li>
+<li><strong>It scales with the processes</strong> (35–40 % less work per process on twice as many), as the remaps run where the interface is.</li>
+<li><strong>Numpy is the limit.</strong> The remaps are vectorised numpy (PPM included); a compiled kernel, a merge of the two lists of interfaces
+per column, is expected to be 10–20 times faster. That is the step before NEAB in 3D, where the rim and ring hold about
+1,000 columns per interface with 30 layers.</li></ul>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>

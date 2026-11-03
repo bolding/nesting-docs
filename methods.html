@@ -270,7 +270,8 @@ onto its face layers (sums kept exactly), adds the r sub-faces and corrects the 
 <tr><td>Rim</td><td>child → parent, <code>tracers</code></td><td>The r × r child columns of each rim cell onto the parent's layers,
 concentrations by the volume each parent layer receives.</td></tr>
 <tr><td>Ring</td><td>parent → child, <code>tracers</code></td><td>The parent's column onto the child's layers in each ring cell, plus the
-child's own vertical detail: its adjacent interior column, minus the same column through the parent's layers and back.</td></tr>
+child's own vertical detail: its adjacent interior column, minus the same column through the parent's layers and back,
+limited to the range of the two.</td></tr>
 </tbody></table></div>
 <p>The concentrations of the rim and the ring are remapped with every interface kept at its depth below the surface (only
 the bottom layer is cut or extended), so that flat isopycnals stay flat over a sloping bottom, and with a limited
