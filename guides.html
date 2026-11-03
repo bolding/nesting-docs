@@ -282,7 +282,10 @@ vertical remaps of the rims (on the parent) and the rings (on the child) at ever
   split: 10                         # 2D steps per 3D step; a child: its parent&#x27;s x its time ratio</code></pre>
 <p>The table then has the 3D exchange per model. The numbers above are IDEAL's on one machine, with the compiled remap; calibrate them
 for a setup and machine from measured runs:</p>
-<pre><code># the costs per subdomain cell and step (all processes but the root&#x27;s), then the cost factor per model
+<pre><code># the 2D coupling&#x27;s own work: per rim cell, per ring cell and step, per message (from runs at several splits)
+nesting-balance IDEAL/config/ideal.yaml --cores 6 --bathymetry /tmp/ideal2d_bathy --fit-exchange RUN1 RUN2 RUN3 RUN4
+
+# the costs per subdomain cell and step (all processes but the root&#x27;s), then the cost factor per model
 nesting-balance NEAB/config/coarse.yaml --cores 18 --bathymetry NEAB/Bathymetry/coarse --fit RUN1 RUN2 --calibrate RUN1
 
 # c_3d and exchange_3d(_base) from a 2D run and coupled 3D runs with 2 and 14 tracers (IDEAL V7)

@@ -323,8 +323,13 @@ uncalibrated choice; the channel's cost factor came out at twice the others'.</p
 <p><strong>Cause:</strong> the model's own computation in the runs' timing.json still held the 3D exchange, and with it the 3D coupler's
 waiting for the partner levels (7.8 s of the channel's 18 s).</p>
 <p><strong>Fix:</strong> the 3D syncs and transports are subtracted (<code>own_compute</code>); the cost factors are then 0.87–0.99 and the choices
-those of the model. Still open: the 2D coupling's own work per interface cell (<code>exchange_cell</code>) is not calibrated yet; it
-matters when a level is on one core.</p></div></section>
+those of the model.</p>
+<p><strong>Then:</strong> the 2D coupling's own work (the ring values, flux register and restriction on the child; flux matching, transport
+replacement and slopes on the parent; their halos and messages) calibrated from five IDEAL 2D runs at different splits
+(<code>--fit-exchange</code>): about 27 per rim cell, 2.4 per ring cell and child step and 900 per message, in wet-cell 2D steps, 11 %
+rms. A parent's work per interface cell is about ten times a child's. With every term calibrated, the balancer's predictions
+are within 5–13 % of the measured runs: it finds the large imbalances (12 cores: 2/4/6) but not differences of a few per cent
+(6 cores).</p></div></section>
 <section class="chapter"><div class="issue" id="dkm-z0"><h3>DKm runs with the wrong bottom roughness</h3><div class="tags"><span class="solved">solved</span><span>DKm</span></div>
 <p>The first DKm tidal runs used z0 = 0.001 m, not the 0.015 m NEAB uses, which made the Kattegat's tide look twice too
 large. The runs were repeated with 0.015 m. A z0 map from the seabed substrate was tried for NEAB and does not change
