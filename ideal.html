@@ -180,7 +180,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a></nav>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a></nav>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -205,6 +205,7 @@ interface is not on the window's edge.</li>
 <li><strong>A wall with a 1 km gap</strong>: open in the shelf (1 cell) and the strait level (3 cells), closed in the channel,
 as the Little Belt in NEAB.</li></ul>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/layout.png" aria-label="Open The layout full size"><img src="fig/ideal/layout.png" alt="The layout" loading="lazy"></button><figcaption><strong>The layout</strong><p>Depth and land of the three levels; the shelf's window and active region (red), the strait level's (blue).</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/bathymetry.png" aria-label="Open The bathymetry of the tests full size"><img src="fig/ideal/bathymetry.png" alt="The bathymetry of the tests" loading="lazy"></button><figcaption><strong>The bathymetry of the tests</strong><p>Every level over the cells it computes, for the three depth configurations: flat at 50 m (the 2D tests and the first 3D tests), 50 → 20 m across the shelf window (V2) and 50 → 10 m (V5, V6). Below: the depth along y = 90 km; dashed: the interfaces; dotted: the pycnocline's initial depth.</p></figcaption></figure>
 <p>Each level is an ordinary pyGETM model (<code>IDEAL/models/&lt;level&gt;/run.py</code>), launched as one MPMD component.
 The nesting (<code>pygetm.nesting</code> on the fork <code>bolding/pygetm</code>) fills the halo zones where the levels overlap
 and matches the fluxes through the faces between them. How it works is described on the
@@ -335,7 +336,34 @@ elsewhere, except in the channel with 10 layers.</li>
 <li><strong>The remap's details do not matter in a flow:</strong> PPM, the piecewise-constant remap and the stretched map agree to within
 1 cm. They mattered in the lake at rest (V2), where nothing else moves the pycnocline.</li></ul>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v5_section.png" aria-label="Open The pycnocline after 48 h full size"><img src="fig/ideal/3d/v5_section.png" alt="The pycnocline after 48 h" loading="lazy"></button><figcaption><strong>The pycnocline after 48 h</strong><p>Depth of the 12 °C isotherm along y = 90 km: the 333 m reference (black), the nested runs (each level over the cells it computes) and the channel alone.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/ideal/3d/v5_anim.gif" alt="48 hours of V5" loading="lazy"></div><figcaption><strong>48 hours of V5</strong><p>Every hour: the mixed-layer depth (where the temperature has dropped 0.5 °C below the surface) and the depth of the 12 °C isotherm, every level over the cells it computes. Grey: land, and no isotherm east of the front. Also as <a href="fig/ideal/3d/v5_anim.mp4">MP4</a>.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v5_error.png" aria-label="Open Where the errors are full size"><img src="fig/ideal/3d/v5_error.png" alt="Where the errors are" loading="lazy"></button><figcaption><strong>Where the errors are</strong><p>Isotherm depth of the default nested run minus the reference after 48 h, every level over its cells. Largest in the channel at the front east of the shelf, where 3 km cells and 10 layers resolve it least.</p></figcaption></figure>
+</section>
+<section id="v6" class="chapter"><header class="chap"><span class="eyebrow">V6</span><h2>A dye front through the levels</h2></header>
+<p class="lede">Does the coupling keep a tracer within its range? A passive dye starts at exactly 1 between x = 117 and 162 km and at 0
+elsewhere, in the V5 setup (pycnocline over the slope, M2 tide, rotation). Its two fronts lie 3 km west of the channel–shelf
+and the shelf–strait interfaces, and the tide carries them across and back twice a day. Anything outside [0, 1] is a new
+extremum. pyGETM's advection (SUPERBEE) creates none in a single model: the 333 m reference stays within 1e-13.</p>
+<div class="tablewrap num"><table><thead><tr><th>48 h</th><th>Level</th><th>max − 1</th><th>−min</th><th>surface dye vs reference, rms</th></tr></thead><tbody>
+<tr><td rowspan="3">nested, PPM</td><td>channel</td><td>4e-7</td><td>3.8e-5</td><td>0.036</td></tr>
+<tr><td>shelf</td><td>3.6e-4</td><td>3.8e-5</td><td>0.030</td></tr>
+<tr><td>strait</td><td>(max 0.06)</td><td>1.2e-4</td><td>0.001</td></tr>
+<tr><td rowspan="3">nested, PPM, without the ring's child detail</td><td>channel</td><td>1e-8</td><td>4.1e-5</td><td>0.036</td></tr>
+<tr><td>shelf</td><td>3e-10</td><td>9e-8</td><td>0.030</td></tr>
+<tr><td>strait</td><td>(max 0.06)</td><td>7e-46</td><td>0.001</td></tr>
+<tr><td>nested, PCM</td><td>channel / shelf / strait</td><td>4e-7 / 3.6e-4 / –</td><td>4.5e-5 / 4.5e-5 / 1.2e-4</td><td>0.036 / 0.030 / 0.001</td></tr>
+</tbody></table></div>
+<ul><li><strong>The dye is conserved</strong> over all levels to 4e-9 at most (2e-10 at the end), with every part of the coupling on.</li>
+<li><strong>New extrema are small but real:</strong> up to 3.6e-4 on the shelf. They come from the ring's child-detail correction (an addition,
+not limited to the local range): without it the shelf and strait stay within 1e-7. A smaller undershoot of 4e-5 in the
+channel, the same in every run, comes from the flux correction on the parent's side.</li>
+<li><strong>PPM and PCM do not differ here.</strong> The front stays within 0.03–0.04 of the reference's surface dye.</li>
+<li><strong>A weak test so far:</strong> the tidal excursion is only 3–5 km, so the fronts cross the interfaces but do not travel far into the
+next level (the dye reaches 0.06 in the strait). A mean current would test it harder.</li></ul>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#ring-extrema">The ring's child-detail correction can create new extrema</a>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_extrema.png" aria-label="Open New extrema over time full size"><img src="fig/ideal/3d/v6_extrema.png" alt="New extrema over time" loading="lazy"></button><figcaption><strong>New extrema over time</strong><p>max(dye) − 1 (above) and −min(dye) (below) per level; positive values are outside the initial range [0, 1].</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_section.png" aria-label="Open The fronts after 48 h full size"><img src="fig/ideal/3d/v6_section.png" alt="The fronts after 48 h" loading="lazy"></button><figcaption><strong>The fronts after 48 h</strong><p>Surface dye along y = 90 km: the 333 m reference (black) and the nested runs, each level over the cells it computes; dashed: the interfaces.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/ideal/3d/v6_anim.gif" alt="48 hours of V6" loading="lazy"></div><figcaption><strong>48 hours of V6</strong><p>Every 30 minutes: the mixed-layer depth and the surface dye, every level over the cells it computes. Also as <a href="fig/ideal/3d/v6_anim.mp4">MP4</a>.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>

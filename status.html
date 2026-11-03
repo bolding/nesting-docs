@@ -196,9 +196,11 @@ velocities and the 3D flux register; heat conserved to 1e-9.</li></ul></div>
 <li>IDEAL V2, a stratified lake at rest: with PPM in the remap the coupling adds 1.6× the single model's error in the
 channel and about 6× on the shelf over the slope.</li>
 <li>IDEAL V5, a pycnocline over the shelf slope against one level at 333 m: within 8–13 cm of pycnocline depth in every
-level, mostly from the coarser levels' layers.</li></ul></div>
+level, mostly from the coarser levels' layers.</li>
+<li>IDEAL V6, a dye front through the levels: conserved to 4e-9; new extrema up to 3.6e-4.</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026).</li></ul></div>
 <div><h4>Open</h4><ul>
-<li>IDEAL V6 (a tracer front through the levels), V7 (the cost of the 3D exchange).</li>
+<li>IDEAL V7 (the cost of the 3D exchange); <a href="issues.html#ring-extrema">new extrema</a> from the ring's detail correction (V6).</li>
 <li>The adaptive coordinates in nested runs (left for later).</li>
 <li>Limited slopes and time interpolation in the 3D ring; a compiled remap kernel.</li>
 <li>Interfaces between sibling children that touch.</li>
@@ -211,8 +213,8 @@ level, mostly from the coarser levels' layers.</li></ul></div>
 <div class="statusgrid">
 <div><h4><a href="ideal.html">IDEAL</a></h4><ul>
 <li>2D: E1, E2, E3, E8, E9 done.</li>
-<li>3D with temperature, 10 / 15 / 20 layers: conservation and uniformity passed; the lake at rest (V2) and a pycnocline over
-the slope (V5) done.</li></ul></div>
+<li>3D with temperature, 10 / 15 / 20 layers: conservation and uniformity passed; the lake at rest (V2), a pycnocline over
+the slope (V5) and a dye front (V6) done.</li></ul></div>
 <div><h4><a href="neab.html">NEAB</a></h4><ul>
 <li>Five levels, 31-day tidal runs on 64 cores (coarse); gauge and TPXO9 comparisons.</li>
 <li><a href="issues.html#neab-skagerrak">The tide east of the Skagerrak amphidrome</a> is open: the depth datum
