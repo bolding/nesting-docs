@@ -1,0 +1,386 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>pyGETM Nesting</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+   a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
+   teal for links, the interface magenta of the figures for emphasis. */
+:root {
+  --paper: #f3f5f4;
+  --paper-2: #e7ecea;
+  --ink: #142028;
+  --ink-2: #4a5a63;
+  --rule: #c9d3d1;
+  --teal: #0b6b72;
+  --magenta: #b0216f;
+  --plate: #ffffff;
+  --ok: #2c7a3f;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1120px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+    --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+  --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 400 1.06rem/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--teal); text-underline-offset: 2px; }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+/* top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule);
+}
+.topin {
+  max-width: var(--wide); margin: 0 auto; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { font: 700 0.95rem/1 var(--display); font-stretch: 85%; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.topbar nav { display: flex; gap: 0.2rem 1rem; flex-wrap: wrap; }
+.topbar nav a { font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); text-decoration: none; }
+.topbar nav a:hover { color: var(--teal); }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
+.chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
+
+/* hero */
+.hero { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.1rem; }
+.draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+h1 {
+  font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
+  letter-spacing: -0.01em; margin: 0; max-width: 18ch; text-wrap: balance;
+}
+.lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
+.facts > div { padding: 0.8rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.facts dt { font: 600 0.74rem/1.2 var(--display); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin: 0.15rem 0 0; font: 700 1.9rem/1.1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.facts p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink-2); }
+
+/* chapters */
+.chapter { padding-block: 3rem 1rem; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.3rem; }
+.chapter > * { width: 100%; }
+.chap { display: grid; gap: 0.3rem; }
+.eyebrow { font: 700 0.76rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+h2 { font: 800 clamp(1.7rem, 3.6vw, 2.5rem)/1.08 var(--display); font-stretch: 80%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.35rem/1.2 var(--display); font-stretch: 85%; margin: 1.4rem auto 0; text-wrap: balance; }
+h4 { font: 700 1.02rem/1.3 var(--display); margin: 0 0 0.4rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.small { font-size: 0.92rem; color: var(--ink-2); }
+.ok { color: var(--ok); font-weight: 600; }
+
+/* figures: white plates, so the white-background figures read in both themes */
+.fig { margin: 0; display: grid; gap: 0.55rem; min-width: 0; }
+.plate {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--plate); cursor: zoom-in; overflow: hidden;
+}
+.plate.static { cursor: default; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
+figcaption strong { font: 700 0.98rem/1.3 var(--display); color: var(--ink); }
+.grid2, .grid3 { display: grid; gap: 1.6rem 1.4rem; align-items: start; }
+.grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.grid3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.6rem; align-items: start; }
+.twocol > *, .grid2 > *, .grid3 > * { min-width: 0; }
+.statusgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.6rem; }
+.statusgrid > div { border-top: 2px solid var(--ink); padding-top: 0.7rem; }
+
+/* tables */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { font: 700 0.78rem/1.2 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); text-align: left; padding: 0.5rem 0.7rem 0.4rem 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+td { padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.num td { font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+.callout { border-left: 3px solid var(--magenta); padding: 0.2rem 0 0.2rem 1rem; display: grid; gap: 0.7rem; }
+pre { margin: 0; padding: 0.8rem 1rem; background: var(--paper-2); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+pre code { background: none; padding: 0; }
+
+/* stepper */
+.stepper { display: grid; gap: 0.8rem; }
+.stepper-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; align-items: center; }
+.stepnav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.step, .stepctl button, #lbclose {
+  font: 600 0.9rem/1 var(--display); border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  border-radius: 3px; min-width: 2.3rem; height: 2.3rem; padding: 0 0.7rem; cursor: pointer;
+}
+.step[aria-current="step"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.stepctl { display: flex; gap: 0.4rem; }
+.step:hover, .stepctl button:hover { border-color: var(--teal); }
+.steptext { display: grid; gap: 0.2rem; max-width: var(--measure); }
+.stepno { font: 600 0.78rem/1 var(--mono); color: var(--magenta); }
+.steptext h4 { margin: 0; font-size: 1.15rem; }
+
+/* lightbox */
+dialog#lightbox { border: none; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
+#lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
+#lbclose { margin: 0 0 0.5rem auto; display: block; }
+
+.foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink-2); }
+</style>
+<div class="topbar"><div class="topin"><a class="brand" href="#top">pyGETM nesting</a><nav aria-label="Chapters"><a href="#method">Method</a><a href="#ideal">IDEAL</a><a href="#neab">NEAB</a><a href="#vertical">3D</a><a href="#smagorinsky">Smagorinsky</a><a href="#status">Status</a></nav></div></div>
+<main id="top">
+<header class="hero">
+  <p class="draft">Draft · under development · updated 31 October 2026</p>
+  <h1>Two-way, multi-level nesting for pyGETM</h1>
+  <p class="lede">Ordinary pyGETM models joined into a nest: each level with its own grid, time step and cores, exchanging only where they overlap, conserving volume and tracer content.</p>
+  <dl class="facts">
+    <div><dt>levels in NEAB</dt><dd>5</dd><p>6.5 km to 0.25 km</p></div>
+    <div><dt>volume conserved</dt><dd>2e-16</dd><p>relative, all levels</p></div>
+    <div><dt>refinement</dt><dd>3 × 3</dd><p>time ratio 1 or 3</p></div>
+    <div><dt>process split</dt><dd>bit-identical</dd><p>M:N exchange plans</p></div>
+  </dl>
+</header>
+<section id="method" class="chapter"><header class="chap"><span class="eyebrow">Method</span><h2>How the nesting works</h2></header>
+<p class="lede">Every level of a nest is an ordinary pyGETM simulation with its own grid, time step and
+subdomain decomposition. The nesting layer (<code>pygetm.nesting</code>, on the fork
+<code>bolding/pygetm</code>, branch <code>nesting</code>) joins them by filling the halo zones where
+they overlap, and by matching the fluxes through the faces between them.</p>
+<div class="stepper" id="stepper">
+  <div class="stepper-head">
+    <div class="stepnav" role="group" aria-label="Steps"><button type="button" class="step" data-k="0" aria-label="Step 1: A domain">1</button><button type="button" class="step" data-k="1" aria-label="Step 2: Its grid">2</button><button type="button" class="step" data-k="2" aria-label="Step 3: A halo of 2 cells">3</button><button type="button" class="step" data-k="3" aria-label="Step 4: A hole">4</button><button type="button" class="step" data-k="4" aria-label="Step 5: A halo inside the hole (the rim)">5</button><button type="button" class="step" data-k="5" aria-label="Step 6: The child">6</button><button type="button" class="step" data-k="6" aria-label="Step 7: The child&#x27;s own halo (the ring)">7</button><button type="button" class="step" data-k="7" aria-label="Step 8: The child in the hole">8</button></div>
+    <div class="stepctl"><button type="button" id="prev" aria-label="Previous step">Back</button><button type="button" id="next" aria-label="Next step">Next</button></div>
+  </div>
+  <button class="plate" type="button" id="stepplate" data-full="fig/a_box.png" aria-label="Open the step full size"><img id="stepimg" src="fig/a_box.png" alt="A domain"></button>
+  <div class="steptext"><span class="stepno" id="stepno">1 / 8</span><h4 id="steptitle">A domain</h4><p id="stepdesc">One pyGETM model: a rectangle of the parent level.</p></div>
+  <template data-src="fig/a_box.png" data-title="A domain" data-text="One pyGETM model: a rectangle of the parent level."></template><template data-src="fig/b_grid.png" data-title="Its grid" data-text="The parent&#x27;s cells."></template><template data-src="fig/c_halo.png" data-title="A halo of 2 cells" data-text="Every variable lives on the interior plus a 2-cell halo. The halo is filled from outside: by pyGETM&#x27;s own exchange between subdomains, or by the parent."></template><template data-src="fig/d_hole.png" data-title="A hole" data-text="Inside its window the parent does not compute: that is the child&#x27;s part."></template><template data-src="fig/e_rim.png" data-title="A halo inside the hole (the rim)" data-text="The cells of the hole that the parent&#x27;s stencils read. They are filled from the child: a conservative (volume-weighted) restriction."></template><template data-src="fig/f_child.png" data-title="The child" data-text="The hole, refined 3 × 3."></template><template data-src="fig/g_child_halo.png" data-title="The child&#x27;s own halo (the ring)" data-text="Filled from the parent: a limited piecewise-linear prolongation, interpolated in time."></template><template data-src="fig/h_nested.png" data-title="The child in the hole" data-text="Parent and child are each an ordinary pyGETM simulation. The nesting only fills the halo zones where they overlap, and matches the fluxes through the interface faces so that volume and tracer content are conserved."></template>
+</div>
+<h3>Land, active regions and decomposition</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/i_land.png" aria-label="Open With land full size"><img src="fig/i_land.png" alt="With land" loading="lazy"></button><figcaption><strong>With land</strong><p>Land is part of each level's own mask; parent and child masks are made consistent (the child's finer bathymetry leads).</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/k_active_region.png" aria-label="Open Only part of the window is active full size"><img src="fig/k_active_region.png" alt="Only part of the window is active" loading="lazy"></button><figcaption><strong>Only part of the window is active</strong><p>The window stays a rectangle in parent indices. The child computes its active region: wet cells connected to a seed point without crossing a barrier, in whole parent cells.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/j_decomposition.png" aria-label="Open Each level has its own decomposition full size"><img src="fig/j_decomposition.png" alt="Each level has its own decomposition" loading="lazy"></button><figcaption><strong>Each level has its own decomposition</strong><p>Parent and child each have their own tiling and pyGETM's own halo exchange. The nesting exchange is separate: M:N messages between the ranks that own cells on both sides, planned once from both tilings.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/j2_decomposition_wet.png" aria-label="Open No exchange where the child is land full size"><img src="fig/j2_decomposition_wet.png" alt="No exchange where the child is land" loading="lazy"></button><figcaption><strong>No exchange where the child is land</strong><p>Only halo cells over water need data from the other level. Tiles that meet only over land exchange no messages.</p></figcaption></figure>
+</div>
+<h3>The exchanges</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/comm_down.png" aria-label="Open Parent → child full size"><img src="fig/comm_down.png" alt="Parent → child" loading="lazy"></button><figcaption><strong>Parent → child</strong><p>The ring: parent values with limited slopes, extrapolated in time over the child's sub-steps.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/comm_up.png" aria-label="Open Child → parent full size"><img src="fig/comm_up.png" alt="Child → parent" loading="lazy"></button><figcaption><strong>Child → parent</strong><p>The rim: volume-weighted means. Flux matching: the parent cell next to each interface face is corrected by the difference between its own flux and the sum of the child's fluxes over its sub-steps.</p></figcaption></figure>
+</div>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/comm_steps.png" aria-label="Open All models compute at the same time full size"><img src="fig/comm_steps.png" alt="All models compute at the same time" loading="lazy"></button><figcaption><strong>All models compute at the same time</strong><p>The sync schedule: every model steps, then the exchanges at the end of each parent step. A model only waits in MPI at the syncs.</p></figcaption></figure>
+<h3>Load balancing</h3>
+<p>Because all models compute at the same time, the slowest model sets the pace. <code>nesting-balance</code>
+gives every model enough cores that all need about the same time per root step: it counts the wet cells
+each model computes, multiplies by its steps per root step, and picks the tiling per model. Subdomains
+that are all land, or hold only a child's hole that nothing reads, are removed and cost no core.</p>
+<div class="grid3">
+<figure class="fig"><button class="plate" type="button" data-full="fig/balance_work.png" aria-label="Open The work of a model full size"><img src="fig/balance_work.png" alt="The work of a model" loading="lazy"></button><figcaption><strong>The work of a model</strong><p>Wet cells computed × steps per root step.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/balance_timeline.png" aria-label="Open All models at the same time full size"><img src="fig/balance_timeline.png" alt="All models at the same time" loading="lazy"></button><figcaption><strong>All models at the same time</strong><p>Balanced when every model needs the same time per root step.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/balance_cores.png" aria-label="Open Cores per model full size"><img src="fig/balance_cores.png" alt="Cores per model" loading="lazy"></button><figcaption><strong>Cores per model</strong><p>The next core goes where it shortens the root step most.</p></figcaption></figure>
+</div>
+<div class="callout"><p><strong>Launch:</strong> one MPMD component per model. <code>nesting-balance</code> prints the
+<code>mpiexec</code> command line for the balanced cores, or writes a Slurm job using
+<code>srun --multi-prog</code>; pinning to cores (<code>--bind core</code>) is optional.</p>
+<pre><code>mpiexec -bind-to core -map-by core \
+    -n 7  python NEAB/models/neab_root/run.py        --nesting coarse.yaml ... \
+  : -n 39 python NEAB/models/north_sea_baltic/run.py --nesting coarse.yaml ... \
+  : -n 14 python NEAB/models/danish_straits/run.py   --nesting coarse.yaml ... \
+  : -n 2  python NEAB/models/northern_little_belt/run.py ... : -n 2 python NEAB/models/northern_sound/run.py ...</code></pre>
+<p>The results are bit-identical to the single-program driver and independent of the process split.</p></div>
+</section><section id="ideal" class="chapter"><header class="chap"><span class="eyebrow">IDEAL</span><h2>IDEAL: three levels with known answers</h2></header>
+<p class="lede">A Cartesian channel with analytic depth, three levels and every nesting feature placed on
+purpose: an island across an interface, an active region bounded by a barrier, and a wall with a 1 km gap
+that is closed in the parent but open in the children (as the Little Belt). Runs take minutes on a few cores.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal_layout.png" aria-label="Open The layout full size"><img src="fig/ideal_layout.png" alt="The layout" loading="lazy"></button><figcaption><strong>The layout</strong><p>channel 3 km → shelf 1 km (time ratio 1) → strait 333 m (time ratio 3). The channel's east and west boundaries can be open (Flather), closed or periodic.</p></figcaption></figure>
+<div class="tablewrap "><table><thead><tr><th></th><th>Experiment</th><th>Result</th></tr></thead><tbody><tr><td>E1</td><td>Sea at rest</td><td><span class='ok'>passed</span>: elevation exactly 0</td></tr><tr><td>E2</td><td>Volume conservation</td><td><span class='ok'>passed</span>: 2e-16 relative; found an instability (below)</td></tr><tr><td>E3</td><td>Tide against one level at 333 m everywhere</td><td>nested within 0.4–2.6 cm (tidal range 21–34 cm)</td></tr><tr><td>E5</td><td>Tracer pulse through the levels</td><td>to do</td></tr><tr><td>E8</td><td>Independent of the process split</td><td><span class='ok'>passed</span>, except one tile layout (1e-4 m)</td></tr><tr><td>E9</td><td>Time per model</td><td>measured</td></tr></tbody></table></div>
+<h3>An instability: a sub-stepping child with flux matching</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_e2_growth.png" aria-label="Open Volume conserved, elevation grows full size"><img src="fig/ideal_e2_growth.png" alt="Volume conserved, elevation grows" loading="lazy"></button><figcaption><strong>Volume conserved, elevation grows</strong><p>A Gaussian bump in a closed basin: the total volume is conserved to 2e-16, but the strait level grows to 23 m within 12 h in the base case.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_e2_snapshot.png" aria-label="Open The strait level after 12 h full size"><img src="fig/ideal_e2_snapshot.png" alt="The strait level after 12 h" loading="lazy"></button><figcaption><strong>The strait level after 12 h</strong><p>A mode of a few cells over the whole level, not grid-scale noise.</p></figcaption></figure>
+</div>
+<div class="twocol">
+<div><h4>What triggers it</h4><ul><li>flux matching (the parent's elevation correction),</li><li>together with a child that sub-steps (time ratio &gt; 1),</li><li>under a parent stepping well above the child's step: the growth rises with the parent's Courant number.</li><li>Two levels are enough. Neither tidal forcing nor friction removes it.</li></ul></div>
+<div><h4>A 1D model of the coupling</h4>
+<p class="small">Growth factor per parent step (power iteration), pyGETM's forward-backward step, the same ring, rim and flux matching.</p>
+<div class="tablewrap num"><table><thead><tr><th>Parent Courant</th><th>time ratio 1</th><th>2</th><th>3</th></tr></thead><tbody><tr><td>0.2</td><td>1.0000</td><td>1.0002</td><td>1.0004</td></tr><tr><td>0.57 (2D runs)</td><td>–</td><td>1.0140</td><td>1.0130</td></tr><tr><td>0.9</td><td>–</td><td>–</td><td>1.1164</td></tr></tbody></table></div></div>
+</div>
+<h3>The fix: an AGRIF-like sponge</h3>
+<p>AGRIF (Debreu et al. 2012) runs its grids in Berger–Oliger order and damps the fine grid's boundary zone
+with a sponge. The same damping works here, with all models still stepping at the same time: the child's
+transports are damped next to the interface (pyGETM's <code>momentum.An</code>, land-aware). It acts on
+momentum only, so volume stays exactly conserved. It is now an option of <code>pygetm.nesting</code>
+(<code>NestedBarotropic(sponge_width=, sponge_alpha=)</code>). An earlier limit of α = 0.02 turned out to be a
+pyGETM bug (the damping was applied with the time step twice, fixed on the fork); the sponge is stable for
+α = 0.03–0.2, default 0.1.</p>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_sponge.png" aria-label="Open The sponge stabilises the sub-stepping child full size"><img src="fig/ideal_sponge.png" alt="The sponge stabilises the sub-stepping child" loading="lazy"></button><figcaption><strong>The sponge stabilises the sub-stepping child</strong><p>Strait level, max |z|, tidal forcing (M2, 0.5 m, 3 h ramp).</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_elevation_compare.png" aria-label="Open Without and with the sponge, 20 h full size"><img src="fig/ideal_elevation_compare.png" alt="Without and with the sponge, 20 h" loading="lazy"></button><figcaption><strong>Without and with the sponge, 20 h</strong><p>Without it the strait level fills with short waves that radiate into the shelf; with a sponge 1 parent cell wide the field is smooth across both interfaces.</p></figcaption></figure>
+</div>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal_elevation_tide.png" aria-label="Open Every 6 hours, all three levels full size"><img src="fig/ideal_elevation_tide.png" alt="Every 6 hours, all three levels" loading="lazy"></button><figcaption><strong>Every 6 hours, all three levels</strong><p>Each level over the cells it computes. The tide crosses the interfaces without jumps. With rotation it travels as a Kelvin wave along the southern wall, reflects at the closed east end and returns along the northern wall.</p></figcaption></figure>
+<h3>Nested against one level at 333 m everywhere</h3>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal_timeseries.png" aria-label="Open Elevation at six stations full size"><img src="fig/ideal_timeseries.png" alt="Elevation at six stations" loading="lazy"></button><figcaption><strong>Elevation at six stations</strong><p>Solid: nested, time ratio 3 with the sponge; dashed: time ratio 1; dotted: one level at the strait's resolution everywhere. Time ratio 1 is within 0.4–1.0 cm at all stations; time ratio 3 within 0.7–0.9 cm on the shelf and in the strait, 2.2–2.6 cm in the channel, where the channel steps at 18 s instead of 6 s.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/ideal_elevation_anim.gif" alt="Animation of the elevation every 30 minutes, nested and single-level side by side, with station series below" loading="lazy"></div>
+<figcaption><strong>Every 30 minutes</strong><p>Left: nested (3 km / 1 km in the red box / 333 m in the blue box). Right: one level at 333 m. Below: the stations, the nested series growing.</p></figcaption></figure>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_e8_tiles.png" aria-label="Open E8: the process split full size"><img src="fig/ideal_e8_tiles.png" alt="E8: the process split" loading="lazy"></button><figcaption><strong>E8: the process split</strong><p>Bit-identical for 1/1/1, 2/3/2, 1/2/1 and 1/1/2 processes. With the channel on 3 processes its tile edges fall on the shelf window's edges and the results differ by 1e-4 m: still open.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal_timing.png" aria-label="Open Time per model full size"><img src="fig/ideal_timing.png" alt="Time per model" loading="lazy"></button><figcaption><strong>Time per model</strong><p>compute: the model's own step; work: restriction, flux matching, ring values; transfer: receiving data; wait: blocked until the partner's data is there.</p></figcaption></figure>
+</div>
+</section><section id="neab" class="chapter"><header class="chap"><span class="eyebrow">NEAB</span><h2>NEAB: a realistic hierarchy</h2></header>
+<p class="lede">North-East Atlantic–Baltic: five models from the NE Atlantic at 6.5 km down to the
+Danish straits at 0.25 km. A coarse version at half the resolution is used for all exploratory work.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab_hierarchy_fine.png" aria-label="Open The hierarchy (full resolution) full size"><img src="fig/neab_hierarchy_fine.png" alt="The hierarchy (full resolution)" loading="lazy"></button><figcaption><strong>The hierarchy (full resolution)</strong><p>Each child is drawn as its active region (solid line); its window is dashed. Magenta: interface cells. The Danish straits model was moved to 9.33°E / 53.46°N on 31 October so that it exchanges only across the Kattegat (north) and at Arkona (east).</p></figcaption></figure>
+<div class="tablewrap "><table><thead><tr><th>Level</th><th>Area</th><th>Interfaces</th><th>Grid</th><th>Resolution</th><th>Time ratio</th><th>dt</th></tr></thead><tbody><tr><td>neab_root</td><td>20°W–31°E, 42–66.5°N</td><td>open boundaries (TPXO9, Flather)</td><td>510 × 392</td><td>6.2 × 6.9 km</td><td>–</td><td>8.8 s</td></tr><tr><td>north_sea_baltic</td><td>North Sea, Channel, Celtic and Irish Sea, Baltic</td><td>8°W, north of Scotland, Shetland–Norway</td><td>1155 × 840</td><td>2.0 × 2.3 km</td><td>1</td><td>8.8 s</td></tr><tr><td>danish_straits</td><td>Kattegat, Belts, Sound, Arkona, German coast</td><td>Kattegat 57.69°N, Arkona 14.5°E</td><td>465 × 618</td><td>0.70 × 0.77 km</td><td>1</td><td>8.8 s</td></tr><tr><td>northern_little_belt</td><td>Fredericia–Middelfart narrows</td><td>across the Belt</td><td>153 × 174</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr><tr><td>northern_sound</td><td>Helsingør–Helsingborg</td><td>across the Sound</td><td>150 × 153</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr></tbody></table></div>
+<p class="small">dt = 0.8 × pyGETM's <code>Domain.cfl_check</code>. Refining by 3 keeps the time step where the water is 9 times shallower: true for the shelf seas under the deep Atlantic, not for the narrow straits, which take 3 steps per parent step.</p>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab_hierarchy_coarse.png" aria-label="Open Active regions (coarse layout) full size"><img src="fig/neab_hierarchy_coarse.png" alt="Active regions (coarse layout)" loading="lazy"></button><figcaption><strong>Active regions (coarse layout)</strong><p>A seed point and straight-line barriers per level. The Norwegian Sea and the Rockall Trough stay with the root, the Skagerrak with north_sea_baltic.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/nse_vs_neab.png" aria-label="Open Against the NSe production domain full size"><img src="fig/nse_vs_neab.png" alt="Against the NSe production domain" loading="lazy"></button><figcaption><strong>Against the NSe production domain</strong><p>The Celtic Sea is part of north_sea_baltic (Irish Sea and Channel connected), which cut the Irish Sea M2 errors by about 40 %.</p></figcaption></figure>
+</div>
+<div class="twocol">
+<div><h4>Bathymetry, as the NSe production setup</h4><ul><li>Raw: ocean-prep <code>bathymetry-regrid</code>, conservative regridding of GEBCO / EMODnet, once per level.</li><li>Processing: thalweg corridors, local minimum depths, basins, rx0 ≤ 0.2.</li><li>Fixes in a second pass, the same groups as NSe (Irish Sea, Great Belt, Little Belt, Øresund). The Little Belt is closed in the raw grids and opened by its thalweg group.</li></ul></div>
+<div><figure class="fig"><button class="plate" type="button" data-full="fig/wadden_barriers.png" aria-label="Open A Wadden Sea level (proposal) full size"><img src="fig/wadden_barriers.png" alt="A Wadden Sea level (proposal)" loading="lazy"></button><figcaption><strong>A Wadden Sea level (proposal)</strong><p>Ratio 3 under north_sea_baltic; the interface outside the barrier islands at about 18 m. Needs drying and flooding.</p></figcaption></figure></div>
+</div>
+<h3>Cores per model</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab_balance_coarse_64.png" aria-label="Open Coarse layout, 64 cores full size"><img src="fig/neab_balance_coarse_64.png" alt="Coarse layout, 64 cores" loading="lazy"></button><figcaption><strong>Coarse layout, 64 cores</strong><p>7 / 39 / 14 / 2 / 2 cores. Dark blue: computed; light blue: children's holes; grey dotted: removed subdomains.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab_balance_fine_128.png" aria-label="Open Full resolution, 128 cores full size"><img src="fig/neab_balance_fine_128.png" alt="Full resolution, 128 cores" loading="lazy"></button><figcaption><strong>Full resolution, 128 cores</strong><p>busy 90–100 % in every model.</p></figcaption></figure>
+</div>
+<h3>Tides (coarse layout, M2)</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/tides_m2_difference.png" aria-label="Open The coupling schedules full size"><img src="fig/tides_m2_difference.png" alt="The coupling schedules" loading="lazy"></button><figcaption><strong>The coupling schedules</strong><p>Sync (all models step at the same time, the child's ring extrapolated from the parent's last two syncs) equals the sequential order to below 1 mm and is 17 % faster.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/tides_m2_levels.png" aria-label="Open M2 per model full size"><img src="fig/tides_m2_levels.png" alt="M2 per model" loading="lazy"></button><figcaption><strong>M2 per model</strong><p>Amplitude and phase, each model over the cells it computes.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/tides_interface_pairs.png" aria-label="Open Across the interfaces full size"><img src="fig/tides_interface_pairs.png" alt="Across the interfaces" loading="lazy"></button><figcaption><strong>Across the interfaces</strong><p>Station pairs on both sides of each interface agree: no jumps.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/gauges_m2_errors.png" aria-label="Open Against the tide gauges (GESLA) full size"><img src="fig/gauges_m2_errors.png" alt="Against the tide gauges (GESLA)" loading="lazy"></button><figcaption><strong>Against the tide gauges (GESLA)</strong><p>Processed bathymetry, z0 = 0.015 m. A sanity check, not a calibration.</p></figcaption></figure>
+</div>
+<h3>Tides in motion</h3>
+<p>Hourly elevation over two days (days 15–17 of the 31-day coarse run, all TPXO9 constituents). Every model
+is drawn over the cells it computes, the finest on top; dashed: the children's windows. On the right, the
+elevation at six stations from the finest model computing each of them, the coloured line growing with the
+animation.</p>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab_anim_hierarchy.gif" alt="Animation of the tidal elevation over the whole NEAB hierarchy" loading="lazy"></div>
+<figcaption><strong>The whole hierarchy</strong><p>The tide enters from the Atlantic, runs around the British Isles into the North Sea and fades towards the Baltic.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab_anim_north_sea_baltic.gif" alt="Animation of the tidal elevation in the North Sea" loading="lazy"></div>
+<figcaption><strong>North Sea</strong><p>The amphidromic systems of the North Sea; the Channel and the Irish Sea are part of the same model.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab_anim_danish_straits.gif" alt="Animation of the tidal elevation in the Danish straits" loading="lazy"></div>
+<figcaption><strong>Danish straits</strong><p>The Kattegat tide drops through the Belts and the Sound; the two straits models (dashed boxes) at 0.5 km.</p></figcaption></figure>
+<h3>The new Danish straits window on 64 cores</h3>
+<p>The same 31-day run (all constituents, z0 = 0.015 m) with the Danish straits moved to 9.33°E / 53.46°N,
+one MPMD component per model, pinned to cores on a 64-core server: <strong>31 minutes</strong>, against
+100 minutes on 18 cores before. Against 685 GESLA gauges the result is unchanged, as expected: the west
+interfaces it removes were a few cells in small fjords.</p>
+<div class="tablewrap num"><table><thead><tr><th>Model</th><th>Gauges</th><th>M2 vector rms before → after</th><th>S2</th><th>K1</th></tr></thead><tbody><tr><td>neab_root</td><td>124</td><td>0.251 → 0.251 m</td><td>0.100 → 0.100 m</td><td>0.055 → 0.055 m</td></tr><tr><td>north_sea_baltic</td><td>463</td><td>0.348 → 0.348 m</td><td>0.143 → 0.143 m</td><td>0.053 → 0.053 m</td></tr><tr><td>danish_straits</td><td>89</td><td>0.077 → 0.076 m</td><td>0.021 → 0.021 m</td><td>0.013 → 0.013 m</td></tr><tr><td>northern_little_belt</td><td>1</td><td>0.221 → 0.221 m</td><td>0.068 → 0.068 m</td><td>0.005 → 0.005 m</td></tr><tr><td>northern_sound</td><td>8</td><td>0.067 → 0.066 m</td><td>0.019 → 0.019 m</td><td>0.010 → 0.010 m</td></tr></tbody></table></div>
+<p class="small">Time per model in that run: north_sea_baltic spends 29 % computing and 55 % in nesting work
+(restriction, flux matching, ring values), so the nesting work, not the exchange (below 0.3 %), is the next
+thing to make faster.</p>
+</section><section id="vertical" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2>3D: exchanging between vertical grids that differ</h2></header>
+<p class="lede">In 3D, parent and child may use adaptive vertical coordinates, so their layers do not
+line up and may differ in number. A child column's depth also differs from its parent cell's, because of the
+child's finer bathymetry. The exchanges must conserve tracer content without assuming that layer k of
+the child matches layer k of the parent.</p>
+<div class="twocol">
+<div><h4>What each exchange needs</h4><ul><li><strong>Rim</strong> (child → parent): the content of each parent cell equals that of its 3 × 3 child columns.</li><li><strong>Ring</strong> (parent → child): consistent, accurate boundary values; the fluxes decide conservation.</li><li><strong>Flux matching</strong>: the parent's flux through each face equals the child's, per tracer.</li></ul></div>
+<div><h4>Options for the rim</h4><ul><li><strong>A</strong>: average layer heights and contents of the ≤ 9 child columns by layer index, then remap once.</li><li><strong>B</strong>: remap every child column, stretched linearly to the parent's depth, then add the contents.</li><li><strong>B′</strong>: as B, but the upper 80 % of the column unstretched.</li><li><strong>B″</strong>: B′ with concentrations by the child volume each parent layer receives, then the column content restored exactly.</li></ul></div>
+</div>
+<h3>A synthetic comparison</h3>
+<p>One parent cell with its 3 × 3 child columns over a bottom slope (depths 30 m × (1 ± g)), a sharp
+pycnocline at 10 m in every column, 30 child layers and 20 parent layers of three kinds. The reference is
+the horizontal mean at fixed depth. All four forms conserve the content to 5e-16.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/rim_ab_accuracy.png" aria-label="Open Accuracy of the rim options full size"><img src="fig/rim_ab_accuracy.png" alt="Accuracy of the rim options" loading="lazy"></button><figcaption><strong>Accuracy of the rim options</strong><p>Profiles at slope g = 0.4 and errors against the slope.</p></figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th>g = 0.4: rms / pycnocline error</th><th>A</th><th>B</th><th>B′</th><th>B″</th></tr></thead><tbody><tr><td>sigma layers</td><td>1.14 / −1.16 m</td><td>1.14 / −1.16 m</td><td>3.37 / −0.03 m</td><td><strong>0.063 / −0.03 m</strong></td></tr><tr><td>GVC (z-like at the surface)</td><td>0.34 / −0.36 m</td><td>1.14 / −1.20 m</td><td>3.32 / −0.04 m</td><td><strong>0.053 / −0.04 m</strong></td></tr><tr><td>adaptive (zoomed at the pycnocline)</td><td>0.14 / −0.10 m</td><td>1.16 / −1.21 m</td><td>3.18 / 0.00 m</td><td><strong>0.009 / 0.00 m</strong></td></tr><tr><td>uniform field stays uniform</td><td>yes</td><td>yes</td><td>no</td><td>yes</td></tr></tbody></table></div>
+<ul><li>For sigma layers A and B are identical: the stretched child layer k lands on layer k of the mean column. Both move the pycnocline by the stretch.</li><li>For GVC and adaptive layers A beats B: their upper layers sit at nearly the same depths in all nine columns, so averaging by index hardly mixes depths, while B's stretch moves them.</li><li>Only a linear stretch both conserves content and keeps a uniform field uniform. B″ gets both by forming concentrations by volume and restoring the column content afterwards; the correction is small because the volumes differ only deep down, where the stratification is weak.</li></ul>
+<h3>Cost, and what the scalars share</h3>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/rim_ab_cost.png" aria-label="Open Cost of A and B″ full size"><img src="fig/rim_ab_cost.png" alt="Cost of A and B″" loading="lazy"></button><figcaption><strong>Cost of A and B″</strong><p>2,000 rim cells, 9 children each, numpy on one core.</p></figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th></th><th>A</th><th>B″</th></tr></thead><tbody><tr><td>setup, once for all scalars</td><td>4 ms</td><td>36–45 ms</td></tr><tr><td>per scalar</td><td>3–4 ms</td><td>10–15 ms</td></tr><tr><td>T and S</td><td>11 ms</td><td>70 ms (6×)</td></tr><tr><td>12 scalars (T, S, 10 FABM)</td><td>52 ms</td><td>230 ms (4.4×)</td></tr><tr><td>12 scalars, setup repeated per scalar</td><td>–</td><td>820 ms</td></tr></tbody></table></div>
+<ul><li><strong>The remap setup is shared</strong> by T, S and all FABM tracers: where every parent interface lies in each child column, and the volume per parent layer. It is about 80 % of B″'s cost for one scalar and has to be redone every exchange, because adaptive layers move.</li><li><strong>The parent's layer heights</strong> go to the child once per sync, for all scalars.</li><li><strong>The ring and the flux register need the same remap</strong> (one parent column onto each child column, and child face profiles onto parent faces), so the machinery is needed anyway; A only saves on the rim.</li><li>A compiled kernel (a merge of the two interface lists per column) should be 10–20× faster than numpy. That is the step before NEAB in 3D.</li></ul>
+<div class="callout"><p><strong>Recommendation:</strong> B″ as the default, A as the cheap option where the layers of
+neighbouring columns sit at similar depths. Next: the 3D IDEAL setup (stratified lake at rest, tracer
+conservation with different layer counts, a pycnocline over the shelf slope), then the ring and the 3D flux register.</p></div>
+</section><section id="smagorinsky" class="chapter"><header class="chap"><span class="eyebrow">Smagorinsky</span><h2>Smagorinsky viscosity for pyGETM</h2></header>
+<p class="lede">A horizontal viscosity that follows the flow and the grid, so that every level of a nest
+gets a viscosity suited to its own resolution. A constant <code>Am</code> cannot do that across a 3 × 3
+refinement.</p>
+<div class="callout"><p><strong>Am = Am0 + Cs² · dx · dy · √(D<sub>T</sub>² + D<sub>S</sub>²)</strong>,
+with tension D<sub>T</sub> = ∂u/∂x − ∂v/∂y and shear D<sub>S</sub> = ∂u/∂y + ∂v/∂x
+(Smagorinsky 1963; Griffies and Hallberg 2000). It vanishes for uniform flow and solid-body rotation, and a
+child at a third of its parent's spacing gets about a ninth of its viscosity for the same deformation.
+Typical Cs: 0.1–0.2.</p></div>
+<div class="twocol">
+<div><h4>Where it is computed</h4><ul><li>pyGETM evaluates the four stress fluxes on four staggered grids: UU and VV (cell centres), UV and VU (corners).</li><li>Am is computed directly on those grids, so the diffusion reads it where it needs it: no interpolation, no new grid.</li><li>Shear at a cell centre and tension at a corner are means of the four surrounding values; land counts as 0, as in the existing stress fluxes.</li></ul></div>
+<div><h4>Code, in the style of the existing routines</h4><ul><li>Fortran: <code>smagorinsky()</code> for one layer and <code>c_smagorinsky()</code> as the C entry; the momentum diffusion takes Am arrays (filled with Am0 when none are given).</li><li>Cython: <code>_pygetm.smagorinsky()</code>, and optional Am arrays on <code>momentum_diffusion()</code>.</li><li>Python: <code>Momentum(Cs=0.2)</code>; Am is updated from the velocities it diffuses before every diffusion call, depth-averaged and per layer.</li></ul></div>
+</div>
+<div class="tablewrap "><table><thead><tr><th>Test</th><th>Checks</th><th>Result</th></tr></thead><tbody><tr><td>analytic fields</td><td>simple shear, pure strain, uniform flow, solid-body rotation</td><td><span class='ok'>exact</span></td></tr><tr><td>background</td><td>Cs = 0 gives Am0; Cs &gt; 0 adds to Am0</td><td><span class='ok'>passed</span></td></tr><tr><td>layers</td><td>the same profile in every layer gives the 2D result per layer</td><td><span class='ok'>identical</span></td></tr><tr><td>constant Am</td><td>Am arrays filled with Am0 against the constant call; a 300-step run against the build without the change</td><td><span class='ok'>bit-identical</span></td></tr><tr><td>sheared jet</td><td>finite, volume unchanged, Am largest on the jet's flanks, more energy loss than without</td><td><span class='ok'>passed</span></td></tr></tbody></table></div>
+<p class="small">Fork <code>bolding/pygetm</code>, branch <code>smagorinsky</code> (from <code>devel</code>, independent of the
+nesting work). The full pyGETM test suite: 75 passed, 7 skipped (tests that need the NorthSea setup now skip
+when it is not installed).</p>
+</section><section id="status" class="chapter"><header class="chap"><span class="eyebrow">Status</span><h2>Where it stands</h2></header>
+<div class="statusgrid">
+<div><h4>Working</h4><ul><li>2D two-way nesting over five levels, volume conserved to round-off.</li><li>Active regions, land-aware exchanges, M:N plans between any tilings; bit-identical across process splits.</li><li>One MPMD component per model; load balancing with <code>nesting-balance</code>, launch by mpiexec or Slurm.</li><li>The sub-stepping instability understood (1D model) and removed by the sponge.</li><li>NEAB tides: coupling schedules compared, interfaces continuous, gauge comparison; 31 days on 64 cores in 31 minutes (coarse).</li><li>Smagorinsky horizontal viscosity (branch <code>smagorinsky</code>).</li></ul></div>
+<div><h4>In progress</h4><ul><li>NEAB tides at full resolution, 30 days on 64 cores (the coarse run is done).</li><li>The nesting work in north_sea_baltic (55 % of its time).</li><li>3D exchanges: remap kernel and the rim comparison done; next the 3D IDEAL setup.</li></ul></div>
+<div><h4>Open</h4><ul><li>One tile layout in IDEAL E8 (1e-4 m).</li><li>IDEAL E5 (tracer pulse) and the sponge for 3D scalars.</li><li>Running a single model with its boundaries from a file.</li><li>Drying and flooding at an interface (the Wadden Sea level).</li></ul></div>
+</div>
+</section>
+<footer class="foot"><p>Code: <a href="https://github.com/bolding/pygetm">bolding/pygetm</a> (fork of pyGETM, branches <code>nesting</code> and <code>nesting-mpmd</code>) and <code>pygetm-nesting</code> (private). Setups: <a href="https://bolding.github.io/neab/">NEAB</a>, <a href="https://bolding.github.io/dkm/">DKm</a>. Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
+</main>
+<dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
+<script>(function () {
+  // stepper: build the nest one step at a time
+  var root = document.getElementById("stepper");
+  if (root) {
+    var steps = Array.prototype.slice.call(root.querySelectorAll("template"));
+    var btns = Array.prototype.slice.call(root.querySelectorAll(".step"));
+    var img = document.getElementById("stepimg"), plate = document.getElementById("stepplate");
+    var title = document.getElementById("steptitle"), desc = document.getElementById("stepdesc"), no = document.getElementById("stepno");
+    var k = 0;
+    steps.forEach(function (t) { var i = new Image(); i.src = t.dataset.src; });  // preload
+    function show(n) {
+      k = Math.max(0, Math.min(steps.length - 1, n));
+      var t = steps[k];
+      img.src = t.dataset.src; img.alt = t.dataset.title; plate.dataset.full = t.dataset.src;
+      title.textContent = t.dataset.title; desc.textContent = t.dataset.text;
+      no.textContent = (k + 1) + " / " + steps.length;
+      btns.forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+      document.getElementById("prev").disabled = k === 0;
+      document.getElementById("next").disabled = k === steps.length - 1;
+    }
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
+    document.getElementById("prev").addEventListener("click", function () { show(k - 1); });
+    document.getElementById("next").addEventListener("click", function () { show(k + 1); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { show(k + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { show(k - 1); e.preventDefault(); }
+    });
+    show(0);
+  }
+  // figures full size
+  var dlg = document.getElementById("lightbox"), lb = document.getElementById("lbimg");
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest && e.target.closest(".plate[data-full]");
+    if (!p || !dlg || typeof dlg.showModal !== "function") return;
+    lb.src = p.dataset.full; var im = p.querySelector("img"); lb.alt = im ? im.alt : "";
+    dlg.showModal();
+  });
+  if (dlg) {
+    document.getElementById("lbclose").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+})();
+</script>
+
+</body></html>
