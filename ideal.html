@@ -177,11 +177,22 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a></nav>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#drying">Drying</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -196,7 +207,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
     <div><dt>layers</dt><dd>10 / 15 / 20</dd><p>a different number per level</p></div>
   </dl>
 </header>
-<section id="layout" class="chapter"><header class="chap"><span class="eyebrow">Layout</span><h2>A channel, a shelf and a strait</h2></header>
+<section id="layout" class="chapter"><header class="chap"><span class="eyebrow">Layout</span><h2 id="a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</h2></header>
 <p>The root is a channel of 360 × 180 km at 3 km, with an open (Flather), closed or periodic boundary at each end
 and an M2 tide of 0.5 m at the open one. The shelf level (1 km, ratio 3, time ratio 1) nests in its middle, the strait
 level (333 m, ratio 3, time ratio 3) in the shelf. Planted features:</p>
@@ -212,7 +223,7 @@ The nesting (<code>pygetm.nesting</code> on the fork <code>bolding/pygetm</code>
 and matches the fluxes through the faces between them. How it works is described on the
 <a href="methods.html">nesting page</a>.</p>
 </section>
-<section id="twod" class="chapter"><header class="chap"><span class="eyebrow">2D</span><h2>The barotropic experiments</h2></header>
+<section id="twod" class="chapter"><header class="chap"><span class="eyebrow">2D</span><h2 id="the-barotropic-experiments">The barotropic experiments</h2></header>
 <div class="tablewrap"><table><thead><tr><th></th><th>Experiment</th><th>Result</th></tr></thead><tbody>
 <tr><td>E1</td><td>Sea at rest, 12 h</td><td><span class="ok">passed</span>: elevation exactly 0 in every level</td></tr>
 <tr><td>E2</td><td>Volume conservation, a 0.5 m bump in a closed basin</td><td><span class="ok">passed</span>: 2e-16 relative; found an <a href="issues.html#substep">instability</a></td></tr>
@@ -223,7 +234,7 @@ and matches the fluxes through the faces between them. How it works is described
 <p>E2 found an instability of a sub-stepping child under flux matching. It is removed by an AGRIF-like sponge
 next to the interface, which all runs below use (3 child cells, α = 0.1).</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#substep">A sub-stepping child is unstable under flux matching</a>, <a href="issues.html#damping-dt">pyGETM applied the transport damping with the time step twice</a>.</p>
-<h3>Nested against one level at 333 m everywhere</h3>
+<h3 id="nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</h3>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/elevation_tide.png" aria-label="Open Every 6 hours, all three levels full size"><img src="fig/ideal/elevation_tide.png" alt="Every 6 hours, all three levels" loading="lazy"></button><figcaption><strong>Every 6 hours, all three levels</strong><p>Each level over the cells it computes. The tide crosses the interfaces without jumps. With rotation it travels as a Kelvin wave along the southern wall, reflects at the closed east end and returns along the northern wall.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/timeseries.png" aria-label="Open Elevation at six stations full size"><img src="fig/ideal/timeseries.png" alt="Elevation at six stations" loading="lazy"></button><figcaption><strong>Elevation at six stations</strong><p>Solid: nested, time ratio 3 with the sponge; dashed: time ratio 1; dotted: one level at 333 m everywhere. Time ratio 1 is within 0.4–1.0 cm everywhere; time ratio 3 within 0.7–0.9 cm on the shelf and in the strait, 2.2–2.6 cm in the channel, which steps at 18 s instead of 6 s.</p></figcaption></figure>
 <figure class="fig wide"><div class="plate static"><img src="fig/ideal/elevation_anim.gif" alt="Every 30 minutes" loading="lazy"></div><figcaption><strong>Every 30 minutes</strong><p>Left: nested (3 km / 1 km in the red box / 333 m in the blue box). Right: one level at 333 m. Below: the stations.</p></figcaption></figure>
@@ -232,7 +243,7 @@ next to the interface, which all runs below use (3 child cells, α = 0.1).</p>
 <figure class="fig"><button class="plate" type="button" data-full="fig/ideal/timing.png" aria-label="Open Time per model full size"><img src="fig/ideal/timing.png" alt="Time per model" loading="lazy"></button><figcaption><strong>Time per model</strong><p>compute: the model's own step; work: restriction, flux matching, ring values; transfer: receiving data; wait: blocked until the partner's data is there.</p></figcaption></figure>
 </div>
 </section>
-<section id="threed" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2>Temperature, with a different number of layers per level</h2></header>
+<section id="threed" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2 id="temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</h2></header>
 <p class="lede">The same three levels in 3D: baroclinic, with temperature and constant salinity, and sigma layers of
 their own in each level (channel 10, shelf 15, strait 20). The levels' layers do not line up, so every exchange of
 a profile goes through a conservative vertical remap.</p>
@@ -264,7 +275,7 @@ sloping isopycnals adjust and drive flow across the interfaces, plus the tide at
 <figure class="fig"><button class="plate" type="button" data-full="fig/ideal/3d/t3d_closed_heat.png" aria-label="Open Heat content in a closed basin full size"><img src="fig/ideal/3d/t3d_closed_heat.png" alt="Heat content in a closed basin" loading="lazy"></button><figcaption><strong>Heat content in a closed basin</strong><p>All levels over the cells each computes. With the 3D transports and the flux register the change is 1e-9; with rim and ring only it is 2.5e-5.</p></figcaption></figure>
 </div>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#rim-content">Exact content in the 3D rim made a uniform field non-uniform</a>, <a href="issues.html#ui-sum">The parent's 3D transport at the interface was 10 % off</a>, <a href="issues.html#layer-flux">Parent and child move different water through each layer of the interface</a>, <a href="issues.html#no-sponge-3d">3D runs need the sponge too</a>.</p>
-<h3>3D velocities in the child's ring</h3>
+<h3 id="3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</h3>
 <p>The child's ring faces are set by the coupling, not computed by the child. In 3D the child first filled them
 with its own layer profile, shifted to the ring's 2D transport. Now it takes the parent's layer transports there:
 the two parent faces around each ring face (linear across, constant along, as in 2D), remapped onto the child's face
@@ -279,7 +290,7 @@ over the 48 h tidal run:</p>
 </tbody></table></div>
 <p class="small">The across-channel velocity v is small, so its relative jumps are large. Heat stays conserved to 1e-9 and a uniform field uniform to 3e-13.</p>
 </section>
-<section id="v2" class="chapter"><header class="chap"><span class="eyebrow">V2</span><h2>A stratified lake at rest</h2></header>
+<section id="v2" class="chapter"><header class="chap"><span class="eyebrow">V2</span><h2 id="a-stratified-lake-at-rest">A stratified lake at rest</h2></header>
 <p class="lede">A closed basin, no tide, no wind, and a flat pycnocline at 15 m over a bottom sloping from 50 to 20 m
 across the shelf window. Nothing should move: every current is error. A single model has some, from the pressure
 gradient on sigma layers over the slope; the test shows how much the coupling adds, with the channel in sigma layers
@@ -310,7 +321,7 @@ a factor of 1.5. A scan of them against a real case (V5) comes next.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring with PCM, with PPM (sigma), and with PPM in adaptive layers.</p></figcaption></figure>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring could not carry the child's vertical structure</a>.</p>
 </section>
-<section id="v5" class="chapter"><header class="chap"><span class="eyebrow">V5</span><h2>A pycnocline over the shelf slope</h2></header>
+<section id="v5" class="chapter"><header class="chap"><span class="eyebrow">V5</span><h2 id="a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</h2></header>
 <p class="lede">Does the nesting move a pycnocline correctly across the interfaces? The bottom slopes from 50 to 10 m across the
 shelf window, so a pycnocline that starts flat at 15 m meets the bottom on the shelf and forms a front. The M2 tide from the
 open west end, with rotation, moves the stratified water across both interfaces twice a day. The reference is one model at
@@ -340,7 +351,7 @@ elsewhere, except in the channel with 10 layers.</li>
 <figure class="fig wide"><div class="plate static"><img src="fig/ideal/3d/v5_anim.gif" alt="48 hours of V5" loading="lazy"></div><figcaption><strong>48 hours of V5</strong><p>Every hour: the mixed-layer depth (where the temperature has dropped 0.5 °C below the surface) and the depth of the 12 °C isotherm, every level over the cells it computes. Grey: land, and no isotherm east of the front. Also as <a href="fig/ideal/3d/v5_anim.mp4">MP4</a>.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v5_error.png" aria-label="Open Where the errors are full size"><img src="fig/ideal/3d/v5_error.png" alt="Where the errors are" loading="lazy"></button><figcaption><strong>Where the errors are</strong><p>Isotherm depth of the default nested run minus the reference after 48 h, every level over its cells. Largest in the channel at the front east of the shelf, where 3 km cells and 10 layers resolve it least.</p></figcaption></figure>
 </section>
-<section id="v6" class="chapter"><header class="chap"><span class="eyebrow">V6</span><h2>A dye front through the levels</h2></header>
+<section id="v6" class="chapter"><header class="chap"><span class="eyebrow">V6</span><h2 id="a-dye-front-through-the-levels">A dye front through the levels</h2></header>
 <p class="lede">Does the coupling keep a tracer within its range? A passive dye starts at exactly 1 between x = 117 and 162 km and at 0
 elsewhere, in the V5 setup (pycnocline over the slope, M2 tide, rotation). Its two fronts lie 3 km west of the channel–shelf
 and the shelf–strait interfaces, and the tide carries them across and back twice a day. Anything outside [0, 1] is a new
@@ -370,7 +381,7 @@ next level (the dye reaches 0.06 in the strait). A mean current would test it ha
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v6_section.png" aria-label="Open The fronts after 48 h full size"><img src="fig/ideal/3d/v6_section.png" alt="The fronts after 48 h" loading="lazy"></button><figcaption><strong>The fronts after 48 h</strong><p>Surface dye along y = 90 km: the 333 m reference (black) and the nested runs, each level over the cells it computes; dashed: the interfaces.</p></figcaption></figure>
 <figure class="fig wide"><div class="plate static"><img src="fig/ideal/3d/v6_anim.gif" alt="48 hours of V6" loading="lazy"></div><figcaption><strong>48 hours of V6</strong><p>Every 30 minutes: the mixed-layer depth and the surface dye, every level over the cells it computes. Also as <a href="fig/ideal/3d/v6_anim.mp4">MP4</a>.</p></figcaption></figure>
 </section>
-<section id="v7" class="chapter"><header class="chap"><span class="eyebrow">V7</span><h2>What the 3D exchange costs</h2></header>
+<section id="v7" class="chapter"><header class="chap"><span class="eyebrow">V7</span><h2 id="what-the-3d-exchange-costs">What the 3D exchange costs</h2></header>
 <p class="lede">Every part of the 3D coupler has its own timer, separating its work from the time it waits for the partner level. The
 V5 setup over 24 h (478 3D steps), with temperature and salinity, and with 12 more passive tracers (14 in all), on 2 and on
 4 processes per level, against the same runs without the 3D coupling.</p>
@@ -456,6 +467,32 @@ high. With each level's split (10, 10, 30):</p>
 with T and S alone. The coupling's fixed cost per step no longer sets the limit.</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>, <a href="issues.html#balance-split">nesting-balance gave every IDEAL level split 1</a>, <a href="issues.html#fabm-burn">The emulated FABM load fed waiting back into itself</a>.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy, the compiled kernel, and the kernel with compiled gather/scatter; T and S or 14 tracers; 2 or 4 processes per level.</p></figcaption></figure>
+</section>
+<section id="drying" class="chapter"><header class="chap"><span class="eyebrow">Drying</span><h2 id="a-tidal-flat-across-an-interface">A tidal flat across an interface</h2></header>
+<p class="lede">Wetting and drying where parent and child meet: a flat whose bed rises from 1 m below to 1 m above mean sea level
+across the shelf's west interface (0 m at x = 120 km), so the wet/dry front moves through the interface with the tide. pyGETM's
+drying in every level (Dmin 0.05 m, Dcrit 0.2 m), Flather boundaries at both ends of the channel with a 0.5 m M2 tide
+(<code>IDEAL/config/ideal_dry.yaml</code>).</p>
+<p>pyGETM keeps a dry cell at its bed + Dmin and tapers every momentum term except the pressure gradient with a factor that goes
+from 0 at a face depth of 2 Dmin to 1 at Dcrit. The coupling now does the same where it sets the child's values:</p>
+<ul><li><strong>The ring's elevation</strong> comes from the parent's mean over each 3 &times; 3 block. On a slope that mean lies below the
+bed of the higher ring cells, which got negative water depths (down to &minus;0.06 m). The ring elevation is now never below the
+child's own bed + Dmin: a ring cell there is dry, like the child's own dry cells.</li>
+<li><strong>The ring's transports</strong> are the parent's, through faces that can be wet in the parent while the child's finer face is
+dry. They are now scaled by pyGETM's drying factor from the child's own depth at each face, so no water moves over the child's
+dry ground.</li>
+<li><strong>Unchanged:</strong> the child's edge faces are its own (its drying factor and pressure gradient); the parent's rim is the mean
+of the child's cells, dry ones at their bed + Dmin, so parent and child hold the same volume. In deep water nothing changes.</li></ul>
+<p>Over 25 h the ring's depths stay at or above Dmin, up to 320 shelf cells fall dry, and the front crosses the interface both
+ways. In a closed basin with a 1 m bump on the flat the volume of all levels together is conserved to 4e-16 while the flat
+floods and drains across the interface. The negative depths of that dam break (&minus;0.24 m in the channel) are pyGETM's own:
+the channel alone gives the same.</p>
+<figure class="fig wide"><div class="plate static"><img src="fig/ideal/ideal_dry.gif" alt="Elevation and exposed flats" loading="lazy"></div><figcaption><strong>Elevation and exposed flats</strong><p>The flat (dotted) with the 3 km channel and the 1 km shelf inside the dashed window; exposed cells (water depth below 2 Dmin) in sand. Middle: the section along the flat, bed and water surface where wet. Bottom: the boundary tide and the exposed share of the flat in each level. Every 10 minutes over 25 h (also as MP4: ideal_dry.mp4).</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/ideal_dry_low.png" aria-label="Open Low tide full size"><img src="fig/ideal/ideal_dry_low.png" alt="Low tide" loading="lazy"></button><figcaption><strong>Low tide</strong><p>The channel's part of the flat is exposed; on the flat west of the interface water drains slowly through the shallow cells, as in pyGETM without nesting.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/ideal_dry_high.png" aria-label="Open High tide full size"><img src="fig/ideal/ideal_dry_high.png" alt="High tide" loading="lazy"></button><figcaption><strong>High tide</strong><p>The water reaches into the shelf's part of the flat.</p></figcaption></figure>
+<p>Still to do: the parent's side (the flux correction on a nearly dry parent cell), the sponge and the 3D ring next to drying
+cells, and a Wadden Sea–like run.</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#ring-below-bed">A child's ring below its own bed on a drying flat</a>.</p>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>

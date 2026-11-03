@@ -177,11 +177,22 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html" aria-current="page">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#setup">Setup</a><a href="#tides">Runs</a><a href="#northsea">North Sea</a><a href="#reference">Reference</a><a href="#uses">Uses</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#five-levels-from-the-atlantic-to-the-danish-stra">Five levels, from the Atlantic to the Danish straits</a><li><a href="#cores-tides-and-timing">Cores, tides and timing</a><ol class="toc-sub"><li><a href="#cores-per-model">Cores per model</a></li><li><a href="#tides-coarse-layout-m2">Tides (coarse layout, M2)</a></li><li><a href="#tides-in-motion">Tides in motion</a></li><li><a href="#the-new-danish-straits-window-on-64-cores">The new Danish straits window on 64 cores</a></li></ol><li><a href="#the-tide-east-of-the-skagerrak-amphidrome">The tide east of the Skagerrak amphidrome</a><li><a href="#tidal-maps-for-model-comparisons">Tidal maps for model comparisons</a><ol class="toc-sub"><li><a href="#series">Tidal series</a></li></ol><li><a href="#boundaries-for-other-setups">Boundaries for other setups</a></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 2 November 2026</p>
   <h1>NEAB: North-East Atlantic–Baltic</h1>
@@ -195,7 +206,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
     <div><dt>tide gauges</dt><dd>685</dd><p>GESLA comparison</p></div>
   </dl>
 </header>
-<section id="setup" class="chapter"><header class="chap"><span class="eyebrow">Setup</span><h2>Five levels, from the Atlantic to the Danish straits</h2></header>
+<section id="setup" class="chapter"><header class="chap"><span class="eyebrow">Setup</span><h2 id="five-levels-from-the-atlantic-to-the-danish-stra">Five levels, from the Atlantic to the Danish straits</h2></header>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/neab_hierarchy_fine.png" aria-label="Open The hierarchy (full resolution) full size"><img src="fig/neab/neab_hierarchy_fine.png" alt="The hierarchy (full resolution)" loading="lazy"></button><figcaption><strong>The hierarchy (full resolution)</strong><p>Each child is drawn as its active region (solid line); its window is dashed. Magenta: interface cells. The Danish straits model was moved to 9.33°E / 53.46°N on 31 October so that it exchanges only across the Kattegat (north) and at Arkona (east).</p></figcaption></figure>
 <div class="tablewrap "><table><thead><tr><th>Level</th><th>Area</th><th>Interfaces</th><th>Grid</th><th>Resolution</th><th>Time ratio</th><th>dt</th></tr></thead><tbody><tr><td>neab_root</td><td>20°W–31°E, 42–66.5°N</td><td>open boundaries (TPXO9, Flather)</td><td>510 × 392</td><td>6.2 × 6.9 km</td><td>–</td><td>8.8 s</td></tr><tr><td>north_sea_baltic</td><td>North Sea, Channel, Celtic and Irish Sea, Baltic</td><td>8°W, north of Scotland, Shetland–Norway</td><td>1155 × 840</td><td>2.0 × 2.3 km</td><td>1</td><td>8.8 s</td></tr><tr><td>danish_straits</td><td>Kattegat, Belts, Sound, Arkona, German coast</td><td>Kattegat 57.69°N, Arkona 14.5°E</td><td>465 × 618</td><td>0.70 × 0.77 km</td><td>1</td><td>8.8 s</td></tr><tr><td>northern_little_belt</td><td>Fredericia–Middelfart narrows</td><td>across the Belt</td><td>153 × 174</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr><tr><td>northern_sound</td><td>Helsingør–Helsingborg</td><td>across the Sound</td><td>150 × 153</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr></tbody></table></div>
 <p class="small">dt = 0.8 × pyGETM's <code>Domain.cfl_check</code>. Refining by 3 keeps the time step where the water is 9 times shallower: true for the shelf seas under the deep Atlantic, not for the narrow straits, which take 3 steps per parent step.</p>
@@ -208,19 +219,19 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <div><figure class="fig"><button class="plate" type="button" data-full="fig/neab/wadden_barriers.png" aria-label="Open A Wadden Sea level (proposal) full size"><img src="fig/neab/wadden_barriers.png" alt="A Wadden Sea level (proposal)" loading="lazy"></button><figcaption><strong>A Wadden Sea level (proposal)</strong><p>Ratio 3 under north_sea_baltic; the interface outside the barrier islands at about 18 m. Needs drying and flooding.</p></figcaption></figure></div>
 </div>
 </section>
-<section id="tides" class="chapter"><header class="chap"><span class="eyebrow">Runs</span><h2>Cores, tides and timing</h2></header><h3>Cores per model</h3>
+<section id="tides" class="chapter"><header class="chap"><span class="eyebrow">Runs</span><h2 id="cores-tides-and-timing">Cores, tides and timing</h2></header><h3 id="cores-per-model">Cores per model</h3>
 <div class="grid2">
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/neab_balance_coarse_64.png" aria-label="Open Coarse layout, 64 cores full size"><img src="fig/neab/neab_balance_coarse_64.png" alt="Coarse layout, 64 cores" loading="lazy"></button><figcaption><strong>Coarse layout, 64 cores</strong><p>7 / 39 / 14 / 2 / 2 cores. Dark blue: computed; light blue: children's holes; grey dotted: removed subdomains.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/neab_balance_fine_128.png" aria-label="Open Full resolution, 128 cores full size"><img src="fig/neab/neab_balance_fine_128.png" alt="Full resolution, 128 cores" loading="lazy"></button><figcaption><strong>Full resolution, 128 cores</strong><p>busy 90–100 % in every model.</p></figcaption></figure>
 </div>
-<h3>Tides (coarse layout, M2)</h3>
+<h3 id="tides-coarse-layout-m2">Tides (coarse layout, M2)</h3>
 <div class="grid2">
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_m2_difference.png" aria-label="Open The coupling schedules full size"><img src="fig/neab/tides_m2_difference.png" alt="The coupling schedules" loading="lazy"></button><figcaption><strong>The coupling schedules</strong><p>Sync (all models step at the same time, the child's ring extrapolated from the parent's last two syncs) equals the sequential order to below 1 mm and is 17 % faster.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_m2_levels.png" aria-label="Open M2 per model full size"><img src="fig/neab/tides_m2_levels.png" alt="M2 per model" loading="lazy"></button><figcaption><strong>M2 per model</strong><p>Amplitude and phase, each model over the cells it computes.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_interface_pairs.png" aria-label="Open Across the interfaces full size"><img src="fig/neab/tides_interface_pairs.png" alt="Across the interfaces" loading="lazy"></button><figcaption><strong>Across the interfaces</strong><p>Station pairs on both sides of each interface agree: no jumps.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/neab/gauges_m2_errors.png" aria-label="Open Against the tide gauges (GESLA) full size"><img src="fig/neab/gauges_m2_errors.png" alt="Against the tide gauges (GESLA)" loading="lazy"></button><figcaption><strong>Against the tide gauges (GESLA)</strong><p>Processed bathymetry, z0 = 0.015 m. A sanity check, not a calibration.</p></figcaption></figure>
 </div>
-<h3>Tides in motion</h3>
+<h3 id="tides-in-motion">Tides in motion</h3>
 <p>Hourly elevation over two days (days 15–17 of the 31-day coarse run, all TPXO9 constituents). Every model
 is drawn over the cells it computes, the finest on top; dashed: the children's windows. On the right, the
 elevation at six stations from the finest model computing each of them, the coloured line growing with the
@@ -231,7 +242,7 @@ animation.</p>
 <figcaption><strong>North Sea</strong><p>The amphidromic systems of the North Sea; the Channel and the Irish Sea are part of the same model.</p></figcaption></figure>
 <figure class="fig wide"><div class="plate static"><img src="fig/neab/neab_anim_danish_straits.gif" alt="Animation of the tidal elevation in the Danish straits" loading="lazy"></div>
 <figcaption><strong>Danish straits</strong><p>The Kattegat tide drops through the Belts and the Sound; the two straits models (dashed boxes) at 0.5 km.</p></figcaption></figure>
-<h3>The new Danish straits window on 64 cores</h3>
+<h3 id="the-new-danish-straits-window-on-64-cores">The new Danish straits window on 64 cores</h3>
 <p>The same 31-day run (all constituents, z0 = 0.015 m) with the Danish straits moved to 9.33°E / 53.46°N,
 one MPMD component per model, pinned to cores on a 64-core server: <strong>31 minutes</strong>, against
 100 minutes on 18 cores before. Against 685 GESLA gauges the result is unchanged, as expected: the west
@@ -242,14 +253,14 @@ children's data sent up first (bit-identical results). The same 31-day run now t
 64 cores. Timers in the halo updates showed that most of what had looked like nesting work was waiting for
 the other models; the nesting's own work (restriction, flux matching, ring values) is 6–14 % of the time.</p>
 </section>
-<section id="northsea" class="chapter"><header class="chap"><span class="eyebrow">North Sea</span><h2>The tide east of the Skagerrak amphidrome</h2></header>
+<section id="northsea" class="chapter"><header class="chap"><span class="eyebrow">North Sea</span><h2 id="the-tide-east-of-the-skagerrak-amphidrome">The tide east of the Skagerrak amphidrome</h2></header>
 <p>Over most of the North Sea NEAB's M2 is within 10–15 % of TPXO9. From the Danish North Sea coast into the
 Skagerrak and the Kattegat it is about twice too large (Skagen 0.29 m against 0.14 m observed in the control run).
 The search for the cause — shallow water and the Wadden Sea flats, bottom friction, the depth datum (LAT against
 MSL), the depth source — is an open issue with its own record.</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#neab-skagerrak">NEAB's tide east of the Skagerrak amphidrome is twice too large</a>, <a href="issues.html#tpxo-coast">TPXO9 at the coast: wet nodes without constants</a>.</p>
 </section>
-<section id="reference" class="chapter"><header class="chap"><span class="eyebrow">Reference</span><h2>Tidal maps for model comparisons</h2></header>
+<section id="reference" class="chapter"><header class="chap"><span class="eyebrow">Reference</span><h2 id="tidal-maps-for-model-comparisons">Tidal maps for model comparisons</h2></header>
 <p>As a common reference for comparing models, the twelve TPXO9-atlas constituents (M2, S2, N2, K2, K1, O1, P1,
 Q1, M4, MS4, MN4, 2N2) are cut to the AMM7 area, extended east and north to hold the whole Baltic: 20°W–31°E,
 40–66°N, on TPXO9-atlas's own 1/30° grid. The file <code>tpxo9_atlas_amm7_baltic.nc</code> (15 MB, in
@@ -280,7 +291,7 @@ output, which cuts the peaks. The deeper shelf brings M2 at the Hinkley Point ga
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_series_neab.png" aria-label="Open January 2020 at Hinkley Point and Saint-Malo full size"><img src="fig/neab/tpxo9_series_neab.png" alt="January 2020 at Hinkley Point and Saint-Malo" loading="lazy"></button><figcaption><strong>January 2020 at Hinkley Point and Saint-Malo</strong><p>TPXO9 (black), NEAB's control run and the run with depths from LAT to MSL (north_sea_baltic, 31 days, z0 0.015 m), shifted to zero mean; the rms difference is in the legend.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_baltic_s2_k1_o1.png" aria-label="Open S2, K1 and O1 in the Baltic full size"><img src="fig/neab/tpxo9_baltic_s2_k1_o1.png" alt="S2, K1 and O1 in the Baltic" loading="lazy"></button><figcaption><strong>S2, K1 and O1 in the Baltic</strong><p>In the central Baltic the diurnal K1 and O1 are as large as M2: medians of 0.6–0.7 cm.</p></figcaption></figure>
 </section>
-<section id="uses" class="chapter"><header class="chap"><span class="eyebrow">Uses</span><h2>Boundaries for other setups</h2></header>
+<section id="uses" class="chapter"><header class="chap"><span class="eyebrow">Uses</span><h2 id="boundaries-for-other-setups">Boundaries for other setups</h2></header>
 <p>A NEAB run can write hourly elevation, transports and velocities of its levels. <code>nesting-boundaries</code>
 samples them at another model's open-boundary points, taking at every point the finest NEAB level with water
 there. The result is a file in the layout of the OceanICU NSe setup, which pyGETM reads on its own grid

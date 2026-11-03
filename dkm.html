@@ -177,11 +177,22 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html" aria-current="page">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#fjords">Fjords</a><a href="#bathymetry">Bathymetry</a><a href="#boundaries">Boundaries</a><a href="#tides">Tides</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-coarse-root-and-fine-levels-where-the-water-is">A coarse root and fine levels where the water is narrow</a><ol class="toc-sub"><li><a href="#nested">A variant: the Belt Sea inside the Kattegat</a></li></ol><li><a href="#the-children">The children</a><li><a href="#denmark-s-depth-model-completed-with-emodnet">Denmark's Depth Model, completed with EMODnet</a><ol class="toc-sub"><li><a href="#thalwegs">What each grid keeps: automatic thalwegs</a></li></ol><li><a href="#open-boundaries-at-the-model-s-own-points">Open boundaries at the model's own points</a><li><a href="#first-tidal-runs-the-forcing-sets-the-kattegat">First tidal runs: the forcing sets the Kattegat</a></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>DKm: the Danish waters and their fjords</h1>
@@ -196,7 +207,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
     <div><dt>open boundaries</dt><dd>228 points</dd><p>NEAB, TPXO9 or CMEMS</p></div>
   </dl>
 </header>
-<section id="layout" class="chapter"><header class="chap"><span class="eyebrow">Layout</span><h2>A coarse root and fine levels where the water is narrow</h2></header>
+<section id="layout" class="chapter"><header class="chap"><span class="eyebrow">Layout</span><h2 id="a-coarse-root-and-fine-levels-where-the-water-is">A coarse root and fine levels where the water is narrow</h2></header>
 <p>The root covers the Skagerrak up to the Oslo Fjord, the Kattegat, the Belt Sea and the western Baltic, from
 the Danish North Sea coast to the narrowest section of the Arkona Sea (Kap Arkona–Sweden). Its north edge is the
 Norwegian coast, not an open boundary across the Skagerrak. At 4 km the Sound is closed at Helsingør and the
@@ -237,7 +248,7 @@ ran on 28 cores instead of 63. Its Kattegat, on 2 cores, waited a third of the t
 needs a few more.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/dkm_nested_m2.png" aria-label="Open M2 in the nested variant full size"><img src="fig/dkm/dkm_nested_m2.png" alt="M2 in the nested variant" loading="lazy"></button><figcaption><strong>M2 in the nested variant</strong><p>M2 amplitude of every level over the cells it computes (finest on top), TPXO9 at the open boundaries, with the GESLA gauges (dots: observed amplitude). Right: model against gauges.</p></figcaption></figure>
 </section>
-<section id="fjords" class="chapter"><header class="chap"><span class="eyebrow">Fjords</span><h2>The children</h2></header>
+<section id="fjords" class="chapter"><header class="chap"><span class="eyebrow">Fjords</span><h2 id="the-children">The children</h2></header>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/dkm_children.png" aria-label="Open Every child over the cells it computes full size"><img src="fig/dkm/dkm_children.png" alt="Every child over the cells it computes" loading="lazy"></button><figcaption><strong>Every child over the cells it computes</strong><p>Grey: water that stays with the parent (inside the window, not active); magenta: the interface cells; star: the cell that sets pyGETM's time step.</p></figcaption></figure>
 <div class="twocol">
 <div><h4>North Jutland</h4><ul>
@@ -252,7 +263,7 @@ needs a few more.</p>
 <li>Ringkøbing Fjord meets the sea only through the sluice at Hvide Sande: it needs a sluice connection, not ordinary nesting.</li></ul></div>
 </div>
 </section>
-<section id="bathymetry" class="chapter"><header class="chap"><span class="eyebrow">Bathymetry</span><h2>Denmark's Depth Model, completed with EMODnet</h2></header>
+<section id="bathymetry" class="chapter"><header class="chap"><span class="eyebrow">Bathymetry</span><h2 id="denmark-s-depth-model-completed-with-emodnet">Denmark's Depth Model, completed with EMODnet</h2></header>
 <p>Denmark's Depth Model (DDM, version 2.0, Geodatastyrelsen) is a 50 m grid of the Danish waters. It covers the
 Danish EEZ only, so Swedish, German and Norwegian waters are filled from EMODnet: the DDM is averaged onto a 45 m
 lon/lat grid, and EMODnet is used only in water outside the DDM's coverage. Inside it, a cell without a DDM value
@@ -281,7 +292,7 @@ two or three cells of the source.</li>
 of them in the Belt Sea, which now computes 61427 cells instead of 60721. No level's time step changes. Run on the
 applied bathymetry, the tool finds no gaps left. Summaries per level: <a href="dkm-dkm_root.html">dkm_root</a>, <a href="dkm-kattegat.html">kattegat</a>, <a href="dkm-limfjord_west.html">limfjord_west</a>, <a href="dkm-limfjord_east.html">limfjord_east</a>, <a href="dkm-mariager_randers.html">mariager_randers</a>, <a href="dkm-belt_sea.html">belt_sea</a>, <a href="dkm-little_belt.html">little_belt</a>, <a href="dkm-sound.html">sound</a>, <a href="dkm-smaalandsfarvandet.html">smaalandsfarvandet</a>, <a href="dkm-ringkobing_fjord.html">ringkobing_fjord</a>.</p>
 </section>
-<section id="boundaries" class="chapter"><header class="chap"><span class="eyebrow">Boundaries</span><h2>Open boundaries at the model's own points</h2></header>
+<section id="boundaries" class="chapter"><header class="chap"><span class="eyebrow">Boundaries</span><h2 id="open-boundaries-at-the-model-s-own-points">Open boundaries at the model's own points</h2></header>
 <p>Two levels have open boundaries: the root on its outer edges (128 points) and the Belt Sea level across the
 Arkona Sea (100 points at 700 m). The points are the wet cells on those edges that each level computes, taken
 from the bathymetry, and are kept with the setup as a lon/lat list. As in the OceanICU NSe setup, a boundary file
@@ -299,7 +310,7 @@ serves both levels; each reads its own points from it.</p>
 </div>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/dkm_boundaries.png" aria-label="Open The open boundary points and their forcing full size"><img src="fig/dkm/dkm_boundaries.png" alt="The open boundary points and their forcing" loading="lazy"></button><figcaption><strong>The open boundary points and their forcing</strong><p>Left: the 228 points by ocean-prep segment (root: North Sea, Tromper Wiek, German Bight, Elbe; Belt Sea: Arkona). Right: elevation in the middle of each segment from NEAB, CMEMS and TPXO9, 2–6 January 2020.</p></figcaption></figure>
 </section>
-<section id="tides" class="chapter"><header class="chap"><span class="eyebrow">Tides</span><h2>First tidal runs: the forcing sets the Kattegat</h2></header>
+<section id="tides" class="chapter"><header class="chap"><span class="eyebrow">Tides</span><h2 id="first-tidal-runs-the-forcing-sets-the-kattegat">First tidal runs: the forcing sets the Kattegat</h2></header>
 <p>Ten levels, 2D, one day of spin-up and seven days from 2 January 2020, 64 cores, 82 minutes per run, bottom
 roughness 0.015 m as in NEAB. M2 from a seven-day fit, at the GESLA gauges from the finest level with water there.
 The layout is the current one: the Belt Sea has its own open boundary across the Arkona Sea. The

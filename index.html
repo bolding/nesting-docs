@@ -177,9 +177,20 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
+
 
 
 <header class="hero">

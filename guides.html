@@ -177,16 +177,27 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html" aria-current="page">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#setup">Environment</a><a href="#hierarchy">Hierarchy</a><a href="#balance">nesting-balance</a><a href="#runs">Runs</a><a href="#boundaries">Boundaries</a><a href="#analysis">Analysis</a><a href="#site">This site</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#the-environment">The environment</a><li><a href="#a-hierarchy-and-its-bathymetry">A hierarchy and its bathymetry</a><ol class="toc-sub"><li><a href="#bathymetry-of-every-level">Bathymetry of every level</a></li><li><a href="#automatic-thalwegs">Automatic thalwegs</a></li><li><a href="#from-lat-to-msl">From LAT to MSL</a></li></ol><li><a href="#cores-per-model-nesting-balance">Cores per model: nesting-balance</a><ol class="toc-sub"><li><a href="#launching-what-it-chose">Launching what it chose</a></li><li><a href="#3d-and-the-cost-model">3D and the cost model</a></li></ol><li><a href="#running-the-models">Running the models</a><ol class="toc-sub"><li><a href="#neab-and-dkm-2d-tides">NEAB and DKm: 2D tides</a></li><li><a href="#ideal-2d-and-3d">IDEAL: 2D and 3D</a></li></ol><li><a href="#boundaries-for-another-model">Boundaries for another model</a><li><a href="#analysis-figures-and-animations">Analysis, figures and animations</a><ol class="toc-sub"><li><a href="#tides-against-references">Tides against references</a></li><li><a href="#ideal-3d">IDEAL 3D</a></li><li><a href="#animations">Animations</a></li></ol><li><a href="#this-site">This site</a></ol></details>
 <header class="hero"><p class="draft">Guides</p><h1>How to run it</h1>
 <p class="lede">The tools of the nesting and its example setups, with the commands as they run today. The nesting itself is in the
 pyGETM fork (<code>pygetm.nesting</code>); the tools and setups below are in <code>pygetm-nesting</code>, which is not public yet.
 Paths are relative to its root.</p></header>
-<section id="setup" class="chapter"><header class="chap"><span class="eyebrow">1</span><h2>The environment</h2></header>
+<section id="setup" class="chapter"><header class="chap"><span class="eyebrow">1</span><h2 id="the-environment">The environment</h2></header>
 <p>Everything runs in one conda environment with the pyGETM fork built into it. pyGETM is compiled (Fortran and Cython), so after
 changing the fork's Fortran or <code>_pygetm.pyx</code> it has to be rebuilt; Python-only changes in <code>pygetm/nesting</code> need a
 reinstall too, since the fork is installed as a package, not in editable mode.</p>
@@ -204,7 +215,7 @@ calls it itself.</li>
 <li>The compiled 3D remap has a numpy fallback: <code>PYGETM_NESTING_REMAP=numpy</code> forces it (the simpler path for trying changes).</li>
 <li>TPXO9 is found through <code>--tpxo DIR</code> or <code>$TPXO9_DIR</code>.</li></ul>
 </section>
-<section id="hierarchy" class="chapter"><header class="chap"><span class="eyebrow">2</span><h2>A hierarchy and its bathymetry</h2></header>
+<section id="hierarchy" class="chapter"><header class="chap"><span class="eyebrow">2</span><h2 id="a-hierarchy-and-its-bathymetry">A hierarchy and its bathymetry</h2></header>
 <p>A nest is one YAML layout: the root's grid, and for every child its parent, its window in the parent's cells and its refinement.</p>
 <pre><code>config:
   min_depth: 5.0
@@ -230,7 +241,7 @@ north_sea_baltic:
     barriers: [...]
   nz: 30                          # 3D: layers, 2D steps per 3D step (for the balancer)
   split: 10</code></pre>
-<h3>Bathymetry of every level</h3>
+<h3 id="bathymetry-of-every-level">Bathymetry of every level</h3>
 <p><code>nesting-bathymetry</code> writes one ocean-prep <code>bathymetry-regrid</code> configuration per level, on the level's grid extended by
 the halo band and aligned with its parent's cells, and with <code>--run</code> runs them. A level's own <code>source:</code> key (gebco,
 emodnet, ddm) overrides <code>--source</code>.</p>
@@ -241,7 +252,7 @@ nesting-bathymetry DKm/config/dkm.yaml --levels limfjord_east,mariager_randers -
 <pre><code>conda run -n ocean-stack python cli/nesting_ddm.py /data/DDM/ddm_50m.dybde.tiff \
     --emodnet /data/cache/emodnet/emodnet_-8.5400_14.0200_47.4750_62.0250_0p0020833333.nc \
     --region 7.0 13.6 53.8 58.3 --out /data/cache/ddm/ddm_emodnet_dkm.nc</code></pre>
-<h3>Automatic thalwegs</h3>
+<h3 id="automatic-thalwegs">Automatic thalwegs</h3>
 <p><code>nesting-thalwegs</code> compares every level's grid with its fine source and finds what the grid closes: gaps (source water
 through the level's dry cells joining two basins) and shortcuts (joining two parts of one basin far apart around it). Through each it
 finds the path whose shallowest point is deepest, and the depth for each dry cell on it (a percentile of the source depths along the
@@ -271,7 +282,7 @@ can be accepted or rejected:</p>
     percentile: 50
     fix_value_min: 2.5
     exclude_bboxes: [[9.3, 10.3, 54.7, 56.0]]   # e.g. children&#x27;s windows</code></pre>
-<h3>From LAT to MSL</h3>
+<h3 id="from-lat-to-msl">From LAT to MSL</h3>
 <p>EMODnet's depths are below the lowest astronomical tide (LAT); pyGETM's elevation is relative to mean sea level (MSL).
 ocean-prep's <code>source_datum</code> shifts the fine source by MSL − LAT before the block means. The shift is a lon/lat field, for
 example minus the lowest level of a two-year TPXO9 prediction (<code>NEAB/scripts/lat_to_msl.py</code> writes it). With
@@ -286,7 +297,7 @@ file only the EMODnet fill is shifted:</p>
 <pre><code>nesting-z0 --region -20 31 42 66.5 --res 0.01 --out /data/cache/emodnet_geology/z0_folk7_neab.nc
 nesting-z0 --region -20 31 42 66.5 --set 3=0.02 5=0.02 --out z0_rough.nc     # other z0 per class</code></pre>
 </section>
-<section id="balance" class="chapter"><header class="chap"><span class="eyebrow">3</span><h2>Cores per model: nesting-balance</h2></header>
+<section id="balance" class="chapter"><header class="chap"><span class="eyebrow">3</span><h2 id="cores-per-model-nesting-balance">Cores per model: nesting-balance</h2></header>
 <p>All models run at the same time and meet at the exchanges, so the slowest sets the pace. <code>nesting-balance</code> counts the wet
 cells each model computes (its active region without its children's), multiplies by its steps per root step, picks pyGETM's tiling
 for each number of cores (subdomains that are all land or only a child's hole cost no core) and hands out the cores one at a time
@@ -301,7 +312,7 @@ northern_sound          75x78        2011       3     3  6.03e+03     2     2x1 
 cores used 63 of 64; wall time per root step = largest work/core = 4834</code></pre>
 <p class="small">work: wet cells × steps per root step (× cost); land: subdomains removed; wait: time per root step spent waiting for the
 slowest model, in the same units; busy: the share of the root step a model computes.</p>
-<h3>Launching what it chose</h3>
+<h3 id="launching-what-it-chose">Launching what it chose</h3>
 <pre><code># mpiexec, one component per model, ranks pinned to cores
 nesting-balance NEAB/config/coarse.yaml --cores 64 --bathymetry NEAB/Bathymetry/coarse --mpiexec --bind core \
     --args &#x27;--nesting {config} --bathymetry NEAB/Bathymetry/coarse --out /data/kb/NEAB/runs/test&#x27;
@@ -311,7 +322,7 @@ nesting-balance NEAB/config/fine.yaml --cores 128 --bathymetry NEAB/Bathymetry/f
     --srun job.sh --partition short --time 02:00:00 --bind core --setup &#x27;conda activate pygetm-nesting&#x27;</code></pre>
 <p>The run scripts default to <code>&lt;config dir&gt;/../models/{level}/run.py</code> (<code>--script</code> to change);
 <code>{level}</code> and <code>{config}</code> in <code>--args</code> are replaced.</p>
-<h3>3D and the cost model</h3>
+<h3 id="3d-and-the-cost-model">3D and the cost model</h3>
 <p>The work per wet cell and 2D step is <code>c_2d + nz (c_3d + c_fabm) / split</code>; in 3D the exchange at the interfaces adds the
 vertical remaps of the rims (on the parent) and the rings (on the child) at every 3D step. The costs go into the layout:</p>
 <pre><code>config:
@@ -340,10 +351,10 @@ nesting-balance IDEAL/config/ideal3d_v5.yaml --cores 12 --bathymetry /tmp/ideal_
 nesting-balance NEAB/config/coarse.yaml --cores 64 --bathymetry NEAB/Bathymetry/coarse \
     --evaluate neab_root=7,north_sea_baltic=39,danish_straits=14,northern_little_belt=2,northern_sound=2</code></pre>
 </section>
-<section id="runs" class="chapter"><header class="chap"><span class="eyebrow">4</span><h2>Running the models</h2></header>
+<section id="runs" class="chapter"><header class="chap"><span class="eyebrow">4</span><h2 id="running-the-models">Running the models</h2></header>
 <p>Every level is an ordinary pyGETM run script; with <code>--nesting LAYOUT</code> it is one component of an MPMD launch, one
 <code>mpiexec</code> component per level (parents first). Everything a model writes goes to <code>&lt;out&gt;/&lt;level&gt;/</code>.</p>
-<h3>NEAB and DKm: 2D tides</h3>
+<h3 id="neab-and-dkm-2d-tides">NEAB and DKm: 2D tides</h3>
 <pre><code>L=NEAB/config/coarse.yaml; B=NEAB/Bathymetry/coarse; O=/data/kb/NEAB/runs/test
 A=&quot;--nesting $L --bathymetry $B --out $O --constituents all --days 30 --z0 0.015 --hourly&quot;
 mpiexec -bind-to core -map-by core \
@@ -359,7 +370,7 @@ arguments of one level overrides it there.</li>
 <code>--boundaries FILE</code>: the root's open boundaries from another model instead of TPXO9 (DKm from NEAB or CMEMS).</li>
 <li>Output per level: <code>zt.nc</code>, <code>m2.npz</code> (M2 amplitude and phase), <code>timing.json</code> (per process: compute, nesting work,
 waiting; the input of <code>--fit</code> and <code>--calibrate</code>).</li></ul>
-<h3>IDEAL: 2D and 3D</h3>
+<h3 id="ideal-2d-and-3d">IDEAL: 2D and 3D</h3>
 <p><code>IDEAL/scripts/run_ideal.py</code> builds the <code>mpiexec</code> command, runs it and summarises (volume, heat, timings). Arguments after
 <code>--</code> go to every model; <code>--layout-set</code> and <code>--level-set</code> change the layout for one run (written to
 <code>&lt;out&gt;/layout.yaml</code>).</p>
@@ -385,7 +396,7 @@ python IDEAL/scripts/run_ideal.py --layout IDEAL/config/ideal3d_v5_ref.yaml --sc
 <code>--no-3d-coupling</code>; <code>--extra-tracers N</code>; <code>--profile</code> (pyGETM's profiler per process). Per level a layout can set
 <code>vertical: adaptive</code> with <code>config.adaptive</code> parameters (not investigated yet).</p>
 </section>
-<section id="boundaries" class="chapter"><header class="chap"><span class="eyebrow">5</span><h2>Boundaries for another model</h2></header>
+<section id="boundaries" class="chapter"><header class="chap"><span class="eyebrow">5</span><h2 id="boundaries-for-another-model">Boundaries for another model</h2></header>
 <p><code>nesting-boundaries</code> samples a run's output at another model's open-boundary points, the finest level with water at each
 point, in ocean-prep's layout (values at the model's own points, read with <code>on_grid=True</code>).</p>
 <pre><code># 1. a NEAB run with hourly fields of every level
@@ -395,8 +406,8 @@ nesting-boundaries /data/kb/NEAB/runs/dkm_bdy/{north_sea_baltic,danish_straits}/
     --like DKm/config/dkm.yaml dkm_root,belt_sea DKm/Bathymetry \
     --write-points DKm/Bathymetry/dkm_bdy_lonlat.txt --out /data/kb/DKm/boundaries/neab_dkm.nc</code></pre>
 </section>
-<section id="analysis" class="chapter"><header class="chap"><span class="eyebrow">6</span><h2>Analysis, figures and animations</h2></header>
-<h3>Tides against references</h3>
+<section id="analysis" class="chapter"><header class="chap"><span class="eyebrow">6</span><h2 id="analysis-figures-and-animations">Analysis, figures and animations</h2></header>
+<h3 id="tides-against-references">Tides against references</h3>
 <pre><code># TPXO9-atlas maps over AMM7 + the Baltic (12 constituents, amplitude, phase, re/im) and their figures
 python NEAB/scripts/tide_reference.py --tpxo /data/TPXO9 --out /data/TPXO9/maps/tpxo9_atlas_amm7_baltic.nc --plots NEAB/docs/figures/reference
 
@@ -409,19 +420,19 @@ python NEAB/scripts/tide_series.py --tpxo /data/TPXO9 --start 2020-01-02 --days 
 python NEAB/scripts/neab_vs_tpxo_m2.py --run control RUN1 --run test RUN2 --level north_sea_baltic --tpxo /data/TPXO9 --out DIR
 python DKm/scripts/dkm_gauges_m2.py --run RUN1 --label control --run2 RUN2 --label2 test \
     --layout NEAB/config/coarse.yaml --gauges /data/kb/NEAB/runs/coarse_tides_all/base_gauges_stations.csv</code></pre>
-<h3>IDEAL 3D</h3>
+<h3 id="ideal-3d">IDEAL 3D</h3>
 <pre><code>python IDEAL/scripts/plot_ideal3d.py --run coupled RUN1 --run &quot;no 3D coupling&quot; RUN2 --out DIR      # sections, isotherm, heat
 python IDEAL/scripts/plot_ideal3d_v2.py --run LABEL RUN ... --out DIR                              # lake at rest: spurious currents
 python IDEAL/scripts/plot_ideal3d_v5.py --ref /data/kb/IDEAL/runs/v5_ref --run nested RUN --out DIR # pycnocline vs reference
 python IDEAL/scripts/plot_ideal3d_v6.py --ref /data/kb/IDEAL/runs/v6_ref --run nested RUN --out DIR # dye: extrema, front
 python IDEAL/scripts/plot_ideal3d_v7.py --run LABEL RUN --base LABEL base RUN_NO3D --out DIR        # cost of the 3D exchange
 python IDEAL/scripts/plot_ideal_bathymetry.py                                                      # the depth of the tests</code></pre>
-<h3>Animations</h3>
+<h3 id="animations">Animations</h3>
 <p>Every level over the cells it computes, one frame per output time; MP4 and a GIF made from it with one palette (no flicker):</p>
 <pre><code>python IDEAL/scripts/anim_ideal3d.py /data/kb/IDEAL/runs/v6 --out v6_anim --fields mld dye      # mixed-layer depth, surface dye
 python IDEAL/scripts/anim_ideal3d.py RUN --out anim --fields sst isotherm --fps 8                # surface temperature, pycnocline</code></pre>
 </section>
-<section id="site" class="chapter"><header class="chap"><span class="eyebrow">7</span><h2>This site</h2></header>
+<section id="site" class="chapter"><header class="chap"><span class="eyebrow">7</span><h2 id="this-site">This site</h2></header>
 <p>The pages are generated from <code>tools/web/pages/*.py</code> into a checkout of <code>bolding/nesting-docs</code>, which holds only the site:</p>
 <pre><code>python tools/web/site.py &lt;checkout of bolding/nesting-docs&gt;        # writes the pages and README.md, copies IDEAL&#x27;s figures
 cd &lt;checkout&gt; &amp;&amp; git add -A &amp;&amp; git commit -m &quot;...&quot; &amp;&amp; git push</code></pre>

@@ -177,16 +177,27 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
 .chapter > pre { max-width: var(--wide); width: 100%; }
 .seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html" aria-current="page">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#method">2D</a><a href="#threed">3D</a><a href="#threed-impl">3D as implemented</a><a href="#pygetm">Changes to pyGETM</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#levels-halos-and-exchanges">Levels, halos and exchanges</a><ol class="toc-sub"><li><a href="#land-active-regions-and-decomposition">Land, active regions and decomposition</a></li><li><a href="#the-exchanges">The exchanges</a></li><li><a href="#load-balancing">Load balancing</a></li></ol><li><a href="#3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</a><ol class="toc-sub"><li><a href="#a-synthetic-comparison">A synthetic comparison</a></li><li><a href="#cost-and-what-the-scalars-share">Cost, and what the scalars share</a></li><li><a href="#threed-impl">The 3D coupling as implemented</a></li></ol><li><a href="#what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</a></ol></details>
 <header class="hero"><p class="draft">Methods</p><h1>How the nesting works</h1>
 <p class="lede">Every level of a nest is an ordinary pyGETM simulation with its own grid, time step and processes. The
 nesting fills the halo zones where the levels overlap, and matches the fluxes through the faces between them, so that
 volume and tracer content are conserved. In 3D the levels may have different vertical grids.</p></header>
-<section id="method" class="chapter"><header class="chap"><span class="eyebrow">2D</span><h2>Levels, halos and exchanges</h2></header>
+<section id="method" class="chapter"><header class="chap"><span class="eyebrow">2D</span><h2 id="levels-halos-and-exchanges">Levels, halos and exchanges</h2></header>
 <p class="lede">Every level of a nest is an ordinary pyGETM simulation with its own grid, time step and
 subdomain decomposition. The nesting layer (<code>pygetm.nesting</code>, on the fork
 <code>bolding/pygetm</code>, branch <code>nesting</code>) joins them by filling the halo zones where
@@ -200,20 +211,20 @@ they overlap, and by matching the fluxes through the faces between them.</p>
   <div class="steptext"><span class="stepno" id="stepno">1 / 8</span><h4 id="steptitle">A domain</h4><p id="stepdesc">One pyGETM model: a rectangle of the parent level.</p></div>
   <template data-src="fig/a_box.png" data-title="A domain" data-text="One pyGETM model: a rectangle of the parent level."></template><template data-src="fig/b_grid.png" data-title="Its grid" data-text="The parent&#x27;s cells."></template><template data-src="fig/c_halo.png" data-title="A halo of 2 cells" data-text="Every variable lives on the interior plus a 2-cell halo. The halo is filled from outside: by pyGETM&#x27;s own exchange between subdomains, or by the parent."></template><template data-src="fig/d_hole.png" data-title="A hole" data-text="Inside its window the parent does not compute: that is the child&#x27;s part."></template><template data-src="fig/e_rim.png" data-title="A halo inside the hole (the rim)" data-text="The cells of the hole that the parent&#x27;s stencils read. They are filled from the child: a conservative (volume-weighted) restriction."></template><template data-src="fig/f_child.png" data-title="The child" data-text="The hole, refined 3 × 3."></template><template data-src="fig/g_child_halo.png" data-title="The child&#x27;s own halo (the ring)" data-text="Filled from the parent: a limited piecewise-linear prolongation, interpolated in time."></template><template data-src="fig/h_nested.png" data-title="The child in the hole" data-text="Parent and child are each an ordinary pyGETM simulation. The nesting only fills the halo zones where they overlap, and matches the fluxes through the interface faces so that volume and tracer content are conserved."></template>
 </div>
-<h3>Land, active regions and decomposition</h3>
+<h3 id="land-active-regions-and-decomposition">Land, active regions and decomposition</h3>
 <div class="grid2">
 <figure class="fig"><button class="plate" type="button" data-full="fig/i_land.png" aria-label="Open With land full size"><img src="fig/i_land.png" alt="With land" loading="lazy"></button><figcaption><strong>With land</strong><p>Land is part of each level's own mask; parent and child masks are made consistent (the child's finer bathymetry leads).</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/k_active_region.png" aria-label="Open Only part of the window is active full size"><img src="fig/k_active_region.png" alt="Only part of the window is active" loading="lazy"></button><figcaption><strong>Only part of the window is active</strong><p>The window stays a rectangle in parent indices. The child computes its active region: wet cells connected to a seed point without crossing a barrier, in whole parent cells.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/j_decomposition.png" aria-label="Open Each level has its own decomposition full size"><img src="fig/j_decomposition.png" alt="Each level has its own decomposition" loading="lazy"></button><figcaption><strong>Each level has its own decomposition</strong><p>Parent and child each have their own tiling and pyGETM's own halo exchange. The nesting exchange is separate: M:N messages between the ranks that own cells on both sides, planned once from both tilings.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/j2_decomposition_wet.png" aria-label="Open No exchange where the child is land full size"><img src="fig/j2_decomposition_wet.png" alt="No exchange where the child is land" loading="lazy"></button><figcaption><strong>No exchange where the child is land</strong><p>Only halo cells over water need data from the other level. Tiles that meet only over land exchange no messages.</p></figcaption></figure>
 </div>
-<h3>The exchanges</h3>
+<h3 id="the-exchanges">The exchanges</h3>
 <div class="grid2">
 <figure class="fig"><button class="plate" type="button" data-full="fig/comm_down.png" aria-label="Open Parent → child full size"><img src="fig/comm_down.png" alt="Parent → child" loading="lazy"></button><figcaption><strong>Parent → child</strong><p>The ring: parent values with limited slopes, extrapolated in time over the child's sub-steps.</p></figcaption></figure>
 <figure class="fig"><button class="plate" type="button" data-full="fig/comm_up.png" aria-label="Open Child → parent full size"><img src="fig/comm_up.png" alt="Child → parent" loading="lazy"></button><figcaption><strong>Child → parent</strong><p>The rim: volume-weighted means. Flux matching: the parent cell next to each interface face is corrected by the difference between its own flux and the sum of the child's fluxes over its sub-steps.</p></figcaption></figure>
 </div>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/comm_steps.png" aria-label="Open All models compute at the same time full size"><img src="fig/comm_steps.png" alt="All models compute at the same time" loading="lazy"></button><figcaption><strong>All models compute at the same time</strong><p>The sync schedule: every model steps, then the exchanges at the end of each parent step. A model only waits in MPI at the syncs.</p></figcaption></figure>
-<h3>Load balancing</h3>
+<h3 id="load-balancing">Load balancing</h3>
 <p>Because all models compute at the same time, the slowest model sets the pace. <code>nesting-balance</code>
 gives every model enough cores that all need about the same time per root step: it counts the wet cells
 each model computes, multiplies by its steps per root step, and picks the tiling per model. Subdomains
@@ -233,7 +244,7 @@ that are all land, or hold only a child's hole that nothing reads, are removed a
   : -n 2  python NEAB/models/northern_little_belt/run.py ... : -n 2 python NEAB/models/northern_sound/run.py ...</code></pre>
 <p>The results are bit-identical to the single-program driver and independent of the process split.</p></div>
 </section>
-<section id="threed" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2>3D: exchanging between vertical grids that differ</h2></header>
+<section id="threed" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2 id="3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</h2></header>
 <p class="lede">In 3D, parent and child may use adaptive vertical coordinates, so their layers do not
 line up and may differ in number. A child column's depth also differs from its parent cell's, because of the
 child's finer bathymetry. The exchanges must conserve tracer content without assuming that layer k of
@@ -242,14 +253,14 @@ the child matches layer k of the parent.</p>
 <div><h4>What each exchange needs</h4><ul><li><strong>Rim</strong> (child → parent): the content of each parent cell equals that of its 3 × 3 child columns.</li><li><strong>Ring</strong> (parent → child): consistent, accurate boundary values; the fluxes decide conservation.</li><li><strong>Flux matching</strong>: the parent's flux through each face equals the child's, per tracer.</li></ul></div>
 <div><h4>Options for the rim</h4><ul><li><strong>A</strong>: average layer heights and contents of the ≤ 9 child columns by layer index, then remap once.</li><li><strong>B</strong>: remap every child column, stretched linearly to the parent's depth, then add the contents.</li><li><strong>B′</strong>: as B, but the upper 80 % of the column unstretched.</li><li><strong>B″</strong>: B′ with concentrations by the child volume each parent layer receives, then the column content restored exactly.</li></ul></div>
 </div>
-<h3>A synthetic comparison</h3>
+<h3 id="a-synthetic-comparison">A synthetic comparison</h3>
 <p>One parent cell with its 3 × 3 child columns over a bottom slope (depths 30 m × (1 ± g)), a sharp
 pycnocline at 10 m in every column, 30 child layers and 20 parent layers of three kinds. The reference is
 the horizontal mean at fixed depth. All four forms conserve the content to 5e-16.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/rim_ab_accuracy.png" aria-label="Open Accuracy of the rim options full size"><img src="fig/rim_ab_accuracy.png" alt="Accuracy of the rim options" loading="lazy"></button><figcaption><strong>Accuracy of the rim options</strong><p>Profiles at slope g = 0.4 and errors against the slope.</p></figcaption></figure>
 <div class="tablewrap num"><table><thead><tr><th>g = 0.4: rms / pycnocline error</th><th>A</th><th>B</th><th>B′</th><th>B″</th></tr></thead><tbody><tr><td>sigma layers</td><td>1.14 / −1.16 m</td><td>1.14 / −1.16 m</td><td>3.37 / −0.03 m</td><td><strong>0.063 / −0.03 m</strong></td></tr><tr><td>GVC (z-like at the surface)</td><td>0.34 / −0.36 m</td><td>1.14 / −1.20 m</td><td>3.32 / −0.04 m</td><td><strong>0.053 / −0.04 m</strong></td></tr><tr><td>adaptive (zoomed at the pycnocline)</td><td>0.14 / −0.10 m</td><td>1.16 / −1.21 m</td><td>3.18 / 0.00 m</td><td><strong>0.009 / 0.00 m</strong></td></tr><tr><td>uniform field stays uniform</td><td>yes</td><td>yes</td><td>no</td><td>yes</td></tr></tbody></table></div>
 <ul><li>For sigma layers A and B are identical: the stretched child layer k lands on layer k of the mean column. Both move the pycnocline by the stretch.</li><li>For GVC and adaptive layers A beats B: their upper layers sit at nearly the same depths in all nine columns, so averaging by index hardly mixes depths, while B's stretch moves them.</li><li>Only a linear stretch both conserves content and keeps a uniform field uniform. B″ gets both by forming concentrations by volume and restoring the column content afterwards; the correction is small because the volumes differ only deep down, where the stratification is weak.</li></ul>
-<h3>Cost, and what the scalars share</h3>
+<h3 id="cost-and-what-the-scalars-share">Cost, and what the scalars share</h3>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/rim_ab_cost.png" aria-label="Open Cost of A and B″ full size"><img src="fig/rim_ab_cost.png" alt="Cost of A and B″" loading="lazy"></button><figcaption><strong>Cost of A and B″</strong><p>2,000 rim cells, 9 children each, numpy on one core.</p></figcaption></figure>
 <div class="tablewrap num"><table><thead><tr><th></th><th>A</th><th>B″</th></tr></thead><tbody><tr><td>setup, once for all scalars</td><td>4 ms</td><td>36–45 ms</td></tr><tr><td>per scalar</td><td>3–4 ms</td><td>10–15 ms</td></tr><tr><td>T and S</td><td>11 ms</td><td>70 ms (6×)</td></tr><tr><td>12 scalars (T, S, 10 FABM)</td><td>52 ms</td><td>230 ms (4.4×)</td></tr><tr><td>12 scalars, setup repeated per scalar</td><td>–</td><td>820 ms</td></tr></tbody></table></div>
 <ul><li><strong>The remap setup is shared</strong> by T, S and all FABM tracers: where every parent interface lies in each child column, and the volume per parent layer. It is about 80 % of B″'s cost for one scalar and has to be redone every exchange, because adaptive layers move.</li><li><strong>The parent's layer heights</strong> go to the child once per sync, for all scalars.</li><li><strong>The ring and the flux register need the same remap</strong> (one parent column onto each child column, and child face profiles onto parent faces), so the machinery is needed anyway; A only saves on the rim.</li><li>A compiled kernel (a merge of the two interface lists per column) should be 10–20× faster than numpy. That is the step before NEAB in 3D.</li></ul>
@@ -286,7 +297,7 @@ conserves its heat content to 1e-9 over 48 h, and a uniform field stays uniform 
 <a href="issues.html#ui-sum">the 3D transport sum</a>, <a href="issues.html#layer-flux">water per layer</a>,
 <a href="issues.html#v2-init">a lake at rest</a>.</p>
 </section>
-<section id="pygetm" class="chapter"><header class="chap"><span class="eyebrow">Code</span><h2>What the nesting changes in pyGETM</h2></header>
+<section id="pygetm" class="chapter"><header class="chap"><span class="eyebrow">Code</span><h2 id="what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</h2></header>
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
 model through a small set of hooks in pyGETM's core: about 400 changed lines in twelve files. All of them are optional.
