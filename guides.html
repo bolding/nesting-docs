@@ -250,7 +250,37 @@ path there). Per level: a summary (<code>&lt;level&gt;.json</code>), ocean-prep 
 against them.</p>
 <pre><code>nesting-thalwegs DKm/config/dkm.yaml --out DKm/Bathymetry/thalwegs --figures DKm/docs/figures/bathymetry
 nesting-thalwegs DKm/config/dkm.yaml --levels belt_sea --sill-min 3 --percentile 75 --out /tmp/thal</code></pre>
-<p>The DKm summaries are on the level pages linked from <a href="dkm.html#thalwegs">DKm</a>.</p>
+<p>The DKm summaries are on the level pages linked from <a href="dkm.html#thalwegs">DKm</a>. The thalwegs are applied by
+<code>design_neab_hierarchy.py --write-bathymetry</code> when the layout names the output (<code>config: thalwegs: apply</code>);
+the depths are set per layout and per level:</p>
+<pre><code>config:
+  thalwegs:
+    apply: DKm/Bathymetry/thalwegs   # nesting-thalwegs --out
+    sill_min: 4.0                    # first search depth (m)
+    percentile: 50                   # an opened cell: this percentile of the source depths along the path in it
+    open_min_depth: 2.5              # ... and at least this deep
+belt_sea:
+  thalwegs: {{path_min_depth: 0.25}}  # this level searches down to 0.25 m (lagoons, Bodden, Roskilde Fjord)</code></pre>
+<p>The same search is part of ocean-prep's <code>bathymetry-regrid</code> (<code>lib/bathymetry/closed_passages.py</code>). There its
+passages become ordinary waypoint thalwegs, with the report and <code>set_depth</code> suggestions in <code>fixes.yaml</code> that
+can be accepted or rejected:</p>
+<pre><code>thalweg:
+  closed_passages:                   # or: true
+    sill_min: 4.0
+    path_min_depth: 0.25
+    percentile: 50
+    fix_value_min: 2.5
+    exclude_bboxes: [[9.3, 10.3, 54.7, 56.0]]   # e.g. children&#x27;s windows</code></pre>
+<h3>From LAT to MSL</h3>
+<p>EMODnet's depths are below the lowest astronomical tide (LAT); pyGETM's elevation is relative to mean sea level (MSL).
+ocean-prep's <code>source_datum</code> shifts the fine source by MSL − LAT before the block means. The shift is a lon/lat field, for
+example minus the lowest level of a two-year TPXO9 prediction (<code>NEAB/scripts/lat_to_msl.py</code> writes it). With
+<code>mask_land: false</code> the flats become sea above MSL. Denmark's Depth Model is already at MSL; in the merged DDM + EMODnet
+file only the EMODnet fill is shifted:</p>
+<pre><code>source_datum:
+  offset: NEAB/Bathymetry/coarse_wadden_msl/msl_minus_lat.npz
+  only_flag: {{file: /data/cache/ddm/ddm_emodnet_dkm.nc, variable: source, values: [2]}}   # 2 = EMODnet
+  flats_max_height: 1.0</code></pre>
 <p>A bottom roughness map from EMODnet Geology's seabed substrate (Folk 7 classes, each given a z0), read by the NEAB/DKm models with
 <code>--z0-map</code>:</p>
 <pre><code>nesting-z0 --region -20 31 42 66.5 --res 0.01 --out /data/cache/emodnet_geology/z0_folk7_neab.nc

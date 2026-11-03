@@ -434,9 +434,27 @@ gain is within its error (it leaves out the 2D coupling's work, which counts whe
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#calibrate-3d">nesting-balance --calibrate counted the 3D waiting as computation</a>.</p>
 <p><strong>With FABM the shares go down.</strong> The exchange grows with the number of tracers, but the computation grows faster:
 a biogeochemical model adds its sources and sinks in every cell and layer, besides the advection of each tracer, while the
-exchange only touches the interface columns. Already the 12 passive tracers here raise c_3d from 8–9 to 13–16; with FABM's
-source terms the computation goes up much more, and the exchange's share of a run down.</p>
-<p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>.</p>
+exchange only touches the interface columns. To check, V5 ran with 32 tracers (T, S and 30 passive ones, all exchanged) and a
+FABM-like load: after every 3D step each process does three times the work of its own model step, a fixed amount calibrated at
+the start (<code>--compute-factor 4</code>). The share of the 3D exchange's own work in the run:</p>
+<div class="tablewrap num"><table><thead><tr><th>12 cores, 4 / 4 / 4</th><th>channel</th><th>shelf</th><th>strait</th></tr></thead><tbody>
+<tr><td>14 tracers</td><td>4.9 %</td><td>14.2 %</td><td>9.4 %</td></tr>
+<tr><td>32 tracers, FABM load ×4</td><td>3.1 %</td><td>7.6 %</td><td>5.3 %</td></tr>
+</tbody></table></div>
+<p>Calibrated from these runs, the exchange costs 0.21–0.24 per tracer, remapped column and layer, the same as with 2 and 14
+tracers: the balancer's model of the exchange holds at 32 tracers. c_3d goes up from 8–13 to 54–106.</p>
+<p><strong>Balanced with the load.</strong> The first balanced split (1 / 3 / 8) was 41 % slower than the uniform one: the balancer
+had given every IDEAL level split 1, so the 3D cost of the strait, which does three 2D steps per root step, came out 30 times too
+high. With each level's split (10, 10, 30):</p>
+<div class="tablewrap num"><table><thead><tr><th>Cores</th><th>channel / shelf / strait</th><th>wall time</th><th>predicted</th><th>own computation per level</th></tr></thead><tbody>
+<tr><td>12, uniform</td><td>4 / 4 / 4</td><td>246.8 s</td><td></td><td>120 / 202 / 229 s</td></tr>
+<tr><td>12, balanced</td><td>2 / 4 / 6</td><td><strong>235.6 s (−5 %)</strong></td><td>−10 %</td><td>193 / 212 / 162 s</td></tr>
+<tr><td>24, uniform</td><td>8 / 8 / 8</td><td>160.5 s</td><td></td><td>62 / 124 / 138 s</td></tr>
+<tr><td>23, balanced</td><td>4 / 10 / 9</td><td><strong>145.4 s (−9 %)</strong></td><td>−13 %</td><td>103 / 104 / 121 s</td></tr>
+</tbody></table></div>
+<p>With the computation four times larger, more cores pay off: from 12 to 24 cores the balanced run is 38 % faster, against 14 %
+with T and S alone. The coupling's fixed cost per step no longer sets the limit.</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>, <a href="issues.html#balance-split">nesting-balance gave every IDEAL level split 1</a>, <a href="issues.html#fabm-burn">The emulated FABM load fed waiting back into itself</a>.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy, the compiled kernel, and the kernel with compiled gather/scatter; T and S or 14 tracers; 2 or 4 processes per level.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>

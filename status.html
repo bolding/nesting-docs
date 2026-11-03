@@ -201,7 +201,7 @@ level, mostly from the coarser levels' layers.</li>
 <li>IDEAL V6, a dye front through the levels: conserved to 4e-9; new extrema 1e-5 in the children after limiting the ring
 correction, 2e-4 in the parent from the flux correction.</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
-8–17 % with 14 tracers.</li>
+8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
 <li>The fork follows pyGETM v0.9.29 (merged 3 November 2026).</li></ul></div>
 <div><h4>Open</h4><ul>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
@@ -228,7 +228,7 @@ the slope (V5), a dye front (V6) and the cost (V7) done.</li></ul></div>
 <div><h4><a href="dkm.html">DKm</a></h4><ul>
 <li>Ten levels down to 57 m from Denmark's Depth Model; open boundaries from NEAB, TPXO9 or CMEMS.</li>
 <li>A nested variant (the Belt Sea inside the Kattegat) gives the same tide on fewer cores.</li>
-<li>Automatic thalwegs from the 50 m source for every level (nesting-thalwegs), with a page per level; next: apply them in the bathymetry.</li>
+<li>Automatic thalwegs from the 50 m source for every level (nesting-thalwegs), with a page per level, applied in the bathymetry: Roskilde Fjord and the Bodden are joined to the sea. The same search and the LAT → MSL shift are now in ocean-prep; next: DKm's bathymetry through ocean-prep.</li>
 <li>Open: water cut off from the sea in the fine levels, the dredged channels, sluices, the island fjords, the Wadden Sea.</li></ul></div>
 </div>
 </section>
