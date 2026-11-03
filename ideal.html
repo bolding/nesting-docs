@@ -400,13 +400,13 @@ every digit.</p>
 <tr><td>T, S: channel / shelf / strait</td><td>12 / 26 / 17 ms</td><td>5 / 13 / 8 ms</td><td>4 / 9 / 6 %</td></tr>
 <tr><td>14 tracers: channel / shelf / strait</td><td>66 / 124 / 72 ms</td><td>16 / 36 / 25 ms</td><td>8 / 17 / 12 %</td></tr>
 </tbody></table></div>
-<p>The exchange's work falls 2–4 times, not 15: a profile puts the kernel at about 40 % of what remains. The rest is the numpy
-around it: gathering the columns from pyGETM's 3D arrays at the interface cells and reversing their layer order, the r × r
-child columns of the rim, the stretch, the ring's limiter and the messages. A kernel that reads and writes the 3D arrays
-at a list of cells itself could gain another 1.5–2 times on the exchange, 2–8 % of a run: worth it for many tracers (FABM),
-not urgent for T and S. The waiting for partner levels, the largest item for the channel, is load balance: the 3D cost per
-level is not yet in <code>nesting-balance</code>.</p>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy and the compiled kernel, T and S or 14 tracers, 2 or 4 processes per level.</p></figcaption></figure>
+<p>The exchange's work falls 2–4 times, not 15: a profile puts the kernel at about 40 % of what remains. The columns are now
+also read from and written into pyGETM's 3D arrays by compiled routines, and the messages packed column by column, without
+any transpose; that changed the work by less than 10 %. What remains is spread over many small numpy operations on small
+arrays, where Python's cost per call dominates. The largest single item is the waiting for partner levels, up to 46 ms per
+3D step in the channel: load balance, as the 3D cost per level is not yet in <code>nesting-balance</code>.</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy, the compiled kernel, and the kernel with compiled gather/scatter; T and S or 14 tracers; 2 or 4 processes per level.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
