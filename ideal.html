@@ -180,7 +180,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a></nav>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a></nav>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -307,6 +307,35 @@ a factor of 1.5. A scan of them against a real case (V5) comes next.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_speed.png" aria-label="Open Spurious currents over time full size"><img src="fig/ideal/3d/v2_speed.png" alt="Spurious currents over time" loading="lazy"></button><figcaption><strong>Spurious currents over time</strong><p>Max |u| and rms u per level for every run; the channel alone in blue.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring with PCM, with PPM (sigma), and with PPM in adaptive layers.</p></figcaption></figure>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring could not carry the child's vertical structure</a>.</p>
+</section>
+<section id="v5" class="chapter"><header class="chap"><span class="eyebrow">V5</span><h2>A pycnocline over the shelf slope</h2></header>
+<p class="lede">Does the nesting move a pycnocline correctly across the interfaces? The bottom slopes from 50 to 10 m across the
+shelf window, so a pycnocline that starts flat at 15 m meets the bottom on the shelf and forms a front. The M2 tide from the
+open west end, with rotation, moves the stratified water across both interfaces twice a day. The reference is one model at
+333 m with 20 layers everywhere, the strait's resolution over the whole domain (1080 × 540 cells, 32 cores).</p>
+<p>Measured, for every level against the reference averaged over each of its cells: the depth of the 12 °C isotherm (the
+pycnocline) and the pycnocline's thickness (10.5–13.5 °C), rms over 12–48 h, over the cells the level computes and over
+those within 3 cells of an interface. All runs in sigma layers.</p>
+<div class="tablewrap num"><table><thead><tr><th>Run</th><th>Level</th><th>pycnocline depth, rms</th><th>next to the interfaces</th><th>thickness, rms</th></tr></thead><tbody>
+<tr><td rowspan="3">nested, 10 / 15 / 20 layers, PPM</td><td>channel</td><td>0.13 m</td><td>0.21 m</td><td>0.51 m</td></tr>
+<tr><td>shelf</td><td>0.12 m</td><td>0.10 m</td><td>0.26 m</td></tr>
+<tr><td>strait</td><td>0.08 m</td><td>0.09 m</td><td>0.09 m</td></tr>
+<tr><td rowspan="3">nested, 20 layers everywhere</td><td>channel</td><td>0.08 m</td><td>0.10 m</td><td>0.06 m</td></tr>
+<tr><td>shelf</td><td>0.09 m</td><td>0.06 m</td><td>0.10 m</td></tr>
+<tr><td>strait</td><td>0.07 m</td><td>0.08 m</td><td>0.09 m</td></tr>
+<tr><td>nested, piecewise-constant remap</td><td>channel / shelf / strait</td><td>0.13 / 0.12 / 0.08 m</td><td>0.21 / 0.11 / 0.09 m</td><td>0.52 / 0.25 / 0.09 m</td></tr>
+<tr><td>nested, stretched vertical map</td><td>channel / shelf / strait</td><td>0.13 / 0.12 / 0.08 m</td><td>0.21 / 0.11 / 0.09 m</td><td>0.52 / 0.25 / 0.09 m</td></tr>
+<tr><td>the channel alone (3 km, 10 layers)</td><td>channel</td><td>0.15 m</td><td>–</td><td>0.58 m</td></tr>
+</tbody></table></div>
+<ul><li><strong>The nesting follows the reference across both interfaces</strong>, within 8–13 cm of pycnocline depth. It keeps the eddies
+behind the wall gap and the front where the pycnocline meets the bottom, which the channel alone misses.</li>
+<li><strong>What is left is mostly vertical resolution, not coupling.</strong> With 20 layers in every level the errors drop to 6–10 cm,
+and the pycnocline's thickness in the channel from 0.51 to 0.06 m. Next to the interfaces the errors are no larger than
+elsewhere, except in the channel with 10 layers.</li>
+<li><strong>The remap's details do not matter in a flow:</strong> PPM, the piecewise-constant remap and the stretched map agree to within
+1 cm. They mattered in the lake at rest (V2), where nothing else moves the pycnocline.</li></ul>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v5_section.png" aria-label="Open The pycnocline after 48 h full size"><img src="fig/ideal/3d/v5_section.png" alt="The pycnocline after 48 h" loading="lazy"></button><figcaption><strong>The pycnocline after 48 h</strong><p>Depth of the 12 °C isotherm along y = 90 km: the 333 m reference (black), the nested runs (each level over the cells it computes) and the channel alone.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v5_error.png" aria-label="Open Where the errors are full size"><img src="fig/ideal/3d/v5_error.png" alt="Where the errors are" loading="lazy"></button><figcaption><strong>Where the errors are</strong><p>Isotherm depth of the default nested run minus the reference after 48 h, every level over its cells. Largest in the channel at the front east of the shelf, where 3 km cells and 10 layers resolve it least.</p></figcaption></figure>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
