@@ -202,11 +202,13 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <ul><li>The level's own water (not under its children, not behind its barriers): 520 km² on the grid, 518 km² deeper than min_depth in the source.</li><li>Source water in the level's dry cells: 3.7 km² (0.7 %), 2.6 million m³. In its wet cells 1.2 % of the source cells are land or shallower.</li><li>Inside a wet cell the source depths spread by 0.3 m (p90 − p10, median over the cells; 1.2 m in the 10 % most varied). The block mean lies at the 50th percentile of its cell's source depths (10–90 % of the cells: 42th–56th).</li><li>3 basins of at least 4 cells with no connection found in the source (deeper than min_depth): 4637 cells at 8.07°E 55.94°N; 6 cells at 8.12°E 56.00°N; 4 cells at 8.20°E 55.86°N.</li></ul>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/bathymetry/ringkobing_fjord.png" aria-label="Open ringkobing_fjord: bathymetry and thalwegs full size"><img src="fig/dkm/bathymetry/ringkobing_fjord.png" alt="ringkobing_fjord: bathymetry and thalwegs" loading="lazy"></button><figcaption><strong>ringkobing_fjord: bathymetry and thalwegs</strong><p>Left: block-mean depth of the level's wet cells, children's windows dashed, the thalwegs found (red, numbered as in the table) and the source water the grid loses (orange). Middle: the spread of the source depths inside each of the level's own wet cells. Right: the source depth along each thalweg; dots where it runs through the level's dry cells.</p></figcaption></figure>
 <h3 id="thalwegs">Thalwegs</h3>
-<p>Source water deeper than 4 m (then down to min_depth for basins still cut off) that crosses the level's dry cells and
-joins two basins (gap) or two parts of one basin much further apart around it (shortcut). Through each, the path whose shallowest point is
-deepest; each dry cell on it gets the median of the source depths along the path in that cell, not its deepest point.</p>
+<p>Source water deeper than 4 m (then down to 0.5 m and 0.5 m for basins still cut off, also through other basins)
+that crosses the level's dry cells and joins two basins (gap) or two parts of one basin much further apart around it (shortcut). Through
+each, the path whose shallowest point is deepest; each dry cell on it gets the p50 of the source depths along
+the path in that cell, not its deepest point, and at least 2.5 m. All of them are applied in the level's
+bathymetry (<code>config: thalwegs: apply</code> in dkm.yaml).</p>
 <p>No gaps or shortcuts: the grid keeps every connection of the source deeper than min_depth.</p>
-<details><summary>Waypoints and channels (nesting-thalwegs output)</summary><pre><code># nesting-thalwegs: ringkobing_fjord (min_depth 0.5 m, corridors deeper than 4.0 m, cell depths the p50.0 of the source along the path)
+<details><summary>Waypoints and channels (nesting-thalwegs output)</summary><pre><code># nesting-thalwegs: ringkobing_fjord (min_depth 0.5 m, corridors deeper than 4.0 m, cell depths the p50 of the source along the path)
 # ocean-prep thalweg waypoints:
 thalweg:
   waypoints: []

@@ -188,7 +188,7 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
   <p class="lede">7.0–13.4°E, 53.9–59.98°N, the whole Skagerrak to the Oslo Fjord.</p>
   <dl class="facts">
     <div><dt>grid</dt><dd>96 × 152</dd><p>4.1 × 4.5 km, parent and ratio –</p></div>
-    <div><dt>active cells</dt><dd>6432</dd><p>time ratio 1, dt 20.2 s</p></div>
+    <div><dt>active cells</dt><dd>6451</dd><p>time ratio 1, dt 20.2 s</p></div>
     <div><dt>source cells per cell</dt><dd>9216</dd><p>DDM/EMODnet at 42 × 46 m</p></div>
     <div><dt>thalwegs found</dt><dd>3</dd><p>gaps and shortcuts the grid closes</p></div>
   </dl>
@@ -202,11 +202,13 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 <ul><li>The level's own water (not under its children, not behind its barriers): 55,578 km² on the grid, 55,270 km² deeper than min_depth in the source.</li><li>Source water in the level's dry cells: 1,148 km² (2.1 %), 24371.0 million m³. In its wet cells 2.6 % of the source cells are land or shallower.</li><li>Inside a wet cell the source depths spread by 8.2 m (p90 − p10, median over the cells; 77.4 m in the 10 % most varied). The block mean lies at the 50th percentile of its cell's source depths (10–90 % of the cells: 42th–59th).</li><li>2 basins of at least 4 cells with no connection found in the source (deeper than min_depth): 5 cells at 9.13°E 54.30°N; 4 cells at 9.13°E 53.94°N.</li></ul>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/bathymetry/dkm_root.png" aria-label="Open dkm_root: bathymetry and thalwegs full size"><img src="fig/dkm/bathymetry/dkm_root.png" alt="dkm_root: bathymetry and thalwegs" loading="lazy"></button><figcaption><strong>dkm_root: bathymetry and thalwegs</strong><p>Left: block-mean depth of the level's wet cells, children's windows dashed, the thalwegs found (red, numbered as in the table) and the source water the grid loses (orange). Middle: the spread of the source depths inside each of the level's own wet cells. Right: the source depth along each thalweg; dots where it runs through the level's dry cells.</p></figcaption></figure>
 <h3 id="thalwegs">Thalwegs</h3>
-<p>Source water deeper than 4 m (then down to min_depth for basins still cut off) that crosses the level's dry cells and
-joins two basins (gap) or two parts of one basin much further apart around it (shortcut). Through each, the path whose shallowest point is
-deepest; each dry cell on it gets the median of the source depths along the path in that cell, not its deepest point.</p>
+<p>Source water deeper than 4 m (then down to 2 m and 2 m for basins still cut off, also through other basins)
+that crosses the level's dry cells and joins two basins (gap) or two parts of one basin much further apart around it (shortcut). Through
+each, the path whose shallowest point is deepest; each dry cell on it gets the p50 of the source depths along
+the path in that cell, not its deepest point, and at least 2.5 m. All of them are applied in the level's
+bathymetry (<code>config: thalwegs: apply</code> in dkm.yaml).</p>
 <div class="tablewrap num"><table><thead><tr><th>#</th><th>Kind</th><th>Sill at</th><th>Sill</th><th>Path</th><th>Cells to open, depth</th></tr></thead><tbody><tr><td>1</td><td>shortcut: same basin</td><td>10.973°E 59.088°N</td><td>35.9 m</td><td>5.13 km</td><td>1: 47.1 m</td></tr><tr><td>2</td><td>gap: another basin, 4 cells</td><td>8.466°E 55.060°N</td><td>33.3 m</td><td>0.09 km</td><td>1: 33.3 m</td></tr><tr><td>3</td><td>gap: another basin, 10 cells</td><td>10.618°E 59.667°N</td><td>29.1 m</td><td>10.84 km</td><td>3: 194.2, 66.6, 77.6 m</td></tr></tbody></table></div>
-<details><summary>Waypoints and channels (nesting-thalwegs output)</summary><pre><code># nesting-thalwegs: dkm_root (min_depth 2.0 m, corridors deeper than 4.0 m, cell depths the p50.0 of the source along the path)
+<details><summary>Waypoints and channels (nesting-thalwegs output)</summary><pre><code># nesting-thalwegs: dkm_root (min_depth 2.0 m, corridors deeper than 4.0 m, cell depths the p50 of the source along the path)
 # ocean-prep thalweg waypoints:
 thalweg:
   waypoints:
@@ -216,7 +218,7 @@ thalweg:
     via:
     - [10.9726, 59.0877]
     bbox: [10.898, 11.039, 59.02, 59.14]
-    bbox_depth_percentile: 50.0
+    bbox_depth_percentile: 50
     auto:
       kind: shortcut
       sill_depth: 35.85
@@ -229,7 +231,7 @@ thalweg:
     via:
     - [8.4663, 55.0598]
     bbox: [8.4, 8.534, 55.02, 55.1]
-    bbox_depth_percentile: 50.0
+    bbox_depth_percentile: 50
     auto:
       kind: gap
       sill_depth: 33.34
@@ -242,7 +244,7 @@ thalweg:
     via:
     - [10.6184, 59.6669]
     bbox: [10.531, 10.695, 59.58, 59.74]
-    bbox_depth_percentile: 50.0
+    bbox_depth_percentile: 50
     auto:
       kind: gap
       sill_depth: 29.05
