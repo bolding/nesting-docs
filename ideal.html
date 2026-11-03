@@ -412,6 +412,20 @@ costs n_rim × r² × (nz_child + nz_parent) remapped column-layers on the paren
 wet-cell 2D steps. Calibrated from these runs against a 2D run on the same machine
 (<code>IDEAL/scripts/calibrate_exchange3d.py</code>): exchange_3d_base 0.40–0.54 and exchange_3d 0.20–0.23 per tracer; the estimates
 from the rims and from the rings agree within 10 %. The 3D computation itself, c_3d per layer, is 8–13 with T and S.</p>
+<p><strong>A balanced run.</strong> IDEAL's depth written as level bathymetry files (<code>IDEAL/scripts/ideal_bathymetry_files.py</code>),
+<code>nesting-balance</code> with these costs chooses the cores per level; V5 with T and S over 24 h, each split run alone, twice:</p>
+<div class="tablewrap num"><table><thead><tr><th>Cores</th><th>channel / shelf / strait</th><th>wall time</th><th>predicted</th><th>own computation per level</th></tr></thead><tbody>
+<tr><td>12, uniform</td><td>4 / 4 / 4</td><td>30.5, 30.6 s</td><td></td><td>6.8 / 13.5 / 17.8 s</td></tr>
+<tr><td>12, balanced</td><td>2 / 4 / 6</td><td><strong>28.4, 28.8 s (−7 %)</strong></td><td>−16 %</td><td>12.4 / 13.3 / 12.5 s</td></tr>
+<tr><td>6, uniform</td><td>2 / 2 / 2</td><td>42.8, 42.5 s</td><td></td><td>11.6 / 24.2 / 29.4 s</td></tr>
+<tr><td>6, balanced</td><td>1 / 3 / 2</td><td>43.7, 43.9 s (+3 %)</td><td>−1.5 %</td><td>21.5 / 12.5 / 29.2 s</td></tr>
+</tbody></table></div>
+<p>On 12 cores the balance works: the levels' own computation becomes nearly equal and the channel's waiting drops from 16 to
+6 s. The gain is half the predicted one, as the 2D coupling's own work, the halos and the output are not in the model. On 6
+cores there is no better split: the strait's grid (90 × 90) has no better tiling on 3 cores than on 2, and the balancer's small
+gain is within its error (it leaves out the 2D coupling's work, which counts when a level is on one core). Calibrated from a run
+(<code>--calibrate</code>), the cost factors are 0.87–0.99, close to the model, and the choices stay the same.</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#calibrate-3d">nesting-balance --calibrate counted the 3D waiting as computation</a>.</p>
 <p><strong>With FABM the shares go down.</strong> The exchange grows with the number of tracers, but the computation grows faster:
 a biogeochemical model adds its sources and sinks in every cell and layer, besides the advection of each tracer, while the
 exchange only touches the interface columns. Already the 12 passive tracers here raise c_3d from 8–9 to 13–16; with FABM's

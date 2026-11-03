@@ -289,6 +289,10 @@ nesting-balance NEAB/config/coarse.yaml --cores 18 --bathymetry NEAB/Bathymetry/
 python IDEAL/scripts/calibrate_exchange3d.py --run2d /data/kb/IDEAL/runs/v7_2d \
     --run3d /data/kb/IDEAL/runs/v7g_ts:2 --run3d /data/kb/IDEAL/runs/v7g_12:14
 
+# IDEAL: its analytic depth as level bathymetry files first
+python IDEAL/scripts/ideal_bathymetry_files.py IDEAL/config/ideal3d_v5.yaml --out /tmp/ideal_bathy
+nesting-balance IDEAL/config/ideal3d_v5.yaml --cores 12 --bathymetry /tmp/ideal_bathy --min-subdomain 6
+
 # predict given splits instead of choosing one
 nesting-balance NEAB/config/coarse.yaml --cores 64 --bathymetry NEAB/Bathymetry/coarse \
     --evaluate neab_root=7,north_sea_baltic=39,danish_straits=14,northern_little_belt=2,northern_sound=2</code></pre>

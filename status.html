@@ -204,7 +204,7 @@ correction, 2e-4 in the parent from the flux correction.</li>
 8–17 % with 14 tracers.</li>
 <li>The fork follows pyGETM v0.9.29 (merged 3 November 2026).</li></ul></div>
 <div><h4>Open</h4><ul>
-<li>A run balanced with the 3D cost in <code>nesting-balance</code> (now in its model, calibrated from IDEAL); see <a href="issues.html#speed-3d">the speed issue</a>.</li>
+<li>The 2D coupling's own work in <code>nesting-balance</code> (<code>exchange_cell</code>, not calibrated); balanced 3D runs: IDEAL on 12 cores 7 % faster.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
 <li>The adaptive coordinates in nested runs (left for later).</li>
 <li>Limited slopes and time interpolation in the 3D ring; a compiled remap kernel.</li>
