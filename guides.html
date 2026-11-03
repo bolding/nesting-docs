@@ -241,6 +241,16 @@ nesting-bathymetry DKm/config/dkm.yaml --levels limfjord_east,mariager_randers -
 <pre><code>conda run -n ocean-stack python cli/nesting_ddm.py /data/DDM/ddm_50m.dybde.tiff \
     --emodnet /data/cache/emodnet/emodnet_-8.5400_14.0200_47.4750_62.0250_0p0020833333.nc \
     --region 7.0 13.6 53.8 58.3 --out /data/cache/ddm/ddm_emodnet_dkm.nc</code></pre>
+<h3>Automatic thalwegs</h3>
+<p><code>nesting-thalwegs</code> compares every level's grid with its fine source and finds what the grid closes: gaps (source water
+through the level's dry cells joining two basins) and shortcuts (joining two parts of one basin far apart around it). Through each it
+finds the path whose shallowest point is deepest, and the depth for each dry cell on it (a percentile of the source depths along the
+path there). Per level: a summary (<code>&lt;level&gt;.json</code>), ocean-prep waypoints and layout <code>channels</code>
+(<code>&lt;level&gt;_thalwegs.yaml</code>) and a map. <code>--no-channels</code> ignores the channels the layout already has, to test
+against them.</p>
+<pre><code>nesting-thalwegs DKm/config/dkm.yaml --out DKm/Bathymetry/thalwegs --figures DKm/docs/figures/bathymetry
+nesting-thalwegs DKm/config/dkm.yaml --levels belt_sea --sill-min 3 --percentile 75 --out /tmp/thal</code></pre>
+<p>The DKm summaries are on the level pages linked from <a href="dkm.html#thalwegs">DKm</a>.</p>
 <p>A bottom roughness map from EMODnet Geology's seabed substrate (Folk 7 classes, each given a z0), read by the NEAB/DKm models with
 <code>--z0-map</code>:</p>
 <pre><code>nesting-z0 --region -20 31 42 66.5 --res 0.01 --out /data/cache/emodnet_geology/z0_folk7_neab.nc
