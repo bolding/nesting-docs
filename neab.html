@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEAB — pyGETM nesting</title><meta name="description" content="NEAB: a nested North-East Atlantic–Baltic setup with pyGETM, five levels from 6.5 km to 0.25 km.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>:root{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+   a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
+   teal for links, the interface magenta of the figures for emphasis. */
+:root {
+  --paper: #f3f5f4;
+  --paper-2: #e7ecea;
+  --ink: #142028;
+  --ink-2: #4a5a63;
+  --rule: #c9d3d1;
+  --teal: #0b6b72;
+  --magenta: #b0216f;
+  --plate: #ffffff;
+  --ok: #2c7a3f;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1120px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+    --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+  --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 400 1.06rem/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--teal); text-underline-offset: 2px; }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+/* top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule);
+}
+.topin {
+  max-width: var(--wide); margin: 0 auto; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { font: 700 0.95rem/1 var(--display); font-stretch: 85%; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.topbar nav { display: flex; gap: 0.2rem 1rem; flex-wrap: wrap; }
+.topbar nav a { font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); text-decoration: none; }
+.topbar nav a:hover { color: var(--teal); }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
+.chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
+
+/* hero */
+.hero { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.1rem; }
+.draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+h1 {
+  font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
+  letter-spacing: -0.01em; margin: 0; max-width: 18ch; text-wrap: balance;
+}
+.lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
+.facts > div { padding: 0.8rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.facts dt { font: 600 0.74rem/1.2 var(--display); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin: 0.15rem 0 0; font: 700 1.9rem/1.1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.facts p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink-2); }
+
+/* chapters */
+.chapter { padding-block: 3rem 1rem; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.3rem; }
+.chapter > * { width: 100%; }
+.chap { display: grid; gap: 0.3rem; }
+.eyebrow { font: 700 0.76rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+h2 { font: 800 clamp(1.7rem, 3.6vw, 2.5rem)/1.08 var(--display); font-stretch: 80%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.35rem/1.2 var(--display); font-stretch: 85%; margin: 1.4rem auto 0; text-wrap: balance; }
+h4 { font: 700 1.02rem/1.3 var(--display); margin: 0 0 0.4rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.small { font-size: 0.92rem; color: var(--ink-2); }
+.ok { color: var(--ok); font-weight: 600; }
+
+/* figures: white plates, so the white-background figures read in both themes */
+.fig { margin: 0; display: grid; gap: 0.55rem; min-width: 0; }
+.plate {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--plate); cursor: zoom-in; overflow: hidden;
+}
+.plate.static { cursor: default; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
+figcaption strong { font: 700 0.98rem/1.3 var(--display); color: var(--ink); }
+.grid2, .grid3 { display: grid; gap: 1.6rem 1.4rem; align-items: start; }
+.grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.grid3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.6rem; align-items: start; }
+.twocol > *, .grid2 > *, .grid3 > * { min-width: 0; }
+.statusgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.6rem; }
+.statusgrid > div { border-top: 2px solid var(--ink); padding-top: 0.7rem; }
+
+/* tables */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { font: 700 0.78rem/1.2 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); text-align: left; padding: 0.5rem 0.7rem 0.4rem 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+td { padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.num td { font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+.callout { border-left: 3px solid var(--magenta); padding: 0.2rem 0 0.2rem 1rem; display: grid; gap: 0.7rem; }
+pre { margin: 0; padding: 0.8rem 1rem; background: var(--paper-2); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+pre code { background: none; padding: 0; }
+
+/* stepper */
+.stepper { display: grid; gap: 0.8rem; }
+.stepper-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; align-items: center; }
+.stepnav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.step, .stepctl button, #lbclose {
+  font: 600 0.9rem/1 var(--display); border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  border-radius: 3px; min-width: 2.3rem; height: 2.3rem; padding: 0 0.7rem; cursor: pointer;
+}
+.step[aria-current="step"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.stepctl { display: flex; gap: 0.4rem; }
+.step:hover, .stepctl button:hover { border-color: var(--teal); }
+.steptext { display: grid; gap: 0.2rem; max-width: var(--measure); }
+.stepno { font: 600 0.78rem/1 var(--mono); color: var(--magenta); }
+.steptext h4 { margin: 0; font-size: 1.15rem; }
+
+/* lightbox */
+dialog#lightbox { border: none; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
+#lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
+#lbclose { margin: 0 0 0.5rem auto; display: block; }
+
+.foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink-2); }
+</style>
+<style>main > .chapter { max-width: var(--wide); }
+.topbar nav { align-items: center; }
+.topbar nav a[aria-current="page"], .menu > summary[aria-current="page"] { color: var(--ink); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary::after { content: " ▾"; font-size: 0.8em; }
+.menu > summary:hover { color: var(--teal); }
+.menu-items { position: absolute; top: 1.9rem; left: -0.6rem; min-width: 11rem; z-index: 6; display: grid;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem 0; box-shadow: 0 6px 18px rgb(0 0 0 / 0.12); }
+.menu-items a { padding: 0.35rem 0.9rem; }
+.menu-items a:hover { background: var(--paper-2); }
+.crumbs { max-width: var(--wide); margin: 0 auto; padding: 0.9rem 0 0; font: 600 0.85rem/1.4 var(--display); color: var(--ink-2); }
+.crumbs a { text-decoration: none; }
+.subnav { max-width: var(--wide); margin: 0.4rem auto 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font: 500 0.82rem/1.4 var(--display); }
+.subnav a { color: var(--ink-2); text-decoration: none; }
+.subnav a:hover { color: var(--teal); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.2rem; max-width: var(--wide); }
+.card { display: grid; gap: 0.4rem; padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); text-decoration: none; color: var(--ink); }
+.card:hover { border-color: var(--teal); }
+.card h3 { margin: 0; font-size: 1.15rem; }
+.card p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+.issue { border-top: 1px solid var(--rule); padding-top: 1rem; display: grid; gap: 0.7rem; }
+.issue > h3 { margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; font: 600 0.75rem/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; }
+.tags span { padding: 0.25rem 0.5rem; border-radius: 3px; background: var(--paper-2); color: var(--ink-2); }
+.tags .solved { background: color-mix(in srgb, var(--ok) 18%, var(--paper)); color: var(--ok); }
+.tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
+.seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+</style></head><body>
+<div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html" aria-current="page">NEAB</a></div></details><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
+<main id="top">
+<div class="crumbs"><a href="index.html">← Overview</a></div>
+<nav class="subnav" aria-label="On this page"><a href="#setup">Setup</a><a href="#tides">Runs</a><a href="#northsea">North Sea</a><a href="#reference">Reference</a><a href="#uses">Uses</a></nav>
+<header class="hero">
+  <p class="draft">Under development · updated 2 November 2026</p>
+  <h1>NEAB: North-East Atlantic–Baltic</h1>
+  <p class="lede">Five pyGETM models from the NE Atlantic at 6.5 km down to the Danish straits at 0.25 km,
+  coupled by two-way nesting. Each level has its own grid, time step and cores; all of them compute at the same time.
+  A coarse version at half the resolution is used for all exploratory work.</p>
+  <dl class="facts">
+    <div><dt>levels</dt><dd>5</dd><p>6.5 km to 0.25 km</p></div>
+    <div><dt>refinement</dt><dd>3 × 3</dd><p>time ratio 1 or 3</p></div>
+    <div><dt>31 days, coarse</dt><dd>21 min</dd><p>on 64 cores</p></div>
+    <div><dt>tide gauges</dt><dd>685</dd><p>GESLA comparison</p></div>
+  </dl>
+</header>
+<section id="setup" class="chapter"><header class="chap"><span class="eyebrow">Setup</span><h2>Five levels, from the Atlantic to the Danish straits</h2></header>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/neab_hierarchy_fine.png" aria-label="Open The hierarchy (full resolution) full size"><img src="fig/neab/neab_hierarchy_fine.png" alt="The hierarchy (full resolution)" loading="lazy"></button><figcaption><strong>The hierarchy (full resolution)</strong><p>Each child is drawn as its active region (solid line); its window is dashed. Magenta: interface cells. The Danish straits model was moved to 9.33°E / 53.46°N on 31 October so that it exchanges only across the Kattegat (north) and at Arkona (east).</p></figcaption></figure>
+<div class="tablewrap "><table><thead><tr><th>Level</th><th>Area</th><th>Interfaces</th><th>Grid</th><th>Resolution</th><th>Time ratio</th><th>dt</th></tr></thead><tbody><tr><td>neab_root</td><td>20°W–31°E, 42–66.5°N</td><td>open boundaries (TPXO9, Flather)</td><td>510 × 392</td><td>6.2 × 6.9 km</td><td>–</td><td>8.8 s</td></tr><tr><td>north_sea_baltic</td><td>North Sea, Channel, Celtic and Irish Sea, Baltic</td><td>8°W, north of Scotland, Shetland–Norway</td><td>1155 × 840</td><td>2.0 × 2.3 km</td><td>1</td><td>8.8 s</td></tr><tr><td>danish_straits</td><td>Kattegat, Belts, Sound, Arkona, German coast</td><td>Kattegat 57.69°N, Arkona 14.5°E</td><td>465 × 618</td><td>0.70 × 0.77 km</td><td>1</td><td>8.8 s</td></tr><tr><td>northern_little_belt</td><td>Fredericia–Middelfart narrows</td><td>across the Belt</td><td>153 × 174</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr><tr><td>northern_sound</td><td>Helsingør–Helsingborg</td><td>across the Sound</td><td>150 × 153</td><td>0.23 × 0.26 km</td><td>3</td><td>2.9 s</td></tr></tbody></table></div>
+<p class="small">dt = 0.8 × pyGETM's <code>Domain.cfl_check</code>. Refining by 3 keeps the time step where the water is 9 times shallower: true for the shelf seas under the deep Atlantic, not for the narrow straits, which take 3 steps per parent step.</p>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/neab_hierarchy_coarse.png" aria-label="Open Active regions (coarse layout) full size"><img src="fig/neab/neab_hierarchy_coarse.png" alt="Active regions (coarse layout)" loading="lazy"></button><figcaption><strong>Active regions (coarse layout)</strong><p>A seed point and straight-line barriers per level. The Norwegian Sea and the Rockall Trough stay with the root, the Skagerrak with north_sea_baltic.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/nse_vs_neab.png" aria-label="Open Against the NSe production domain full size"><img src="fig/neab/nse_vs_neab.png" alt="Against the NSe production domain" loading="lazy"></button><figcaption><strong>Against the NSe production domain</strong><p>The Celtic Sea is part of north_sea_baltic (Irish Sea and Channel connected), which cut the Irish Sea M2 errors by about 40 %.</p></figcaption></figure>
+</div>
+<div class="twocol">
+<div><h4>Bathymetry, as the NSe production setup</h4><ul><li>Raw: ocean-prep <code>bathymetry-regrid</code>, conservative regridding of GEBCO / EMODnet, once per level.</li><li>Processing: thalweg corridors, local minimum depths, basins, rx0 ≤ 0.2.</li><li>Fixes in a second pass, the same groups as NSe (Irish Sea, Great Belt, Little Belt, Øresund). The Little Belt is closed in the raw grids and opened by its thalweg group.</li></ul></div>
+<div><figure class="fig"><button class="plate" type="button" data-full="fig/neab/wadden_barriers.png" aria-label="Open A Wadden Sea level (proposal) full size"><img src="fig/neab/wadden_barriers.png" alt="A Wadden Sea level (proposal)" loading="lazy"></button><figcaption><strong>A Wadden Sea level (proposal)</strong><p>Ratio 3 under north_sea_baltic; the interface outside the barrier islands at about 18 m. Needs drying and flooding.</p></figcaption></figure></div>
+</div>
+</section>
+<section id="tides" class="chapter"><header class="chap"><span class="eyebrow">Runs</span><h2>Cores, tides and timing</h2></header><h3>Cores per model</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/neab_balance_coarse_64.png" aria-label="Open Coarse layout, 64 cores full size"><img src="fig/neab/neab_balance_coarse_64.png" alt="Coarse layout, 64 cores" loading="lazy"></button><figcaption><strong>Coarse layout, 64 cores</strong><p>7 / 39 / 14 / 2 / 2 cores. Dark blue: computed; light blue: children's holes; grey dotted: removed subdomains.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/neab_balance_fine_128.png" aria-label="Open Full resolution, 128 cores full size"><img src="fig/neab/neab_balance_fine_128.png" alt="Full resolution, 128 cores" loading="lazy"></button><figcaption><strong>Full resolution, 128 cores</strong><p>busy 90–100 % in every model.</p></figcaption></figure>
+</div>
+<h3>Tides (coarse layout, M2)</h3>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_m2_difference.png" aria-label="Open The coupling schedules full size"><img src="fig/neab/tides_m2_difference.png" alt="The coupling schedules" loading="lazy"></button><figcaption><strong>The coupling schedules</strong><p>Sync (all models step at the same time, the child's ring extrapolated from the parent's last two syncs) equals the sequential order to below 1 mm and is 17 % faster.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_m2_levels.png" aria-label="Open M2 per model full size"><img src="fig/neab/tides_m2_levels.png" alt="M2 per model" loading="lazy"></button><figcaption><strong>M2 per model</strong><p>Amplitude and phase, each model over the cells it computes.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/tides_interface_pairs.png" aria-label="Open Across the interfaces full size"><img src="fig/neab/tides_interface_pairs.png" alt="Across the interfaces" loading="lazy"></button><figcaption><strong>Across the interfaces</strong><p>Station pairs on both sides of each interface agree: no jumps.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/neab/gauges_m2_errors.png" aria-label="Open Against the tide gauges (GESLA) full size"><img src="fig/neab/gauges_m2_errors.png" alt="Against the tide gauges (GESLA)" loading="lazy"></button><figcaption><strong>Against the tide gauges (GESLA)</strong><p>Processed bathymetry, z0 = 0.015 m. A sanity check, not a calibration.</p></figcaption></figure>
+</div>
+<h3>Tides in motion</h3>
+<p>Hourly elevation over two days (days 15–17 of the 31-day coarse run, all TPXO9 constituents). Every model
+is drawn over the cells it computes, the finest on top; dashed: the children's windows. On the right, the
+elevation at six stations from the finest model computing each of them, the coloured line growing with the
+animation.</p>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab/neab_anim_hierarchy.gif" alt="Animation of the tidal elevation over the whole NEAB hierarchy" loading="lazy"></div>
+<figcaption><strong>The whole hierarchy</strong><p>The tide enters from the Atlantic, runs around the British Isles into the North Sea and fades towards the Baltic.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab/neab_anim_north_sea_baltic.gif" alt="Animation of the tidal elevation in the North Sea" loading="lazy"></div>
+<figcaption><strong>North Sea</strong><p>The amphidromic systems of the North Sea; the Channel and the Irish Sea are part of the same model.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/neab/neab_anim_danish_straits.gif" alt="Animation of the tidal elevation in the Danish straits" loading="lazy"></div>
+<figcaption><strong>Danish straits</strong><p>The Kattegat tide drops through the Belts and the Sound; the two straits models (dashed boxes) at 0.5 km.</p></figcaption></figure>
+<h3>The new Danish straits window on 64 cores</h3>
+<p>The same 31-day run (all constituents, z0 = 0.015 m) with the Danish straits moved to 9.33°E / 53.46°N,
+one MPMD component per model, pinned to cores on a 64-core server: <strong>31 minutes</strong>, against
+100 minutes on 18 cores before. Against 685 GESLA gauges the result is unchanged, as expected: the west
+interfaces it removes were a few cells in small fjords.</p>
+<div class="tablewrap num"><table><thead><tr><th>Model</th><th>Gauges</th><th>M2 vector rms before → after</th><th>S2</th><th>K1</th></tr></thead><tbody><tr><td>neab_root</td><td>124</td><td>0.251 → 0.251 m</td><td>0.100 → 0.100 m</td><td>0.055 → 0.055 m</td></tr><tr><td>north_sea_baltic</td><td>463</td><td>0.348 → 0.348 m</td><td>0.143 → 0.143 m</td><td>0.053 → 0.053 m</td></tr><tr><td>danish_straits</td><td>89</td><td>0.077 → 0.076 m</td><td>0.021 → 0.021 m</td><td>0.013 → 0.013 m</td></tr><tr><td>northern_little_belt</td><td>1</td><td>0.221 → 0.221 m</td><td>0.068 → 0.068 m</td><td>0.005 → 0.005 m</td></tr><tr><td>northern_sound</td><td>8</td><td>0.067 → 0.066 m</td><td>0.019 → 0.019 m</td><td>0.010 → 0.010 m</td></tr></tbody></table></div>
+<p class="small">Since then the order of the exchanges in a sync has changed: one halo update per sync, the
+children's data sent up first (bit-identical results). The same 31-day run now takes <strong>21 minutes</strong> on
+64 cores. Timers in the halo updates showed that most of what had looked like nesting work was waiting for
+the other models; the nesting's own work (restriction, flux matching, ring values) is 6–14 % of the time.</p>
+</section>
+<section id="northsea" class="chapter"><header class="chap"><span class="eyebrow">North Sea</span><h2>The tide east of the Skagerrak amphidrome</h2></header>
+<p>Over most of the North Sea NEAB's M2 is within 10–15 % of TPXO9. From the Danish North Sea coast into the
+Skagerrak and the Kattegat it is about twice too large (Skagen 0.29 m against 0.14 m observed in the control run).
+The search for the cause — shallow water and the Wadden Sea flats, bottom friction, the depth datum (LAT against
+MSL), the depth source — is an open issue with its own record.</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#neab-skagerrak">NEAB's tide east of the Skagerrak amphidrome is twice too large</a>, <a href="issues.html#tpxo-coast">TPXO9 at the coast: wet nodes without constants</a>.</p>
+</section>
+<section id="reference" class="chapter"><header class="chap"><span class="eyebrow">Reference</span><h2>Tidal maps for model comparisons</h2></header>
+<p>As a common reference for comparing models, the twelve TPXO9-atlas constituents (M2, S2, N2, K2, K1, O1, P1,
+Q1, M4, MS4, MN4, 2N2) are cut to the AMM7 area, extended east and north to hold the whole Baltic: 20°W–31°E,
+40–66°N, on TPXO9-atlas's own 1/30° grid. The file <code>tpxo9_atlas_amm7_baltic.nc</code> (15 MB, in
+<code>TPXO9/maps</code> beside the TPXO9 data) holds, for every constituent:</p>
+<ul><li>the amplitude (m) and the Greenwich phase lag (°): the cotidal lines are the contours of the phase;</li>
+<li>the complex amplitude (re, im), for interpolation onto a model grid without the jump at 0/360°;</li>
+<li>TPXO9's depth and water mask.</li></ul>
+<p>These are harmonic constants without nodal corrections. Only water connected to the Atlantic is kept. Inside the
+box the Mediterranean is cut off (Gibraltar lies south of 40°N), and TPXO9-atlas has amplitudes of metres there
+that are not real, in the Adriatic. TPXO9 is fitted to altimetry and tide gauges, so it is a good reference
+offshore and on the open shelf. In the Wadden Sea, the inner Danish waters and the Baltic, with tides of a few
+centimetres, it is a guide, to be used together with gauges. In the Baltic its local patches show edges against its
+coarser global solution (Gulf of Finland, Gulf of Riga, 24°E in the Bothnian Bay). The file and the figures come
+from <code>NEAB/scripts/tide_reference.py</code>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_m2.png" aria-label="Open TPXO9-atlas M2 full size"><img src="fig/neab/tpxo9_m2.png" alt="TPXO9-atlas M2" loading="lazy"></button><figcaption><strong>TPXO9-atlas M2</strong><p>M2 amplitude and cotidal lines every 30° (Greenwich phase) over the whole box; red, dashed: the AMM7 domain.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_m2_zooms.png" aria-label="Open M2 in the North Sea and the Baltic full size"><img src="fig/neab/tpxo9_m2_zooms.png" alt="M2 in the North Sea and the Baltic" loading="lazy"></button><figcaption><strong>M2 in the North Sea and the Baltic</strong><p>Left: the North Sea and its three amphidromes. Right: the Baltic with the colour scale to 5 cm.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_constituents.png" aria-label="Open All twelve constituents full size"><img src="fig/neab/tpxo9_constituents.png" alt="All twelve constituents" loading="lazy"></button><figcaption><strong>All twelve constituents</strong><p>Amplitude and cotidal lines every 30° for each constituent, each with its own colour scale.</p></figcaption></figure>
+<h3 id="series">Tidal series</h3>
+<p>The same TPXO9 constituents give time series at any point, predicted as pyGETM does at its open boundaries (all
+twelve constituents, nodal corrections), with model runs on top (<code>NEAB/scripts/tide_series.py</code>). January
+2020 in the Bristol Channel (Hinkley Point) and at Saint-Malo, two of the largest tides in the area, both with a
+range of over 11 m at springs, against NEAB's control run and the run with its depths from LAT to MSL. The series are taken at the nearest TPXO9 node with
+tidal constants: at Hinkley Point that is 11 km out in the channel (M2 3.72 m against 3.92 m at the gauge), at
+Saint-Malo 3 km off (3.68 m against 3.67 m). NEAB's spring tides in the Bristol Channel are about 0.5 m too
+small, and its neaps at Saint-Malo a little too large. Part of the rms difference comes from NEAB's hourly
+output, which cuts the peaks. The deeper shelf brings M2 at the Hinkley Point gauge from 3.58 m to 3.73 m (observed
+3.89 m) but hardly changes the rms differences of the series (0.63 m and 0.38 m).</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_series_neab.png" aria-label="Open January 2020 at Hinkley Point and Saint-Malo full size"><img src="fig/neab/tpxo9_series_neab.png" alt="January 2020 at Hinkley Point and Saint-Malo" loading="lazy"></button><figcaption><strong>January 2020 at Hinkley Point and Saint-Malo</strong><p>TPXO9 (black), NEAB's control run and the run with depths from LAT to MSL (north_sea_baltic, 31 days, z0 0.015 m), shifted to zero mean; the rms difference is in the legend.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/tpxo9_baltic_s2_k1_o1.png" aria-label="Open S2, K1 and O1 in the Baltic full size"><img src="fig/neab/tpxo9_baltic_s2_k1_o1.png" alt="S2, K1 and O1 in the Baltic" loading="lazy"></button><figcaption><strong>S2, K1 and O1 in the Baltic</strong><p>In the central Baltic the diurnal K1 and O1 are as large as M2: medians of 0.6–0.7 cm.</p></figcaption></figure>
+</section>
+<section id="uses" class="chapter"><header class="chap"><span class="eyebrow">Uses</span><h2>Boundaries for other setups</h2></header>
+<p>A NEAB run can write hourly elevation, transports and velocities of its levels. <code>nesting-boundaries</code>
+samples them at another model's open-boundary points, taking at every point the finest NEAB level with water
+there. The result is a file in the layout of the OceanICU NSe setup, which pyGETM reads on its own grid
+without interpolation. The first user is <a href="dkm.html">DKm</a>, the Danish waters
+with their fjords: its root and its Belt Sea level take their open boundaries from NEAB, TPXO9 or CMEMS.
+Through NEAB, DKm inherits the Kattegat error described above. With TPXO9 at its boundaries, DKm has the
+Kattegat tide right.</p>
+</section>
+<footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
+</main>
+<dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
+<script>(function () {
+  // stepper: build the nest one step at a time
+  var root = document.getElementById("stepper");
+  if (root) {
+    var steps = Array.prototype.slice.call(root.querySelectorAll("template"));
+    var btns = Array.prototype.slice.call(root.querySelectorAll(".step"));
+    var img = document.getElementById("stepimg"), plate = document.getElementById("stepplate");
+    var title = document.getElementById("steptitle"), desc = document.getElementById("stepdesc"), no = document.getElementById("stepno");
+    var k = 0;
+    steps.forEach(function (t) { var i = new Image(); i.src = t.dataset.src; });  // preload
+    function show(n) {
+      k = Math.max(0, Math.min(steps.length - 1, n));
+      var t = steps[k];
+      img.src = t.dataset.src; img.alt = t.dataset.title; plate.dataset.full = t.dataset.src;
+      title.textContent = t.dataset.title; desc.textContent = t.dataset.text;
+      no.textContent = (k + 1) + " / " + steps.length;
+      btns.forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+      document.getElementById("prev").disabled = k === 0;
+      document.getElementById("next").disabled = k === steps.length - 1;
+    }
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
+    document.getElementById("prev").addEventListener("click", function () { show(k - 1); });
+    document.getElementById("next").addEventListener("click", function () { show(k + 1); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { show(k + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { show(k - 1); e.preventDefault(); }
+    });
+    show(0);
+  }
+  // figures full size
+  var dlg = document.getElementById("lightbox"), lb = document.getElementById("lbimg");
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest && e.target.closest(".plate[data-full]");
+    if (!p || !dlg || typeof dlg.showModal !== "function") return;
+    lb.src = p.dataset.full; var im = p.querySelector("img"); lb.alt = im ? im.alt : "";
+    dlg.showModal();
+  });
+  if (dlg) {
+    document.getElementById("lbclose").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+})();
+
+document.addEventListener("click", function (e) {
+  document.querySelectorAll("details.menu[open]").forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute("open"); });
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") document.querySelectorAll("details.menu[open]").forEach(function (d) { d.removeAttribute("open"); });
+});
+</script>
+</body></html>

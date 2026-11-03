@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IDEAL — pyGETM nesting</title><meta name="description" content="IDEAL: three nested pyGETM levels (3 km, 1 km, 333 m) in an analytic channel for testing the two-way nesting, in 2D and in 3D with temperature.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>:root{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+   a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
+   teal for links, the interface magenta of the figures for emphasis. */
+:root {
+  --paper: #f3f5f4;
+  --paper-2: #e7ecea;
+  --ink: #142028;
+  --ink-2: #4a5a63;
+  --rule: #c9d3d1;
+  --teal: #0b6b72;
+  --magenta: #b0216f;
+  --plate: #ffffff;
+  --ok: #2c7a3f;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1120px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+    --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+  --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 400 1.06rem/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--teal); text-underline-offset: 2px; }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+/* top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule);
+}
+.topin {
+  max-width: var(--wide); margin: 0 auto; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { font: 700 0.95rem/1 var(--display); font-stretch: 85%; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.topbar nav { display: flex; gap: 0.2rem 1rem; flex-wrap: wrap; }
+.topbar nav a { font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); text-decoration: none; }
+.topbar nav a:hover { color: var(--teal); }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
+.chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
+
+/* hero */
+.hero { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.1rem; }
+.draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+h1 {
+  font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
+  letter-spacing: -0.01em; margin: 0; max-width: 18ch; text-wrap: balance;
+}
+.lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
+.facts > div { padding: 0.8rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.facts dt { font: 600 0.74rem/1.2 var(--display); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin: 0.15rem 0 0; font: 700 1.9rem/1.1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.facts p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink-2); }
+
+/* chapters */
+.chapter { padding-block: 3rem 1rem; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.3rem; }
+.chapter > * { width: 100%; }
+.chap { display: grid; gap: 0.3rem; }
+.eyebrow { font: 700 0.76rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+h2 { font: 800 clamp(1.7rem, 3.6vw, 2.5rem)/1.08 var(--display); font-stretch: 80%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.35rem/1.2 var(--display); font-stretch: 85%; margin: 1.4rem auto 0; text-wrap: balance; }
+h4 { font: 700 1.02rem/1.3 var(--display); margin: 0 0 0.4rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.small { font-size: 0.92rem; color: var(--ink-2); }
+.ok { color: var(--ok); font-weight: 600; }
+
+/* figures: white plates, so the white-background figures read in both themes */
+.fig { margin: 0; display: grid; gap: 0.55rem; min-width: 0; }
+.plate {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--plate); cursor: zoom-in; overflow: hidden;
+}
+.plate.static { cursor: default; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
+figcaption strong { font: 700 0.98rem/1.3 var(--display); color: var(--ink); }
+.grid2, .grid3 { display: grid; gap: 1.6rem 1.4rem; align-items: start; }
+.grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.grid3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.6rem; align-items: start; }
+.twocol > *, .grid2 > *, .grid3 > * { min-width: 0; }
+.statusgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.6rem; }
+.statusgrid > div { border-top: 2px solid var(--ink); padding-top: 0.7rem; }
+
+/* tables */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { font: 700 0.78rem/1.2 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); text-align: left; padding: 0.5rem 0.7rem 0.4rem 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+td { padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.num td { font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+.callout { border-left: 3px solid var(--magenta); padding: 0.2rem 0 0.2rem 1rem; display: grid; gap: 0.7rem; }
+pre { margin: 0; padding: 0.8rem 1rem; background: var(--paper-2); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+pre code { background: none; padding: 0; }
+
+/* stepper */
+.stepper { display: grid; gap: 0.8rem; }
+.stepper-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; align-items: center; }
+.stepnav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.step, .stepctl button, #lbclose {
+  font: 600 0.9rem/1 var(--display); border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  border-radius: 3px; min-width: 2.3rem; height: 2.3rem; padding: 0 0.7rem; cursor: pointer;
+}
+.step[aria-current="step"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.stepctl { display: flex; gap: 0.4rem; }
+.step:hover, .stepctl button:hover { border-color: var(--teal); }
+.steptext { display: grid; gap: 0.2rem; max-width: var(--measure); }
+.stepno { font: 600 0.78rem/1 var(--mono); color: var(--magenta); }
+.steptext h4 { margin: 0; font-size: 1.15rem; }
+
+/* lightbox */
+dialog#lightbox { border: none; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
+#lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
+#lbclose { margin: 0 0 0.5rem auto; display: block; }
+
+.foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink-2); }
+</style>
+<style>main > .chapter { max-width: var(--wide); }
+.topbar nav { align-items: center; }
+.topbar nav a[aria-current="page"], .menu > summary[aria-current="page"] { color: var(--ink); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary::after { content: " ▾"; font-size: 0.8em; }
+.menu > summary:hover { color: var(--teal); }
+.menu-items { position: absolute; top: 1.9rem; left: -0.6rem; min-width: 11rem; z-index: 6; display: grid;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem 0; box-shadow: 0 6px 18px rgb(0 0 0 / 0.12); }
+.menu-items a { padding: 0.35rem 0.9rem; }
+.menu-items a:hover { background: var(--paper-2); }
+.crumbs { max-width: var(--wide); margin: 0 auto; padding: 0.9rem 0 0; font: 600 0.85rem/1.4 var(--display); color: var(--ink-2); }
+.crumbs a { text-decoration: none; }
+.subnav { max-width: var(--wide); margin: 0.4rem auto 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font: 500 0.82rem/1.4 var(--display); }
+.subnav a { color: var(--ink-2); text-decoration: none; }
+.subnav a:hover { color: var(--teal); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.2rem; max-width: var(--wide); }
+.card { display: grid; gap: 0.4rem; padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); text-decoration: none; color: var(--ink); }
+.card:hover { border-color: var(--teal); }
+.card h3 { margin: 0; font-size: 1.15rem; }
+.card p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+.issue { border-top: 1px solid var(--rule); padding-top: 1rem; display: grid; gap: 0.7rem; }
+.issue > h3 { margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; font: 600 0.75rem/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; }
+.tags span { padding: 0.25rem 0.5rem; border-radius: 3px; background: var(--paper-2); color: var(--ink-2); }
+.tags .solved { background: color-mix(in srgb, var(--ok) 18%, var(--paper)); color: var(--ok); }
+.tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
+.seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+</style></head><body>
+<div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
+<main id="top">
+<div class="crumbs"><a href="index.html">← Overview</a></div>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a></nav>
+<header class="hero">
+  <p class="draft">Under development · updated 3 November 2026</p>
+  <h1>IDEAL: three nested levels with known answers</h1>
+  <p class="lede">A Cartesian channel with an analytic depth and three nested pyGETM levels, 3 km, 1 km and
+  333 m, with every feature of the nesting placed on purpose. It is where the two-way nesting for pyGETM is
+  tested before it goes into the realistic setups <a href="neab.html">NEAB</a> and
+  <a href="dkm.html">DKm</a>. Runs take minutes on a few cores.</p>
+  <dl class="facts">
+    <div><dt>levels</dt><dd>3</dd><p>3 km → 1 km → 333 m</p></div>
+    <div><dt>volume conserved</dt><dd>2e-16</dd><p>relative, 2D</p></div>
+    <div><dt>heat conserved</dt><dd>1e-9</dd><p>relative, 3D, 48 h</p></div>
+    <div><dt>layers</dt><dd>10 / 15 / 20</dd><p>a different number per level</p></div>
+  </dl>
+</header>
+<section id="layout" class="chapter"><header class="chap"><span class="eyebrow">Layout</span><h2>A channel, a shelf and a strait</h2></header>
+<p>The root is a channel of 360 × 180 km at 3 km, with an open (Flather), closed or periodic boundary at each end
+and an M2 tide of 0.5 m at the open one. The shelf level (1 km, ratio 3, time ratio 1) nests in its middle, the strait
+level (333 m, ratio 3, time ratio 3) in the shelf. Planted features:</p>
+<ul><li><strong>An island across the shelf's west interface</strong>: the interface runs through land.</li>
+<li><strong>An active region bounded by a barrier</strong>: the shelf's north-east corner stays with the channel, so that
+interface is not on the window's edge.</li>
+<li><strong>A wall with a 1 km gap</strong>: open in the shelf (1 cell) and the strait level (3 cells), closed in the channel,
+as the Little Belt in NEAB.</li></ul>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/layout.png" aria-label="Open The layout full size"><img src="fig/ideal/layout.png" alt="The layout" loading="lazy"></button><figcaption><strong>The layout</strong><p>Depth and land of the three levels; the shelf's window and active region (red), the strait level's (blue).</p></figcaption></figure>
+<p>Each level is an ordinary pyGETM model (<code>IDEAL/models/&lt;level&gt;/run.py</code>), launched as one MPMD component.
+The nesting (<code>pygetm.nesting</code> on the fork <code>bolding/pygetm</code>) fills the halo zones where the levels overlap
+and matches the fluxes through the faces between them. How it works is described on the
+<a href="methods.html">nesting page</a>.</p>
+</section>
+<section id="twod" class="chapter"><header class="chap"><span class="eyebrow">2D</span><h2>The barotropic experiments</h2></header>
+<div class="tablewrap"><table><thead><tr><th></th><th>Experiment</th><th>Result</th></tr></thead><tbody>
+<tr><td>E1</td><td>Sea at rest, 12 h</td><td><span class="ok">passed</span>: elevation exactly 0 in every level</td></tr>
+<tr><td>E2</td><td>Volume conservation, a 0.5 m bump in a closed basin</td><td><span class="ok">passed</span>: 2e-16 relative; found an <a href="issues.html#substep">instability</a></td></tr>
+<tr><td>E3</td><td>Tide against one level at 333 m everywhere</td><td>nested within 0.4–2.6 cm (tidal range 21–34 cm)</td></tr>
+<tr><td>E8</td><td>Independent of the process split</td><td><span class="ok">passed</span> for 1/1/1, 2/3/2, 1/2/1, 1/1/2 processes; one tile layout differs by 1e-4 m (<a href="issues.html#e8-tiles">open</a>)</td></tr>
+<tr><td>E9</td><td>Time per model</td><td>measured: compute, nesting work, transfer, wait</td></tr>
+</tbody></table></div>
+<p>E2 found an instability of a sub-stepping child under flux matching. It is removed by an AGRIF-like sponge
+next to the interface, which all runs below use (3 child cells, α = 0.1).</p>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#substep">A sub-stepping child is unstable under flux matching</a>, <a href="issues.html#damping-dt">pyGETM applied the transport damping with the time step twice</a>.</p>
+<h3>Nested against one level at 333 m everywhere</h3>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/elevation_tide.png" aria-label="Open Every 6 hours, all three levels full size"><img src="fig/ideal/elevation_tide.png" alt="Every 6 hours, all three levels" loading="lazy"></button><figcaption><strong>Every 6 hours, all three levels</strong><p>Each level over the cells it computes. The tide crosses the interfaces without jumps. With rotation it travels as a Kelvin wave along the southern wall, reflects at the closed east end and returns along the northern wall.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/timeseries.png" aria-label="Open Elevation at six stations full size"><img src="fig/ideal/timeseries.png" alt="Elevation at six stations" loading="lazy"></button><figcaption><strong>Elevation at six stations</strong><p>Solid: nested, time ratio 3 with the sponge; dashed: time ratio 1; dotted: one level at 333 m everywhere. Time ratio 1 is within 0.4–1.0 cm everywhere; time ratio 3 within 0.7–0.9 cm on the shelf and in the strait, 2.2–2.6 cm in the channel, which steps at 18 s instead of 6 s.</p></figcaption></figure>
+<figure class="fig wide"><div class="plate static"><img src="fig/ideal/elevation_anim.gif" alt="Every 30 minutes" loading="lazy"></div><figcaption><strong>Every 30 minutes</strong><p>Left: nested (3 km / 1 km in the red box / 333 m in the blue box). Right: one level at 333 m. Below: the stations.</p></figcaption></figure>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/e8_tiles.png" aria-label="Open E8: the process split full size"><img src="fig/ideal/e8_tiles.png" alt="E8: the process split" loading="lazy"></button><figcaption><strong>E8: the process split</strong><p>Bit-identical for 1/1/1, 2/3/2, 1/2/1 and 1/1/2 processes. With the channel on 3 processes its tile edges fall on the shelf window's edges and the results differ by 1e-4 m: still open.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/timing.png" aria-label="Open Time per model full size"><img src="fig/ideal/timing.png" alt="Time per model" loading="lazy"></button><figcaption><strong>Time per model</strong><p>compute: the model's own step; work: restriction, flux matching, ring values; transfer: receiving data; wait: blocked until the partner's data is there.</p></figcaption></figure>
+</div>
+</section>
+<section id="threed" class="chapter"><header class="chap"><span class="eyebrow">3D</span><h2>Temperature, with a different number of layers per level</h2></header>
+<p class="lede">The same three levels in 3D: baroclinic, with temperature and constant salinity, and sigma layers of
+their own in each level (channel 10, shelf 15, strait 20). The levels' layers do not line up, so every exchange of
+a profile goes through a conservative vertical remap.</p>
+<p>All levels share the 3D time step (181 s): a child's split factor is its parent's times its time ratio, so every
+3D step is a sync. At each sync (<code>pygetm.nesting.baroclinic.NestedTracers3D</code>):</p>
+<ul><li><strong>Rim</strong> (child → parent): the 3 × 3 child columns of each parent rim cell are remapped onto the parent's
+layers (the upper 80 % of the column unstretched, the rest stretched to the parent's depth), with concentrations by
+the volume each parent layer receives. A uniform field stays uniform.</li>
+<li><strong>Ring</strong> (parent → child): the parent's column, remapped onto the child's layers in each ring cell; and the
+parent's layer transports at the faces around the ring, remapped onto the child's face layers and shifted to the
+child's own column total.</li>
+<li><strong>3D transports at the interface</strong> (child → parent): the child's layer transports through its edge faces
+replace the parent's at the window faces, before the parent advects, so both move the same water through every layer.</li>
+<li><strong>3D flux register</strong> (child → parent): the tracer amounts through the child's edge faces over the 3D step,
+remapped onto the parent's face layers; the parent cell next to each face is corrected layer by layer.</li></ul>
+<p>The initial state is at rest with a pycnocline that deepens from 10 m in the west to 25 m in the east, so the
+sloping isopycnals adjust and drive flow across the interfaces, plus the tide at the open west end.</p>
+<div class="tablewrap num"><table><thead><tr><th>Test (48 h unless noted)</th><th>Result</th></tr></thead><tbody>
+<tr><td>uniform temperature, tide, full coupling (12 h)</td><td>T = 12 °C to 3e-13 in all levels</td></tr>
+<tr><td>closed basin, no 3D coupling</td><td>heat content of all levels, max change 9e-6</td></tr>
+<tr><td>closed basin, rim and ring only</td><td>2.5e-5</td></tr>
+<tr><td>closed basin, full coupling</td><td><strong>1.2e-9</strong></td></tr>
+<tr><td>sloping pycnocline, tide, without the sponge</td><td>the strait level blows up at 11 h, with or without 3D coupling (<a href="issues.html#no-sponge-3d">issue</a>)</td></tr>
+<tr><td>sloping pycnocline, tide, sponge, full coupling</td><td>stable; the pycnocline continuous across both interfaces</td></tr>
+</tbody></table></div>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/t3d_section.png" aria-label="Open Temperature through all three levels full size"><img src="fig/ideal/3d/t3d_section.png" alt="Temperature through all three levels" loading="lazy"></button><figcaption><strong>Temperature through all three levels</strong><p>A west–east section at y = 90 km, each level over the cells it computes, with its own layers (5 m, 3.3 m and 2.5 m): at the start and after 48 h with the full coupling, with rim and ring only, and without 3D coupling.</p></figcaption></figure>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/3d/t3d_isotherm.png" aria-label="Open The pycnocline after 48 h full size"><img src="fig/ideal/3d/t3d_isotherm.png" alt="The pycnocline after 48 h" loading="lazy"></button><figcaption><strong>The pycnocline after 48 h</strong><p>Depth of the 12 °C isotherm: continuous across both interfaces.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/3d/t3d_closed_heat.png" aria-label="Open Heat content in a closed basin full size"><img src="fig/ideal/3d/t3d_closed_heat.png" alt="Heat content in a closed basin" loading="lazy"></button><figcaption><strong>Heat content in a closed basin</strong><p>All levels over the cells each computes. With the 3D transports and the flux register the change is 1e-9; with rim and ring only it is 2.5e-5.</p></figcaption></figure>
+</div>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#rim-content">Exact content in the 3D rim made a uniform field non-uniform</a>, <a href="issues.html#ui-sum">The parent's 3D transport at the interface was 10 % off</a>, <a href="issues.html#layer-flux">Parent and child move different water through each layer of the interface</a>, <a href="issues.html#no-sponge-3d">3D runs need the sponge too</a>.</p>
+<h3>3D velocities in the child's ring</h3>
+<p>The child's ring faces are set by the coupling, not computed by the child. In 3D the child first filled them
+with its own layer profile, shifted to the ring's 2D transport. Now it takes the parent's layer transports there:
+the two parent faces around each ring face (linear across, constant along, as in 2D), remapped onto the child's face
+layers and shifted to the child's column total. They are set at the child's 3D momentum step and held over the 3D step.
+The jump of the 3D velocity between a ring face and the child's first interior face, relative to the interior velocity,
+over the 48 h tidal run:</p>
+<div class="tablewrap num"><table><thead><tr><th>Interface</th><th>child's own profile</th><th>the parent's profile</th></tr></thead><tbody>
+<tr><td>shelf, west / east (u)</td><td>0.12 / 0.12</td><td><strong>0.06 / 0.06</strong></td></tr>
+<tr><td>shelf, south / north (v)</td><td>0.94 / 0.96</td><td><strong>0.51 / 0.55</strong></td></tr>
+<tr><td>strait, west / east (u)</td><td>0.10 / 0.12</td><td><strong>0.03 / 0.04</strong></td></tr>
+<tr><td>strait, south / north (v)</td><td>0.91 / 0.97</td><td><strong>0.52 / 0.45</strong></td></tr>
+</tbody></table></div>
+<p class="small">The across-channel velocity v is small, so its relative jumps are large. Heat stays conserved to 1e-9 and a uniform field uniform to 3e-13.</p>
+</section>
+<section id="v2" class="chapter"><header class="chap"><span class="eyebrow">V2</span><h2>A stratified lake at rest</h2></header>
+<p class="lede">A closed basin, no tide, no wind, and a flat pycnocline at 15 m over a bottom sloping from 50 to 20 m
+across the shelf window. Nothing should move: every current is error. A single model has some, from the pressure
+gradient on sigma layers over the slope; the test shows how much the coupling adds, with the channel in sigma layers
+and the shelf and strait in sigma or in adaptive layers that zoom on the stratification.</p>
+<p>pyGETM's adaptive coordinates have about 25 parameters, all off by default except the pull towards the background
+grid; none of them have been tuned here. The runs use zooming on the density gradient (cNN 1, drho 0.3), a neighbour
+limit (cneigh 0.1), a shallow-water limit (chmin 0.1, hmin 0.3 m) and a time scale of 3 h, plus three variations.</p>
+<div class="tablewrap num"><table><thead><tr><th>48 h, all levels from consistent layer means</th><th>max |u| channel</th><th>shelf</th><th>strait</th><th>pycnocline moved (shelf)</th></tr></thead><tbody>
+<tr><td>the channel alone (single model, same step)</td><td>1.4 mm/s</td><td>–</td><td>–</td><td>–</td></tr>
+<tr><td>nested, sigma, without the 3D ring</td><td>1.4 mm/s</td><td>1.1 mm/s</td><td>3.3 mm/s</td><td>0.01 m</td></tr>
+<tr><td>nested, sigma, ring from the parent</td><td>16 mm/s</td><td>32 mm/s</td><td>12 mm/s</td><td>0.34 m</td></tr>
+<tr><td>nested, sigma, ring with the child's vertical detail</td><td>8.6 mm/s</td><td>21 mm/s</td><td>6.2 mm/s</td><td>0.16 m</td></tr>
+<tr><td>nested, adaptive, ring with the child's detail</td><td>8.3 mm/s</td><td>16 mm/s</td><td>9.2 mm/s</td><td>0.10 m</td></tr>
+<tr><td>adaptive, cNN 0.3</td><td>8.0 mm/s</td><td>18 mm/s</td><td>12 mm/s</td><td>0.12 m</td></tr>
+<tr><td>adaptive, time scale 1 h</td><td>8.5 mm/s</td><td>14 mm/s</td><td>14 mm/s</td><td>0.10 m</td></tr>
+<tr><td>adaptive, pyGETM's defaults (no zooming)</td><td>8.2 mm/s</td><td>19 mm/s</td><td>11 mm/s</td><td>0.12 m</td></tr>
+</tbody></table></div>
+<p>Heat is conserved to 1e-10 in every run. The coupling still adds spurious currents of 1–2 cm/s along the
+interfaces, mostly on the parent's side. Without the 3D ring they vanish, so they come from the ring's temperature
+profile: a piecewise-constant remap from the parent's 5 m layers onto the child's finer ones cannot carry a 3 m thick
+pycnocline. Adding the child's own vertical detail halves them. The adaptive coordinates and their parameters change the
+result far less than the ring does, so their scan becomes meaningful only once the ring is better.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_speed.png" aria-label="Open Spurious currents over time full size"><img src="fig/ideal/3d/v2_speed.png" alt="Spurious currents over time" loading="lazy"></button><figcaption><strong>Spurious currents over time</strong><p>Max |u| and rms u per level for every run; the channel alone in blue.</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring from the parent, the ring with the child's detail (sigma and adaptive).</p></figcaption></figure>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring cannot carry the child's vertical structure</a>.</p>
+</section>
+<footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
+</main>
+<dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
+<script>(function () {
+  // stepper: build the nest one step at a time
+  var root = document.getElementById("stepper");
+  if (root) {
+    var steps = Array.prototype.slice.call(root.querySelectorAll("template"));
+    var btns = Array.prototype.slice.call(root.querySelectorAll(".step"));
+    var img = document.getElementById("stepimg"), plate = document.getElementById("stepplate");
+    var title = document.getElementById("steptitle"), desc = document.getElementById("stepdesc"), no = document.getElementById("stepno");
+    var k = 0;
+    steps.forEach(function (t) { var i = new Image(); i.src = t.dataset.src; });  // preload
+    function show(n) {
+      k = Math.max(0, Math.min(steps.length - 1, n));
+      var t = steps[k];
+      img.src = t.dataset.src; img.alt = t.dataset.title; plate.dataset.full = t.dataset.src;
+      title.textContent = t.dataset.title; desc.textContent = t.dataset.text;
+      no.textContent = (k + 1) + " / " + steps.length;
+      btns.forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+      document.getElementById("prev").disabled = k === 0;
+      document.getElementById("next").disabled = k === steps.length - 1;
+    }
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
+    document.getElementById("prev").addEventListener("click", function () { show(k - 1); });
+    document.getElementById("next").addEventListener("click", function () { show(k + 1); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { show(k + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { show(k - 1); e.preventDefault(); }
+    });
+    show(0);
+  }
+  // figures full size
+  var dlg = document.getElementById("lightbox"), lb = document.getElementById("lbimg");
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest && e.target.closest(".plate[data-full]");
+    if (!p || !dlg || typeof dlg.showModal !== "function") return;
+    lb.src = p.dataset.full; var im = p.querySelector("img"); lb.alt = im ? im.alt : "";
+    dlg.showModal();
+  });
+  if (dlg) {
+    document.getElementById("lbclose").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+})();
+
+document.addEventListener("click", function (e) {
+  document.querySelectorAll("details.menu[open]").forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute("open"); });
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") document.querySelectorAll("details.menu[open]").forEach(function (d) { d.removeAttribute("open"); });
+});
+</script>
+</body></html>

@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Issues — pyGETM nesting</title><meta name="description" content="Problems found while building the two-way nesting for pyGETM, solved and open.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>:root{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+   a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
+   teal for links, the interface magenta of the figures for emphasis. */
+:root {
+  --paper: #f3f5f4;
+  --paper-2: #e7ecea;
+  --ink: #142028;
+  --ink-2: #4a5a63;
+  --rule: #c9d3d1;
+  --teal: #0b6b72;
+  --magenta: #b0216f;
+  --plate: #ffffff;
+  --ok: #2c7a3f;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1120px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+    --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
+  --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 400 1.06rem/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--teal); text-underline-offset: 2px; }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+/* top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule);
+}
+.topin {
+  max-width: var(--wide); margin: 0 auto; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { font: 700 0.95rem/1 var(--display); font-stretch: 85%; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.topbar nav { display: flex; gap: 0.2rem 1rem; flex-wrap: wrap; }
+.topbar nav a { font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); text-decoration: none; }
+.topbar nav a:hover { color: var(--teal); }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
+.chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
+
+/* hero */
+.hero { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.1rem; }
+.draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+h1 {
+  font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
+  letter-spacing: -0.01em; margin: 0; max-width: 18ch; text-wrap: balance;
+}
+.lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
+.facts > div { padding: 0.8rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.facts dt { font: 600 0.74rem/1.2 var(--display); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin: 0.15rem 0 0; font: 700 1.9rem/1.1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.facts p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink-2); }
+
+/* chapters */
+.chapter { padding-block: 3rem 1rem; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.3rem; }
+.chapter > * { width: 100%; }
+.chap { display: grid; gap: 0.3rem; }
+.eyebrow { font: 700 0.76rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+h2 { font: 800 clamp(1.7rem, 3.6vw, 2.5rem)/1.08 var(--display); font-stretch: 80%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.35rem/1.2 var(--display); font-stretch: 85%; margin: 1.4rem auto 0; text-wrap: balance; }
+h4 { font: 700 1.02rem/1.3 var(--display); margin: 0 0 0.4rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.small { font-size: 0.92rem; color: var(--ink-2); }
+.ok { color: var(--ok); font-weight: 600; }
+
+/* figures: white plates, so the white-background figures read in both themes */
+.fig { margin: 0; display: grid; gap: 0.55rem; min-width: 0; }
+.plate {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--plate); cursor: zoom-in; overflow: hidden;
+}
+.plate.static { cursor: default; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
+figcaption strong { font: 700 0.98rem/1.3 var(--display); color: var(--ink); }
+.grid2, .grid3 { display: grid; gap: 1.6rem 1.4rem; align-items: start; }
+.grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.grid3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.6rem; align-items: start; }
+.twocol > *, .grid2 > *, .grid3 > * { min-width: 0; }
+.statusgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.6rem; }
+.statusgrid > div { border-top: 2px solid var(--ink); padding-top: 0.7rem; }
+
+/* tables */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { font: 700 0.78rem/1.2 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); text-align: left; padding: 0.5rem 0.7rem 0.4rem 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+td { padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.num td { font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+.callout { border-left: 3px solid var(--magenta); padding: 0.2rem 0 0.2rem 1rem; display: grid; gap: 0.7rem; }
+pre { margin: 0; padding: 0.8rem 1rem; background: var(--paper-2); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+pre code { background: none; padding: 0; }
+
+/* stepper */
+.stepper { display: grid; gap: 0.8rem; }
+.stepper-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; align-items: center; }
+.stepnav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.step, .stepctl button, #lbclose {
+  font: 600 0.9rem/1 var(--display); border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  border-radius: 3px; min-width: 2.3rem; height: 2.3rem; padding: 0 0.7rem; cursor: pointer;
+}
+.step[aria-current="step"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.stepctl { display: flex; gap: 0.4rem; }
+.step:hover, .stepctl button:hover { border-color: var(--teal); }
+.steptext { display: grid; gap: 0.2rem; max-width: var(--measure); }
+.stepno { font: 600 0.78rem/1 var(--mono); color: var(--magenta); }
+.steptext h4 { margin: 0; font-size: 1.15rem; }
+
+/* lightbox */
+dialog#lightbox { border: none; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
+#lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
+#lbclose { margin: 0 0 0.5rem auto; display: block; }
+
+.foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink-2); }
+</style>
+<style>main > .chapter { max-width: var(--wide); }
+.topbar nav { align-items: center; }
+.topbar nav a[aria-current="page"], .menu > summary[aria-current="page"] { color: var(--ink); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary::after { content: " ▾"; font-size: 0.8em; }
+.menu > summary:hover { color: var(--teal); }
+.menu-items { position: absolute; top: 1.9rem; left: -0.6rem; min-width: 11rem; z-index: 6; display: grid;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem 0; box-shadow: 0 6px 18px rgb(0 0 0 / 0.12); }
+.menu-items a { padding: 0.35rem 0.9rem; }
+.menu-items a:hover { background: var(--paper-2); }
+.crumbs { max-width: var(--wide); margin: 0 auto; padding: 0.9rem 0 0; font: 600 0.85rem/1.4 var(--display); color: var(--ink-2); }
+.crumbs a { text-decoration: none; }
+.subnav { max-width: var(--wide); margin: 0.4rem auto 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font: 500 0.82rem/1.4 var(--display); }
+.subnav a { color: var(--ink-2); text-decoration: none; }
+.subnav a:hover { color: var(--teal); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.2rem; max-width: var(--wide); }
+.card { display: grid; gap: 0.4rem; padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); text-decoration: none; color: var(--ink); }
+.card:hover { border-color: var(--teal); }
+.card h3 { margin: 0; font-size: 1.15rem; }
+.card p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+.issue { border-top: 1px solid var(--rule); padding-top: 1rem; display: grid; gap: 0.7rem; }
+.issue > h3 { margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; font: 600 0.75rem/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; }
+.tags span { padding: 0.25rem 0.5rem; border-radius: 3px; background: var(--paper-2); color: var(--ink-2); }
+.tags .solved { background: color-mix(in srgb, var(--ok) 18%, var(--paper)); color: var(--ok); }
+.tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
+.seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+</style></head><body>
+<div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="issues.html" aria-current="page">Issues</a><a href="status.html">Status</a></nav></div></div>
+<main id="top">
+<div class="crumbs"><a href="index.html">← Overview</a></div>
+<nav class="subnav" aria-label="On this page"><a href="#list">All issues</a></nav>
+<header class="hero"><p class="draft">Issues</p><h1>What went wrong, and how it was found</h1>
+<p class="lede">The problems found while building and testing the nesting: in the coupling, in pyGETM, in the setups and in
+the test cases. Solved ones stay here as a record. The example pages link to the issues that concern them.</p></header>
+<section id="list" class="chapter"><ul><li><a href="#substep">A sub-stepping child is unstable under flux matching</a> <span class="small">(solved; IDEAL, NEAB, 2D)</span></li><li><a href="#damping-dt">pyGETM applied the transport damping with the time step twice</a> <span class="small">(solved; pyGETM, IDEAL)</span></li><li><a href="#hole-cores">Subdomains holding only a child's hole got a core</a> <span class="small">(solved; NEAB, load balancing)</span></li><li><a href="#e8-tiles">One process split differs by 1e-4 m</a> <span class="small">(open; IDEAL, 2D)</span></li><li><a href="#gif">Streaks in the animations</a> <span class="small">(solved; IDEAL)</span></li><li><a href="#rim-content">Exact content in the 3D rim made a uniform field non-uniform</a> <span class="small">(solved; IDEAL, 3D)</span></li><li><a href="#ui-sum">The parent's 3D transport at the interface was 10 % off</a> <span class="small">(solved; IDEAL, 3D, pyGETM)</span></li><li><a href="#layer-flux">Parent and child move different water through each layer of the interface</a> <span class="small">(solved; IDEAL, 3D)</span></li><li><a href="#no-sponge-3d">3D runs need the sponge too</a> <span class="small">(solved; IDEAL, 3D)</span></li><li><a href="#v2-init">Spurious currents at the interfaces in a lake at rest</a> <span class="small">(solved; IDEAL, 3D, test setup)</span></li><li><a href="#ring-vertical">The 3D ring cannot carry the child's vertical structure</a> <span class="small">(open; IDEAL, 3D)</span></li><li><a href="#dkm-z0">DKm runs with the wrong bottom roughness</a> <span class="small">(solved; DKm)</span></li><li><a href="#tpxo-coast">TPXO9 at the coast: wet nodes without constants</a> <span class="small">(solved; reference data)</span></li><li><a href="#neab-skagerrak">NEAB's tide east of the Skagerrak amphidrome is twice too large</a> <span class="small">(open; NEAB, DKm)</span></li></ul></section>
+<section class="chapter"><div class="issue" id="substep"><h3>A sub-stepping child is unstable under flux matching</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>NEAB</span><span>2D</span></div>
+<p><strong>Seen:</strong> IDEAL E2. The volume was conserved to 2e-16, yet the strait level grew to 23 m within 12 h.</p>
+<p><strong>What triggers it:</strong> switching parts off one at a time showed the combination of</p>
+<ul><li>flux matching (the parent's elevation correction next to the interface),</li>
+<li>a child that sub-steps (time ratio &gt; 1),</li>
+<li>under a parent stepping well above the child's step.</li></ul>
+<p>The growth rises with the parent's Courant number. Two levels are enough, and neither tidal forcing nor friction
+removes it. A 1D model of the same coupling (<code>IDEAL/scripts/coupling1d.py</code>) reproduces it: growth factors per
+parent step of 1.013 at Courant 0.57 and 1.12 at 0.9 (time ratio 3).</p>
+<p><strong>The mode:</strong> it lives in the child, a few cells wide, and changes sign every 1–2 parent steps. Short waves
+the parent cannot represent are pumped by the loop flux mismatch → correction of the parent cell outside the window →
+the child's ring.</p>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/e2_growth.png" aria-label="Open Volume conserved, elevation grows full size"><img src="fig/ideal/e2_growth.png" alt="Volume conserved, elevation grows" loading="lazy"></button><figcaption><strong>Volume conserved, elevation grows</strong><p>A Gaussian bump in a closed basin: the strait level's max |z| in the instability runs.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/e2_snapshot.png" aria-label="Open The strait level after 12 h full size"><img src="fig/ideal/e2_snapshot.png" alt="The strait level after 12 h" loading="lazy"></button><figcaption><strong>The strait level after 12 h</strong><p>Unstable (time ratio 3) against stable (time ratio 1).</p></figcaption></figure>
+</div>
+<p><strong>Fix:</strong> an AGRIF-like sponge (Debreu et al. 2012). The child's transports are damped next to the interface
+through pyGETM's horizontal viscosity (<code>momentum.An</code>, land-aware): <code>NestedBarotropic(sponge_width=,
+sponge_alpha=)</code>. It acts on momentum only, so the volume stays exactly conserved. It is stable for α = 0.03–0.2, default 0.1.</p>
+<div class="grid2">
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/sponge.png" aria-label="Open The sponge stabilises the sub-stepping child full size"><img src="fig/ideal/sponge.png" alt="The sponge stabilises the sub-stepping child" loading="lazy"></button><figcaption><strong>The sponge stabilises the sub-stepping child</strong><p>Strait level, max |z|, M2 tide with a 3 h ramp.</p></figcaption></figure>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/elevation_compare.png" aria-label="Open Without and with the sponge, 20 h full size"><img src="fig/ideal/elevation_compare.png" alt="Without and with the sponge, 20 h" loading="lazy"></button><figcaption><strong>Without and with the sponge, 20 h</strong><p>Without it the strait level fills with short waves that radiate into the shelf.</p></figcaption></figure>
+</div></div></section>
+<section class="chapter"><div class="issue" id="damping-dt"><h3>pyGETM applied the transport damping with the time step twice</h3><div class="tags"><span class="solved">solved</span><span>pyGETM</span><span>IDEAL</span></div>
+<p><strong>Seen:</strong> the sponge became unstable above α = 0.02, far below the explicit limit.</p>
+<p><strong>Cause:</strong> a unit analysis of <code>src/momentum.F90</code> (<code>damp</code>) showed that the damping was
+multiplied by the time step twice. This is also in upstream pyGETM. The 0.25 limit on α is the explicit diffusion limit
+for the 2Δx mode, and the tendency's units were mislabelled (m⁻² s⁻² instead of m² s⁻²).</p>
+<p><strong>Fix:</strong> fork commit 77469d3. The sponge is now stable for α = 0.03–0.2.</p></div></section>
+<section class="chapter"><div class="issue" id="hole-cores"><h3>Subdomains holding only a child's hole got a core</h3><div class="tags"><span class="solved">solved</span><span>NEAB</span><span>load balancing</span></div>
+<p><strong>Seen:</strong> in the NEAB balance figures, the root had cores for subdomains that lie under its children.</p>
+<p><strong>Cause:</strong> the hole is wet (EXTERNAL), so pyGETM kept those subdomains.</p>
+<p><strong>Fix:</strong> <code>Domain.tiling_mask</code> and <code>Level.tiling_mask</code> (fork 296f411): only subdomains with
+cells the parent reads (its rim) stay. The NEAB root now needs 7 cores at 64, and 52–54 instead of about 80 at 512;
+wall time −6 to −9 %.</p></div></section>
+<section class="chapter"><div class="issue" id="e8-tiles"><h3>One process split differs by 1e-4 m</h3><div class="tags"><span class="open">open</span><span>IDEAL</span><span>2D</span></div>
+<p>The results are bit-identical for the process splits 1/1/1, 2/3/2, 1/2/1 and 1/1/2. With the channel on 3 processes
+its tile edges fall on the shelf window's edges, and the results differ by 1e-4 m. Not yet explained.</p>
+<figure class="fig"><button class="plate" type="button" data-full="fig/ideal/e8_tiles.png" aria-label="Open E8: the process split full size"><img src="fig/ideal/e8_tiles.png" alt="E8: the process split" loading="lazy"></button><figcaption><strong>E8: the process split</strong><p>Channel elevation difference 1/1/1 against 3/1/1 after 1 h, with the tile edges.</p></figcaption></figure></div></section>
+<section class="chapter"><div class="issue" id="gif"><h3>Streaks in the animations</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span></div>
+<p>Bands and diagonal streaks in the animated elevation were GIF quantisation (a palette per frame, dithered), not the
+model: the fields have no grid-scale noise. The GIF is now made from the MP4 with one ffmpeg palette.</p></div></section>
+<section class="chapter"><div class="issue" id="rim-content"><h3>Exact content in the 3D rim made a uniform field non-uniform</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span></div>
+<p><strong>Seen:</strong> with a uniform temperature, the 3D coupling made it non-uniform by 2e-4 °C in 12 h at the shelf's rim.</p>
+<p><strong>Cause:</strong> the planned rim form B″ restored each rim column's content exactly in the parent's volume. At the
+tracer stage the parent's rim still has the elevation of the previous 2D sync, so the child columns' volume differs
+from the parent cell's, and the exact content then means a different concentration.</p>
+<p><strong>Fix:</strong> concentrations by the child volume each parent layer receives. A uniform field stays uniform to 3e-13;
+exact conservation is left to the 3D flux register.</p></div></section>
+<section class="chapter"><div class="issue" id="ui-sum"><h3>The parent's 3D transport at the interface was 10 % off</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span><span>pyGETM</span></div>
+<p><strong>Seen:</strong> building the 3D flux register. The water through the window faces over a 3D step differed by about 10 %
+between parent and child, although the 2D coupling matches them.</p>
+<p><strong>Cause:</strong> pyGETM sums the 2D transports over the 3D step for the 3D momentum (<code>Ui</code>) in
+<code>advance_depth_integrated</code>, before the 2D coupler replaces the parent's transports at the window faces.</p>
+<p><strong>Fix:</strong> <code>NestedBarotropic</code> adds its replacement to that sum as well (fork 02a1eb1). The difference is
+1e-4. This affects every nested 3D run.</p></div></section>
+<section class="chapter"><div class="issue" id="layer-flux"><h3>Parent and child move different water through each layer of the interface</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span></div>
+<p><strong>Seen:</strong> a per-layer tracer correction that conserves the content exactly made a uniform field 15 °C non-uniform.</p>
+<p><strong>Cause:</strong> the 2D coupling matches only the column total. The child, with more layers, resolves a jet at the
+pycnocline that the parent does not, so the layer profiles of the water through a face differ strongly. A per-layer
+tracer correction without the matching water changes concentrations in thin layers.</p>
+<p><strong>Fix:</strong> at the <code>momentum_3d</code> stage the parent takes the child's layer transports at the window faces,
+remapped onto its own face layers with its column total kept, and recomputes its vertical velocity before it advects.
+With the 3D flux register the heat content of a closed basin is then conserved to 1e-9, and a uniform field stays
+uniform (fork 02a1eb1).</p></div></section>
+<section class="chapter"><div class="issue" id="no-sponge-3d"><h3>3D runs need the sponge too</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span></div>
+<p>The first 48 h IDEAL 3D runs went NaN at 11 h, with and without the 3D coupling. The strait level grew from about 7 h:
+the sub-stepping instability of the 2D coupling (<a href="#substep">above</a>), which the 3D model had been run without.
+With the sponge (3 child cells, α 0.1, now the default of <code>ideal3d.py</code>) all runs are stable.</p></div></section>
+<section class="chapter"><div class="issue" id="v2-init"><h3>Spurious currents at the interfaces in a lake at rest</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span><span>test setup</span></div>
+<p><strong>Seen:</strong> IDEAL V2, a lake at rest. The nested runs had spurious currents of 1–3 cm/s in a frame along the
+interfaces, ten times the single model's. They were the same with sigma and with adaptive layers, and vanished without
+the 3D ring.</p>
+<p><strong>Cause:</strong> the test setup. Every level sampled the analytic temperature profile at its own layer
+centres. Across a 3 m thick pycnocline the value at the centre of a 5 m layer is far from the layer's mean, so the
+parent held a different discretisation of the same state than the child, and its ring gave the child 0.4 °C
+differences at the pycnocline: a horizontal density gradient at the interface.</p>
+<p><strong>Fix:</strong> every level starts from the exact layer means of the analytic profile (the tanh integrates in closed
+form). The column means are then identical for 10, 15 and 20 layers. This alone did not remove the currents; what
+remains is the <a href="#ring-vertical">ring's vertical reconstruction</a>.</p></div></section>
+<section class="chapter"><div class="issue" id="ring-vertical"><h3>The 3D ring cannot carry the child's vertical structure</h3><div class="tags"><span class="open">open</span><span>IDEAL</span><span>3D</span></div>
+<p><strong>Seen:</strong> IDEAL V2 after the <a href="#v2-init">consistent initial state</a>: 1–2 cm/s of spurious current
+along the interfaces in a lake at rest, against about 1 mm/s without the 3D ring.</p>
+<p><strong>Cause:</strong> the ring's profile comes from the parent's coarser layers, remapped piecewise-constant: a 3 m thick
+pycnocline in 5 m layers lands in the child's ring as steps of up to 1 °C.</p>
+<p><strong>Tried:</strong></p>
+<ul><li>Keeping every interface at its depth in the remap (only the bottom layer cut or extended): the right map for flat
+isopycnals over a slope, but no measurable difference here.</li>
+<li>Adding the child's own vertical detail to the ring: its adjacent interior column, minus the same column through the
+parent's layers and back. This halves the currents.</li></ul>
+<p><strong>Next:</strong> a limited piecewise-linear or parabolic reconstruction (PLM/PPM) in the remap, and a relaxation of the
+3D ring values (a sponge for the scalars).</p></div></section>
+<section class="chapter"><div class="issue" id="dkm-z0"><h3>DKm runs with the wrong bottom roughness</h3><div class="tags"><span class="solved">solved</span><span>DKm</span></div>
+<p>The first DKm tidal runs used z0 = 0.001 m, not the 0.015 m NEAB uses, which made the Kattegat's tide look twice too
+large. The runs were repeated with 0.015 m. A z0 map from the seabed substrate was tried for NEAB and does not change
+the North Sea tide; z0 stays uniform.</p></div></section>
+<section class="chapter"><div class="issue" id="tpxo-coast"><h3>TPXO9 at the coast: wet nodes without constants</h3><div class="tags"><span class="solved">solved</span><span>reference data</span></div>
+<p>Next to the coast TPXO9-atlas has nodes with a depth but zero constants, and interpolating between nodes mixes in
+land (zero): at Hinkley Point the interpolated M2 was 0. The series now take the nearest node with constants, without
+interpolation. In the reference maps, only water connected to the Atlantic is kept: inside the box the Adriatic has
+amplitudes of metres that are not real.</p></div></section>
+<section class="chapter"><div class="issue" id="neab-skagerrak"><h3>NEAB's tide east of the Skagerrak amphidrome is twice too large</h3><div class="tags"><span class="open">open</span><span>NEAB</span><span>DKm</span></div>
+<p>Over most of the North Sea NEAB's M2 is within 10–15 % of TPXO9. From the Danish North Sea coast into the
+Skagerrak and the Kattegat it is about twice too large (Skagen 0.29 m against 0.14 m observed). The error is
+the same at both resolutions, and a bottom roughness map from the seabed substrate does not remove it.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/neab_vs_tpxo_m2.png" aria-label="Open NEAB against TPXO9 in the North Sea full size"><img src="fig/neab/neab_vs_tpxo_m2.png" alt="NEAB against TPXO9 in the North Sea" loading="lazy"></button><figcaption><strong>NEAB against TPXO9 in the North Sea</strong><p>M2 of north_sea_baltic (coarse, 31 days, z0 0.015 m) and of TPXO9 at the same cells, both fitted from hourly elevation over the same 30 days. Right: the amplitude ratio. TPXO9 is fitted to observations and serves as the reference offshore.</p></figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th>Region</th><th>TPXO9 M2</th><th>NEAB / TPXO9</th></tr></thead><tbody>
+<tr><td>Northern North Sea</td><td>0.42 m</td><td>1.13</td></tr>
+<tr><td>Central North Sea</td><td>0.41 m</td><td>1.10</td></tr>
+<tr><td>Channel</td><td>2.58 m</td><td>0.97</td></tr>
+<tr><td>Southern Bight</td><td>0.49 m</td><td>0.81</td></tr>
+<tr><td>German Bight, offshore</td><td>0.66 m</td><td>0.99</td></tr>
+<tr><td>Off Jutland (6–8°E)</td><td>0.14 m</td><td>1.86</td></tr>
+<tr><td>Skagerrak</td><td>0.10 m</td><td>2.40</td></tr>
+</tbody></table></div>
+<p>The amphidrome in front of the German Bight lies about 0.3° south-west of TPXO9's. The region off Jutland and
+the Skagerrak lies between that amphidrome and the Norwegian one. Its small amplitudes are very sensitive to
+where the amphidromes are, so a small shift doubles them there. The most likely cause is too little
+dissipation in the south-eastern North Sea:</p>
+<ul><li>The Wadden Sea flats are not in the bathymetry: after the regridding they are land or have no depth
+(the sources refer to the lowest astronomical tide).</li>
+<li>The models mask water shallower than 5 m.</li>
+<li>The tide coming in from the Atlantic is also 5–17 % too large (no tidal potential, 12 km cells over the
+north-western shelf), but that is a smaller effect.</li></ul>
+<p>Two sensitivity runs of 31 days each:</p>
+<div class="tablewrap num"><table><thead><tr><th>Run</th><th>off Jutland</th><th>Skagerrak</th><th>Skagen gauge</th></tr></thead><tbody>
+<tr><td>z0 0.015 m, minimum depth 5 m</td><td>1.86</td><td>2.40</td><td>0.29 m</td></tr>
+<tr><td>minimum depth 2 m (411 more wet cells, most of them outside the North Sea)</td><td>1.73</td><td>2.09</td><td>0.25 m</td></tr>
+<tr><td>z0 ten times larger (0.15 m) in the Wadden zone, 4,555 km² shallower than 10 m</td><td>1.85</td><td>2.42</td><td>0.29 m</td></tr>
+<tr><td>a <a href="#neab-wadden">Wadden Sea level</a> with the intertidal flats (1.5 km), z0 0.015 m</td><td>1.54</td><td>2.04</td><td>0.25 m</td></tr>
+<tr><td>the same, z0 0.002 m in the Wadden Sea level</td><td>1.51</td><td>1.81</td><td>0.22 m</td></tr>
+<tr><td>the same, z0 0.015 m × min(1, H/10 m) in the Wadden Sea level</td><td>1.49</td><td>1.96</td><td>0.24 m</td></tr>
+<tr><td>north_sea_baltic with <a href="#neab-depths">EMODnet depths</a> instead of GEBCO</td><td>1.95</td><td>2.79</td><td>0.34 m</td></tr>
+<tr><td>all levels <a href="#neab-depths">from LAT to MSL</a></td><td>2.05</td><td>3.24</td><td>0.40 m</td></tr>
+<tr><td>from LAT to MSL, with the Wadden Sea level (flats from M2, z0 0.002 m)</td><td>1.72</td><td>2.45</td><td>0.30 m</td></tr>
+<tr><td>the same, the flats from the same MSL − LAT as the other levels</td><td>1.37</td><td>1.96</td><td>0.24 m</td></tr>
+</tbody></table></div>
+<p>A few more shallow cells along the coasts move the German Bight amphidrome and lower the Skagerrak by 13 %.
+Much more friction over the shallow water that is already there does almost nothing, except locally. So it is
+the missing area of shallow water and flats, and their volume, that matters, more than the friction on them.
+The remedy is a Wadden Sea bathymetry with its intertidal flats, and the Wadden Sea level proposed above. Before
+production runs, every level's bathymetry has to be checked carefully.</p>
+<h4 id="neab-wadden">A Wadden Sea level</h4>
+<p>A sixth level, <code>wadden</code>, nests in north_sea_baltic over the Wadden Sea from Den Helder to Skallingen
+(4.6–9.2°E, 52.9–55.7°N) at ratio 3, about 1.5 km in the coarse setup, with the open North Sea in front of it. Its
+bathymetry includes the intertidal flats:</p>
+<ul><li>EMODnet without its land mask: the flats keep their height above the lowest astronomical tide (LAT).</li>
+<li>Land is taken from the Natural Earth land polygons, not from the sign of the depth, so the polders behind the
+dikes, below sea level, stay land.</li>
+<li>The depths are taken from LAT to mean sea level: MSL − LAT is estimated from TPXO9 as the sum of its
+constituents' amplitudes, about 1.2–1.5 m along the Dutch coast, 2–2.5 m in the German Bight and 1 m at Esbjerg.</li>
+<li>Water up to 1 m above MSL is kept wet. pyGETM's drying and flooding handles the flats.</li></ul>
+<p>Most of the flats then lie 0–2 m below MSL: 3,800 km² that fall dry at the lowest tide are water in this
+level, where north_sea_baltic has land.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/wadden_bathymetry.png" aria-label="Open The Wadden Sea level's bathymetry full size"><img src="fig/neab/wadden_bathymetry.png" alt="The Wadden Sea level's bathymetry" loading="lazy"></button><figcaption><strong>The Wadden Sea level's bathymetry</strong><p>Left: depth below MSL at 1.5 km (red line: MSL; white: 2 m). Right: MSL − LAT from TPXO9, taken in open water and carried to the coast. Inland, where it is carried along the rivers, it is not used.</p></figcaption></figure>
+<p>A first 31-day run with the Wadden Sea level (z0 0.015 m everywhere, as the control run) shows that the flats
+are the lever, but this time the effect is too strong. M2 amplitude as a ratio to TPXO9, and at the gauges:</p>
+<div class="tablewrap num"><table><thead><tr><th></th><th>TPXO9 / observed</th><th>control (5 m)</th><th>Wadden, z0 0.015 m</th><th>Wadden, z0 0.002 m</th><th>Wadden, z0(H)</th><th>flats M2, z0 0.015 m</th><th>flats M2, z0 0.002 m</th></tr></thead><tbody>
+<tr><td>off Jutland (6–8°E), ratio</td><td>0.14 m</td><td>1.86</td><td>1.54</td><td>1.51</td><td>1.49</td><td>1.61</td><td>1.64</td></tr>
+<tr><td>Skagerrak, ratio</td><td>0.10 m</td><td>2.40</td><td>2.04</td><td>1.81</td><td>1.96</td><td>2.08</td><td>1.98</td></tr>
+<tr><td>German Bight offshore, ratio</td><td>0.65 m</td><td>0.99</td><td>0.86</td><td>0.88</td><td>0.85</td><td>0.89</td><td>0.93</td></tr>
+<tr><td>Skagen</td><td>0.14 m</td><td>0.29 m</td><td>0.25 m</td><td>0.22 m</td><td>0.24 m</td><td>0.25 m</td><td>0.24 m</td></tr>
+<tr><td>Helgoland</td><td>1.06 m</td><td>0.98 m</td><td>0.84 m</td><td>0.91 m</td><td>0.83 m</td><td>0.88 m</td><td>0.96 m</td></tr>
+<tr><td>Cuxhaven, Mittelgrund</td><td>1.37 m</td><td>1.22 m</td><td>0.95 m</td><td>1.11 m</td><td>0.94 m</td><td>0.97 m</td><td>1.11 m</td></tr>
+<tr><td>Wilhelmshaven</td><td>1.70 m</td><td>1.27 m</td><td>0.99 m</td><td>1.19 m</td><td>1.01 m</td><td>1.03 m</td><td>1.22 m</td></tr>
+<tr><td>Eemshaven</td><td>1.15 m</td><td>1.00 m</td><td>0.74 m</td><td>0.89 m</td><td>0.74 m</td><td>0.79 m</td><td>0.94 m</td></tr>
+<tr><td>List auf Sylt</td><td>0.78 m</td><td>0.86 m</td><td>0.55 m</td><td>0.65 m</td><td>0.54 m</td><td>0.52 m</td><td>0.61 m</td></tr>
+<tr><td>all 369 gauges, rms error</td><td></td><td>0.17 m</td><td>0.21 m</td><td>0.19 m</td><td>0.21 m</td><td>0.20 m</td><td>0.18 m</td></tr>
+</tbody></table></div>
+<p>The flats lower the Skagerrak and off Jutland by 15–20 %, and the Kattegat gauges with them, more than any of
+the sensitivity runs above. But they also take 15–25 % of the tide in the German Bight and the Wadden Sea itself,
+which was about right or too small before. With z0 0.015 m the drag on water less than a metre deep is several
+times that in 20 m, so the flats likely dissipate too much. A second run with z0 0.002 m in the Wadden Sea level
+only (north_sea_baltic keeps 0.015 m) helps on both sides. The Skagerrak comes down further, to 1.81 times TPXO9,
+and Skagen to 0.22 m. In the Wadden Sea about half of the lost tide comes back, but it is still lower than in the
+control run, and the error over all gauges is 0.19 m against 0.17 m. Lower friction also lowering the Skagerrak
+shows that the flats act through where the tide goes, not only through what they dissipate.</p>
+<p>A third run tests a depth-dependent z0 in the Wadden Sea level: z0 = 0.015 m × min(1, H/10 m), at least
+0.0005 m, with H the depth below MSL (<code>--z0-depth 10</code>). pyGETM's drag already uses the actual water depth, so
+with a constant z0 the drag coefficient on a flat 1 m deep is 0.013, against 0.004 in 20 m. With z0(H) it stays at
+about 0.005 on the flats, while the channels and the open sea, 86 % of the level's cells, keep 0.015 m. The result
+is almost that of the constant 0.015 m: the friction on the flats themselves hardly matters. What the 0.002 m run
+changed was the friction in the channels and in the sea in front of the flats. Even with it, the Wadden Sea level
+lowers the German Bight by 10–15 % against the control run. That points to the flats themselves, their area and
+height: MSL − LAT from the amplitude sum is an upper bound, so the flats may lie too deep and take too much water.
+Checking them against a survey-based bathymetry with heights is the next step, and production runs need a closer
+look at the bathymetry in any case.</p>
+<p>Two more runs raise the flats: MSL − LAT is taken from the M2 amplitude alone (<code>wadden_bathymetry.py --msl-lat
+m2</code>), 0.01–1.52 m instead of 0.05–3.02 m. That leaves 1 km³ less water in the part shallower than 5 m, and 140
+more cells above MSL. With z0 0.002 m in the Wadden Sea level, the German Bight comes back to 0.93 of TPXO9, and
+Helgoland, Cuxhaven and Wilhelmshaven to within 10–20 % of the gauges. The Skagerrak, however, drops less (1.98
+instead of 1.81 times TPXO9). Over all gauges the two flat heights are equal (0.18 m against 0.19 m), and both are
+still above the control run's 0.17 m. Higher flats help the Wadden Sea and cost the Skagerrak, so the flats alone
+do not settle it.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/wadden_vs_tpxo_m2.png" aria-label="Open M2 with the Wadden Sea level full size"><img src="fig/neab/wadden_vs_tpxo_m2.png" alt="M2 with the Wadden Sea level" loading="lazy"></button><figcaption><strong>M2 with the Wadden Sea level</strong><p>North_sea_baltic with the Wadden Sea level, against TPXO9 (as the figure above). Where the Wadden Sea level computes, north_sea_baltic has no values.</p></figcaption></figure>
+<h4 id="neab-depths">The depth datum and the depth source</h4>
+<p>Two 31-day runs test the North Sea depths themselves, without the Wadden Sea level.</p>
+<p><b>LAT to MSL.</b> EMODnet gives depths below the lowest astronomical tide (LAT), and GEBCO 2026 is built from
+it on the shelf, while pyGETM's elevation is relative to mean sea level. So the shelf is too shallow by MSL − LAT.
+<code>NEAB/scripts/lat_to_msl.py</code> computes MSL − LAT as LAT is defined: the lowest level of a TPXO9 prediction
+(12 constituents, nodal corrections), hourly over 2015 and 2024, near both ends of the 18.6-year nodal cycle, on
+a 1/10° grid. That gives about 1.6 m at Den Helder, 2.8 m at Cuxhaven, 2.0 m at Esbjerg, 4.7 m at Dover and 7 m at
+Saint-Malo. The offset is added to every cell at least 5 m below LAT, so the set of wet cells stays the same. The
+median change is 0.9 m in north_sea_baltic and 1.4 m in the root.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/msl_minus_lat.png" aria-label="Open MSL − LAT from TPXO9 full size"><img src="fig/neab/msl_minus_lat.png" alt="MSL − LAT from TPXO9" loading="lazy"></button><figcaption><strong>MSL − LAT from TPXO9</strong><p>Minus the lowest level of hourly TPXO9 predictions over 2015 and 2024, on every third point of the reference file (1/10°).</p></figcaption></figure>
+<p>The deeper shelf is the larger improvement so far. Over north_sea_baltic's 225 gauges the M2 rms error drops from
+0.19 m to 0.15 m, and over all 369 gauges from 0.17 m to 0.15 m. The Southern Bight comes from 0.81 to 0.95 of TPXO9,
+Hoek van Holland from 0.54 m to 0.70 m (observed 0.78 m), Helgoland from 0.98 m to 1.06 m (1.06 m), and the
+German Bight and Southern Bight amphidromes move to within 0.1–0.2° of TPXO9's. But the Skagerrak gets worse:
+3.2 times TPXO9, Skagen 0.40 m (observed 0.14 m), and the Kattegat gauges with it (danish_straits rms 0.12 m
+against 0.07 m). The map shows why. The Norwegian amphidrome lies at about 5.3°E 58.6°N, against 6.0°E 58.3°N in
+TPXO9, so the Skagerrak lies further from it. With the south-eastern amphidromes right, the Skagerrak error is
+now on the Norwegian side: the depths of the Norwegian Trench and the Skagerrak, which LAT → MSL hardly changes
+(MSL − LAT is 0.2–0.5 m there), or how the tide enters along the Norwegian coast.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/msl_vs_tpxo_m2.png" aria-label="Open M2 with the depths from LAT to MSL full size"><img src="fig/neab/msl_vs_tpxo_m2.png" alt="M2 with the depths from LAT to MSL" loading="lazy"></button><figcaption><strong>M2 with the depths from LAT to MSL</strong><p>North_sea_baltic with all levels from LAT to MSL, against TPXO9 (as the figure above).</p></figcaption></figure>
+<p><b>EMODnet instead of GEBCO.</b> GEBCO 2026 is a patchwork in the North Sea. It is about 0.5 m shallower than
+EMODnet in the Southern Bight and the German Bight, about the same in the central North Sea, and 2–4 m
+shallower off Jutland, with straight seams at 0.5°E and 60°N between its sources.
+<code>NEAB/scripts/swap_depth_source.py</code> adds the difference of the two cell means to north_sea_baltic's depths,
+in 55,000 of its 101,000 wet cells, keeping the mask and the fixes. The result is almost the same as the control
+run: rms 0.173 m over all gauges, the Southern Bight 0.82 of TPXO9. Only the Skagerrak goes up, from 2.40 to 2.79
+times TPXO9, Skagen from 0.29 m to 0.34 m. The deeper water off Jutland moves the tide the wrong way there.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/emodnet_minus_gebco.png" aria-label="Open EMODnet − GEBCO in north_sea_baltic full size"><img src="fig/neab/emodnet_minus_gebco.png" alt="EMODnet − GEBCO in north_sea_baltic" loading="lazy"></button><figcaption><strong>EMODnet − GEBCO in north_sea_baltic</strong><p>The depth change from GEBCO to EMODnet (cell means; red: EMODnet deeper), limited to half the depth.</p></figcaption></figure>
+<p><b>Both together.</b> The flats lowered the Skagerrak but took tide from the German Bight, and the deeper
+shelf does the opposite, so a third run combines them: all levels from LAT to MSL, plus the Wadden Sea level with
+its flats (from M2, z0 0.002 m). The two effects roughly add up. Against the LAT → MSL run, the Skagerrak comes
+down from 3.24 to 2.45 times TPXO9, back to the control run's level, and Skagen from 0.40 m to 0.30 m. The Kattegat
+gauges are as good as in the control run (danish_straits rms 0.08 m), and the Norwegian amphidrome moves to about
+5.6°E 58.5°N, closer to TPXO9's. The Southern Bight keeps its gain (0.94). But the Wadden Sea loses tide again:
+List 0.65 m (observed 0.78 m), Cuxhaven Mittelgrund 1.18 m (1.37 m), Eemshaven 1.00 m (1.15 m). Over the North Sea
+gauges the rms is 0.16 m against 0.15 m without the flats, and 0.153 m against 0.149 m over all gauges. The flats
+in this run are still those made for the old datum, with MSL − LAT from M2 alone.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/msl_wadden_vs_tpxo_m2.png" aria-label="Open M2 with the depths from LAT to MSL and the Wadden Sea level full size"><img src="fig/neab/msl_wadden_vs_tpxo_m2.png" alt="M2 with the depths from LAT to MSL and the Wadden Sea level" loading="lazy"></button><figcaption><strong>M2 with the depths from LAT to MSL and the Wadden Sea level</strong><p>North_sea_baltic with all levels from LAT to MSL and the Wadden Sea level, against TPXO9 (as the figure above). Where the Wadden Sea level computes, north_sea_baltic has no values.</p></figcaption></figure>
+<p><b>One datum for all levels.</b> A last run builds the flats with the same MSL − LAT as the other levels
+(<code>wadden_bathymetry.py --offset</code>, the lowest level of the two-year TPXO9 prediction). In the inner Wadden
+Sea that is much larger than before: 1.6 m at Harlingen, 1.9 m at Delfzijl and 2.7 m at Wilhelmshaven, against
+0.1–0.9 m from the amplitude sum carried in from open water. So the flats there lie lower. This gives the best
+Skagerrak and Kattegat of all runs: the Skagerrak at 1.96 times TPXO9, off Jutland 1.37, Skagen 0.24 m, and the
+Kattegat gauges at an rms of 0.056 m, against 0.074 m in the control run. The Norwegian Sea side is unchanged. But
+the Wadden Sea level loses more tide: Helgoland 0.91 m (observed 1.06 m), Den Helder 0.48 m (0.64 m), Eemshaven
+0.93 m (1.15 m), rms 0.29 m over its 53 gauges. Over all 370 gauges the rms is 0.157 m, against 0.149 m without the
+Wadden Sea level and 0.173 m in the control run. More water over the flats takes more tide out of the German Bight,
+and that is what brings the Skagerrak down. The Wadden Sea itself then needs less dissipation: less friction or
+more resolution in its channels, at 1.5 km now. That is the next test, together with the depths of the Norwegian
+Trench and the Skagerrak.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/neab/msl_wadden_msl_vs_tpxo_m2.png" aria-label="Open M2 with one datum for all levels full size"><img src="fig/neab/msl_wadden_msl_vs_tpxo_m2.png" alt="M2 with one datum for all levels" loading="lazy"></button><figcaption><strong>M2 with one datum for all levels</strong><p>North_sea_baltic with all levels and the Wadden Sea flats from LAT to MSL with the same MSL − LAT, against TPXO9.</p></figcaption></figure>
+</div></section>
+<footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
+</main>
+<dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
+<script>(function () {
+  // stepper: build the nest one step at a time
+  var root = document.getElementById("stepper");
+  if (root) {
+    var steps = Array.prototype.slice.call(root.querySelectorAll("template"));
+    var btns = Array.prototype.slice.call(root.querySelectorAll(".step"));
+    var img = document.getElementById("stepimg"), plate = document.getElementById("stepplate");
+    var title = document.getElementById("steptitle"), desc = document.getElementById("stepdesc"), no = document.getElementById("stepno");
+    var k = 0;
+    steps.forEach(function (t) { var i = new Image(); i.src = t.dataset.src; });  // preload
+    function show(n) {
+      k = Math.max(0, Math.min(steps.length - 1, n));
+      var t = steps[k];
+      img.src = t.dataset.src; img.alt = t.dataset.title; plate.dataset.full = t.dataset.src;
+      title.textContent = t.dataset.title; desc.textContent = t.dataset.text;
+      no.textContent = (k + 1) + " / " + steps.length;
+      btns.forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+      document.getElementById("prev").disabled = k === 0;
+      document.getElementById("next").disabled = k === steps.length - 1;
+    }
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
+    document.getElementById("prev").addEventListener("click", function () { show(k - 1); });
+    document.getElementById("next").addEventListener("click", function () { show(k + 1); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { show(k + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { show(k - 1); e.preventDefault(); }
+    });
+    show(0);
+  }
+  // figures full size
+  var dlg = document.getElementById("lightbox"), lb = document.getElementById("lbimg");
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest && e.target.closest(".plate[data-full]");
+    if (!p || !dlg || typeof dlg.showModal !== "function") return;
+    lb.src = p.dataset.full; var im = p.querySelector("img"); lb.alt = im ? im.alt : "";
+    dlg.showModal();
+  });
+  if (dlg) {
+    document.getElementById("lbclose").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+})();
+
+document.addEventListener("click", function (e) {
+  document.querySelectorAll("details.menu[open]").forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute("open"); });
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") document.querySelectorAll("details.menu[open]").forEach(function (d) { d.removeAttribute("open"); });
+});
+</script>
+</body></html>
