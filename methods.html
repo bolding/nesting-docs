@@ -277,7 +277,8 @@ limited to the range of the two.</td></tr>
 the bottom layer is cut or extended), so that flat isopycnals stay flat over a sloping bottom, and with a limited
 piecewise-parabolic reconstruction (PPM, Colella and Woodward 1984) inside each source layer, which carries a thin
 pycnocline from coarse onto fine layers 5–20 times more accurately than a constant. The remap runs in a compiled
-kernel in pyGETM (<code>_pygetm.vertical_remap</code>), 15 times faster than the numpy version. The amounts of the flux
+kernel in pyGETM (<code>_pygetm.vertical_remap</code>), 15 times faster than the numpy version, which stays as the fallback
+(<code>PYGETM_NESTING_REMAP=numpy</code>). The load balancer (<code>nesting-balance</code>) includes the 3D exchange per model. The amounts of the flux
 register and the transports are remapped with the stretch, which keeps their sums exactly. With all of it, a closed basin
 conserves its heat content to 1e-9 over 48 h, and a uniform field stays uniform to round-off
 (<a href="ideal.html#threed">IDEAL</a>). How it got there: <a href="issues.html#rim-content">exact rim content</a>,

@@ -404,7 +404,17 @@ every digit.</p>
 also read from and written into pyGETM's 3D arrays by compiled routines, and the messages packed column by column, without
 any transpose; that changed the work by less than 10 %. What remains is spread over many small numpy operations on small
 arrays, where Python's cost per call dominates. The largest single item is the waiting for partner levels, up to 46 ms per
-3D step in the channel: load balance, as the 3D cost per level is not yet in <code>nesting-balance</code>.</p>
+3D step in the channel: load balance.</p>
+<p><strong>The 3D cost in the load balancer.</strong> <code>nesting-balance</code> now has the 3D exchange in its model: per 3D step the rim
+costs n_rim × r² × (nz_child + nz_parent) remapped column-layers on the parent, the ring n_ring × (nz_child + nz_parent) × 4
+(the remap and the three of the child-detail correction) on the child, each at (exchange_3d_base + exchange_3d × tracers)
+wet-cell 2D steps. Calibrated from these runs against a 2D run on the same machine
+(<code>IDEAL/scripts/calibrate_exchange3d.py</code>): exchange_3d_base 0.40–0.54 and exchange_3d 0.20–0.23 per tracer; the estimates
+from the rims and from the rings agree within 10 %. The 3D computation itself, c_3d per layer, is 8–13 with T and S.</p>
+<p><strong>With FABM the shares go down.</strong> The exchange grows with the number of tracers, but the computation grows faster:
+a biogeochemical model adds its sources and sinks in every cell and layer, besides the advection of each tracer, while the
+exchange only touches the interface columns. Already the 12 passive tracers here raise c_3d from 8–9 to 13–16; with FABM's
+source terms the computation goes up much more, and the exchange's share of a run down.</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy, the compiled kernel, and the kernel with compiled gather/scatter; T and S or 14 tracers; 2 or 4 processes per level.</p></figcaption></figure>
 </section>

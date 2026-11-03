@@ -304,10 +304,17 @@ the number of tracers (the ring's child-detail correction needs three more remap
 shelf from 26 to 13 ms (T, S) and from 124 to 36 ms (14 tracers), 9 % and 17 % of the run.</li>
 <li>Compiled gather and scatter of columns from and into pyGETM's 3D arrays, and messages packed column by column, so that no
 transposes are left. Less than 10 % more: the transposes were not the cost.</li></ul>
+<li>The 3D cost in <code>nesting-balance</code>: the rim and ring remaps per model and 3D step, calibrated from IDEAL
+(<code>exchange_3d_base</code> 0.40–0.54, <code>exchange_3d</code> 0.20–0.23 per tracer, in wet-cell 2D steps; rim and ring estimates
+within 10 %).</li></ul>
 <p><strong>Left:</strong> the remaining work is spread over many small numpy operations, where Python's cost per call dominates; moving
 whole steps (the rim's assembly, remap and write; the ring's remap, correction and limiter) into single compiled routines
-might give another 1.5 times on the exchange, a few per cent of a run. The larger item is the waiting for partner levels
-(up to 46 ms per 3D step in the channel): load balance, as <code>nesting-balance</code> does not yet know the 3D cost per level.</p></div></section>
+might give another 1.5 times on the exchange, a few per cent of a run. The waiting for partner levels (up to 46 ms per 3D
+step in the channel) is for the balancer, which now knows the 3D cost; the balance itself is still to be checked in a run.</p>
+<p><strong>The pure-Python path stays:</strong> every compiled routine has its numpy version, used when pyGETM is built without them or
+with <code>PYGETM_NESTING_REMAP=numpy</code>, so the remap can also be changed and tried in numpy first, with a simpler interface.</p>
+<p><strong>With FABM</strong> the shares go down: the exchange grows with the number of tracers, the computation faster (sources and
+sinks in every cell and layer).</p></div></section>
 <section class="chapter"><div class="issue" id="dkm-z0"><h3>DKm runs with the wrong bottom roughness</h3><div class="tags"><span class="solved">solved</span><span>DKm</span></div>
 <p>The first DKm tidal runs used z0 = 0.001 m, not the 0.015 m NEAB uses, which made the Kattegat's tide look twice too
 large. The runs were repeated with 0.015 m. A z0 map from the seabed substrate was tried for NEAB and does not change
