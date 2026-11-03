@@ -289,20 +289,24 @@ limit (cneigh 0.1), a shallow-water limit (chmin 0.1, hmin 0.3 m) and a time sca
 <tr><td>the channel alone (single model, same step)</td><td>1.4 mm/s</td><td>–</td><td>–</td><td>–</td></tr>
 <tr><td>nested, sigma, without the 3D ring</td><td>1.4 mm/s</td><td>1.1 mm/s</td><td>3.3 mm/s</td><td>0.01 m</td></tr>
 <tr><td>nested, sigma, ring from the parent</td><td>16 mm/s</td><td>32 mm/s</td><td>12 mm/s</td><td>0.34 m</td></tr>
-<tr><td>nested, sigma, ring with the child's vertical detail</td><td>8.6 mm/s</td><td>21 mm/s</td><td>6.2 mm/s</td><td>0.16 m</td></tr>
-<tr><td>nested, adaptive, ring with the child's detail</td><td>8.3 mm/s</td><td>16 mm/s</td><td>9.2 mm/s</td><td>0.10 m</td></tr>
-<tr><td>adaptive, cNN 0.3</td><td>8.0 mm/s</td><td>18 mm/s</td><td>12 mm/s</td><td>0.12 m</td></tr>
-<tr><td>adaptive, time scale 1 h</td><td>8.5 mm/s</td><td>14 mm/s</td><td>14 mm/s</td><td>0.10 m</td></tr>
-<tr><td>adaptive, pyGETM's defaults (no zooming)</td><td>8.2 mm/s</td><td>19 mm/s</td><td>11 mm/s</td><td>0.12 m</td></tr>
+<tr><td>nested, sigma, ring with the child's vertical detail (PCM)</td><td>8.6 mm/s</td><td>21 mm/s</td><td>6.2 mm/s</td><td>0.16 m</td></tr>
+<tr><td><strong>nested, sigma, the same with PPM</strong></td><td><strong>2.2 mm/s</strong></td><td><strong>6.5 mm/s</strong></td><td><strong>2.4 mm/s</strong></td><td><strong>0.03 m</strong></td></tr>
+<tr><td>nested, adaptive, PPM</td><td>3.0 mm/s</td><td>7.7 mm/s</td><td>6.5 mm/s</td><td>0.08 m</td></tr>
+<tr><td>adaptive, cNN 0.3, PPM</td><td>2.6 mm/s</td><td>6.9 mm/s</td><td>9.1 mm/s</td><td>0.06 m</td></tr>
+<tr><td>adaptive, time scale 1 h, PPM</td><td>3.3 mm/s</td><td>10 mm/s</td><td>4.5 mm/s</td><td>0.11 m</td></tr>
+<tr><td>adaptive, pyGETM's defaults (no zooming), PPM</td><td>2.5 mm/s</td><td>8.1 mm/s</td><td>2.9 mm/s</td><td>0.11 m</td></tr>
 </tbody></table></div>
-<p>Heat is conserved to 1e-10 in every run. The coupling still adds spurious currents of 1–2 cm/s along the
-interfaces, mostly on the parent's side. Without the 3D ring they vanish, so they come from the ring's temperature
-profile: a piecewise-constant remap from the parent's 5 m layers onto the child's finer ones cannot carry a 3 m thick
-pycnocline. Adding the child's own vertical detail halves them. The adaptive coordinates and their parameters change the
-result far less than the ring does, so their scan becomes meaningful only once the ring is better.</p>
+<p>Heat is conserved to 1e-10 in every run. The spurious currents the coupling adds sit along the interfaces, mostly on
+the parent's side, and vanish without the 3D ring: they come from the ring's temperature profile. A piecewise-constant
+(PCM) remap from the parent's 5 m layers onto the child's finer ones cannot carry a 3 m thick pycnocline. Adding the
+child's own vertical detail halves them. A limited piecewise-parabolic reconstruction (PPM, Colella and Woodward 1984)
+in the remap cuts them by another factor of 3, and the displacement of the pycnocline by 5. The channel is then within
+1.6 times the single model's error, the strait at the level of the run without a 3D ring, and the shelf, where the slope
+is, at about 6 times. The adaptive layers do not improve on sigma here; their parameters change the result by less than
+a factor of 1.5. A scan of them against a real case (V5) comes next.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_speed.png" aria-label="Open Spurious currents over time full size"><img src="fig/ideal/3d/v2_speed.png" alt="Spurious currents over time" loading="lazy"></button><figcaption><strong>Spurious currents over time</strong><p>Max |u| and rms u per level for every run; the channel alone in blue.</p></figcaption></figure>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring from the parent, the ring with the child's detail (sigma and adaptive).</p></figcaption></figure>
-<p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring cannot carry the child's vertical structure</a>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring with PCM, with PPM (sigma), and with PPM in adaptive layers.</p></figcaption></figure>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring could not carry the child's vertical structure</a>.</p>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
