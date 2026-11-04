@@ -192,7 +192,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#fjords">Fjords</a><a href="#bathymetry">Bathymetry</a><a href="#boundaries">Boundaries</a><a href="#tides">Tides</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-coarse-root-and-fine-levels-where-the-water-is">A coarse root and fine levels where the water is narrow</a><ol class="toc-sub"><li><a href="#nested">A variant: the Belt Sea inside the Kattegat</a></li></ol><li><a href="#the-children">The children</a><li><a href="#denmark-s-depth-model-completed-with-emodnet">Denmark's Depth Model, completed with EMODnet</a><ol class="toc-sub"><li><a href="#thalwegs">What each grid keeps: automatic thalwegs</a></li></ol><li><a href="#open-boundaries-at-the-model-s-own-points">Open boundaries at the model's own points</a><li><a href="#first-tidal-runs-the-forcing-sets-the-kattegat">First tidal runs: the forcing sets the Kattegat</a></ol></details>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-coarse-root-and-fine-levels-where-the-water-is">A coarse root and fine levels where the water is narrow</a><ol class="toc-sub"><li><a href="#nested">A variant: the Belt Sea inside the Kattegat</a></li></ol><li><a href="#the-children">The children</a><li><a href="#denmark-s-depth-model-completed-with-emodnet">Denmark's Depth Model, completed with EMODnet</a><ol class="toc-sub"><li><a href="#thalwegs">What each grid keeps: automatic thalwegs</a></li></ol><li><a href="#open-boundaries-at-the-model-s-own-points">Open boundaries at the model's own points</a><li><a href="#first-tidal-runs-the-forcing-sets-the-kattegat">First tidal runs: the forcing sets the Kattegat</a><ol class="toc-sub"><li><a href="#tides-ocean-prep">With the ocean-prep bathymetry</a></li></ol></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 3 November 2026</p>
   <h1>DKm: the Danish waters and their fjords</h1>
@@ -335,6 +335,29 @@ see <a href="neab.html#northsea">NEAB</a>). For now TPXO9 is the forcing to use 
 CMEMS will be needed for the sea level beyond the tide. The Wadden Sea gauges are poor with every forcing: the root has 4 km cells there.
 Kiel is too high with NEAB and TPXO9 even with the Kiel Canal closed.</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#neab-skagerrak">NEAB's tide east of the Skagerrak amphidrome is twice too large</a>, <a href="issues.html#dkm-z0">DKm runs with the wrong bottom roughness</a>.</p>
+<h3 id="tides-ocean-prep">With the ocean-prep bathymetry</h3>
+<p>The same run (TPXO9, 1 + 7 days, 64 cores, 86 minutes) on the bathymetry from ocean-prep: the DDM 50 m regridded
+conservatively, the closed passages opened, only the main water of each level kept and no coastline mask. More water
+is joined to the sea (Mariager/Randers computes 30 % more cells with tide); the Kiel Canal, the Eider and the Elbe are gone.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/dkm_m2_v4op.png" aria-label="Open M2 amplitude, v4 and ocean-prep bathymetry full size"><img src="fig/dkm/dkm_m2_v4op.png" alt="M2 amplitude, v4 and ocean-prep bathymetry" loading="lazy"></button><figcaption><strong>M2 amplitude, v4 and ocean-prep bathymetry</strong><p>Both with TPXO9 at the open boundaries. Dots: the gauges, coloured by the observed amplitude. Right: model against observed.</p></figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th>M2 amplitude, rms error</th><th>gauges</th><th>v4</th><th>ocean-prep</th></tr></thead><tbody>
+<tr><td>Skagerrak / Kattegat</td><td>20</td><td>0.9 cm</td><td>0.8 cm</td></tr>
+<tr><td>Sound</td><td>16</td><td>0.9 cm</td><td>0.9 cm</td></tr>
+<tr><td>Belts / western Baltic</td><td>26</td><td>2.0 cm</td><td><strong>1.6 cm</strong></td></tr>
+<tr><td>Little Belt</td><td>8</td><td>3.2 cm</td><td><strong>2.5 cm</strong></td></tr>
+<tr><td>North Sea / Wadden Sea</td><td>10</td><td>19.5 cm</td><td>19.8 cm</td></tr>
+<tr><td>All but Hvide Sande and Bakens Z</td><td>81</td><td>7.0 cm</td><td>7.1 cm</td></tr>
+</tbody></table></div>
+<ul><li><strong>The Belts and the Little Belt get closer:</strong> v4 is 1–3 cm too high there; the new bathymetry lowers the M2 by
+0.3–1 cm (Smålandsfarvandet 1 cm, with 6° later phase). Elsewhere the phase changes by 0–4°.</li>
+<li><strong>The Wadden Sea is unchanged</strong>, about 17 cm too low at Helgoland, Scharhörn and Wittdün: the root's 4 km cells and the
+forcing, not the bathymetry.</li>
+<li><strong>Thyborøn is worse</strong>: 0.17 m against 0.19 m (observed 0.205 m). The western entrance of the Limfjord changed, and the
+phase inside the fjord differs from v4 by up to 48°.</li>
+<li><strong>Hvide Sande</strong> shows 0.02 m against 0.30 m observed, but that is the gauge lookup: Ringkøbing Fjord is now joined to the
+sea through one cell at the sluice and gets 2 cm of M2, and its cells lie closer to the gauge than the coast's. On the coast
+the run gives 0.31 m. Bakens Z observes 0.018 m beside Bakens A's 1.33 m: a bad record, left out.</li></ul>
+
 </section><p class="small">Contains data from Denmark's Depth Model (DDM) v2.0, Geodatastyrelsen, downloaded 1 November 2026; EMODnet Bathymetry; E.U. Copernicus Marine Service Information (NWSHELF_MULTIYEAR_PHY_004_009, BALTICSEA_MULTIYEAR_PHY_003_011); GESLA tide gauges; TPXO9 tides, directly and through NEAB.</p>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
