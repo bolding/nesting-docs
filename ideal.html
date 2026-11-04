@@ -194,7 +194,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a></nav>
 <details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol></ol></details>
 <header class="hero">
-  <p class="draft">Under development · updated 3 November 2026</p>
+  <p class="draft">Under development · updated 4 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
   <p class="lede">A Cartesian channel with an analytic depth and three nested pyGETM levels, 3 km, 1 km and
   333 m, with every feature of the nesting placed on purpose. It is where the two-way nesting for pyGETM is
@@ -326,7 +326,21 @@ and the shelf and strait in sigma or in adaptive layers that zoom on the stratif
 <p>pyGETM's adaptive coordinates have about 25 parameters, all off by default except the pull towards the background
 grid; none of them have been tuned here. The runs use zooming on the density gradient (cNN 1, drho 0.3), a neighbour
 limit (cneigh 0.1), a shallow-water limit (chmin 0.1, hmin 0.3 m) and a time scale of 3 h, plus three variations.</p>
-<div class="tablewrap num"><table><thead><tr><th>48 h, all levels from consistent layer means</th><th>max |u| channel</th><th>shelf</th><th>strait</th><th>pycnocline moved (shelf)</th></tr></thead><tbody>
+<p><strong>The fair reference</strong> for each level is its own grid run alone with the same setup: the error of sigma layers over
+a slope depends on the resolution. In 48 h (sigma layers; max |u| over the cells each level computes):</p>
+<div class="tablewrap num"><table><thead><tr><th>48 h, sigma</th><th>channel</th><th>shelf</th><th>strait</th></tr></thead><tbody>
+<tr><td>each grid alone (single model)</td><td>1.42 mm/s</td><td>1.26 mm/s</td><td>0.87 mm/s</td></tr>
+<tr><td>nested, without the 3D ring</td><td>1.42 mm/s</td><td>1.08 mm/s</td><td>3.43 mm/s</td></tr>
+<tr><td>nested, ring with PPM (3 Nov)</td><td>1.92 mm/s (1.4x)</td><td>4.87 mm/s (3.9x)</td><td>1.80 mm/s (2.1x)</td></tr>
+<tr><td><strong>nested, PPM in the second layers too (now)</strong></td><td><strong>1.41 mm/s (1.0x)</strong></td><td><strong>1.75 mm/s (1.4x)</strong></td><td><strong>1.81 mm/s (2.1x)</strong></td></tr>
+</tbody></table></div>
+<p>The error that was left came from the shelf's east interface, where the water is 20 m deep and the pycnocline lies in the
+bottom layers: the remap kept the two outermost layers at each end constant, which put the ring 0.01-0.02 °C off the child's
+own profile even at rest (<a href="issues.html#ppm-outer-layers">issue</a>). With a parabola in the second layers too the channel
+is at its single-grid level and the shelf at 1.4 times. The strait's maximum is a single face where the wall meets its west
+interface, a corner like the wall's gap that is the single grids' own maximum; it grows slowly in all runs.</p>
+<p class="small">Earlier steps, against the channel alone (1.4 mm/s) and with the shelf and strait in sigma or adaptive layers:</p>
+<div class="tablewrap num"><table><thead><tr><th>48 h, all levels from consistent layer means (before 4 Nov)</th><th>max |u| channel</th><th>shelf</th><th>strait</th><th>pycnocline moved (shelf)</th></tr></thead><tbody>
 <tr><td>the channel alone (single model, same step)</td><td>1.4 mm/s</td><td>–</td><td>–</td><td>–</td></tr>
 <tr><td>nested, sigma, without the 3D ring</td><td>1.4 mm/s</td><td>1.1 mm/s</td><td>3.3 mm/s</td><td>0.01 m</td></tr>
 <tr><td>nested, sigma, ring from the parent</td><td>16 mm/s</td><td>32 mm/s</td><td>12 mm/s</td><td>0.34 m</td></tr>
@@ -345,9 +359,9 @@ in the remap cuts them by another factor of 3, and the displacement of the pycno
 1.6 times the single model's error, the strait at the level of the run without a 3D ring, and the shelf, where the slope
 is, at about 6 times. The adaptive layers do not improve on sigma here; their parameters change the result by less than
 a factor of 1.5. A scan of them against a real case (V5) comes next.</p>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_speed.png" aria-label="Open Spurious currents over time full size"><img src="fig/ideal/3d/v2_speed.png" alt="Spurious currents over time" loading="lazy"></button><figcaption><strong>Spurious currents over time</strong><p>Max |u| and rms u per level for every run; the channel alone in blue.</p></figcaption></figure>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h: the channel alone, the ring with PCM, with PPM (sigma), and with PPM in adaptive layers.</p></figcaption></figure>
-<p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring could not carry the child's vertical structure</a>.</p>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_speed.png" aria-label="Open Spurious currents over time full size"><img src="fig/ideal/3d/v2_speed.png" alt="Spurious currents over time" loading="lazy"></button><figcaption><strong>Spurious currents over time</strong><p>Max |u| and rms u per level: each grid alone, nested before and after the change of the remap (sigma layers).</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v2_maps.png" aria-label="Open Where they are full size"><img src="fig/ideal/3d/v2_maps.png" alt="Where they are" loading="lazy"></button><figcaption><strong>Where they are</strong><p>Max |u| in the water column after 48 h, nested in sigma layers, before and after the change of the remap.</p></figcaption></figure>
+<p class="seeissues">Issues found and solved along the way: <a href="issues.html#v2-init">Spurious currents at the interfaces in a lake at rest</a>, <a href="issues.html#ring-vertical">The 3D ring could not carry the child's vertical structure</a>, <a href="issues.html#ppm-outer-layers">The remap's outer layers were constant</a>.</p>
 </section>
 <section id="v5" class="chapter"><header class="chap"><span class="eyebrow">3D · V5</span><h2 id="a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</h2></header>
 <p class="lede">Does the nesting move a pycnocline correctly across the interfaces? The bottom slopes from 50 to 10 m across the
