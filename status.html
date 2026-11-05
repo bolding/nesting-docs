@@ -190,10 +190,10 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html" aria-current="page">Status</a></nav></div></div>
 <main id="top">
-<div class="crumbs"><a href="index.html">← Overview</a></div>
+<div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#nesting">Nesting</a><a href="#examples">Examples</a></nav>
 
-<header class="hero"><p class="draft">Status · 3 November 2026</p><h1>Where it stands</h1>
+<header class="hero"><p class="draft">Status · 5 November 2026</p><h1>Where it stands</h1>
 <p class="lede">What works, what is being worked on, and what is open: in the nesting itself and in the example setups.</p></header>
 <section id="nesting" class="chapter"><header class="chap"><span class="eyebrow">Nesting</span><h2 id="the-method-and-the-code">The method and the code</h2></header>
 <div class="statusgrid">
@@ -203,7 +203,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <li>One MPMD component per model; load balancing with <code>nesting-balance</code>, launch by mpiexec or Slurm.</li>
 <li>The sub-stepping instability understood and removed by an AGRIF-like sponge.</li>
 <li>3D: temperature and salinity between levels with different vertical grids: rim, ring, 3D transports, ring
-velocities and the 3D flux register; heat conserved to 1e-9.</li></ul></div>
+velocities and the 3D flux register; heat conserved to 1e-9.</li>
+<li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number. Tested in IDEAL, not yet in a flow that needs it.</li></ul></div>
 <div><h4>In progress</h4><ul>
 <li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest, against each level's grid run alone: after
 <a href="issues.html#ppm-outer-layers">a fix of the remap's outer layers</a> the coupling adds nothing in the channel, 1.4× on the

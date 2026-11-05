@@ -190,7 +190,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html" aria-current="page">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
-<div class="crumbs"><a href="index.html">← Overview</a></div>
+<div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#setup">Environment</a><a href="#hierarchy">Hierarchy</a><a href="#balance">nesting-balance</a><a href="#runs">Runs</a><a href="#boundaries">Boundaries</a><a href="#analysis">Analysis</a><a href="#site">This site</a></nav>
 <details class="toc" open><summary>Contents</summary><ol><li><a href="#the-environment">The environment</a><li><a href="#a-hierarchy-and-its-bathymetry">A hierarchy and its bathymetry</a><ol class="toc-sub"><li><a href="#bathymetry-of-every-level">Bathymetry of every level</a></li><li><a href="#automatic-thalwegs">Automatic thalwegs</a></li><li><a href="#from-lat-to-msl">From LAT to MSL</a></li></ol><li><a href="#cores-per-model-nesting-balance">Cores per model: nesting-balance</a><ol class="toc-sub"><li><a href="#launching-what-it-chose">Launching what it chose</a></li><li><a href="#3d-and-the-cost-model">3D and the cost model</a></li></ol><li><a href="#running-the-models">Running the models</a><ol class="toc-sub"><li><a href="#neab-and-dkm-2d-tides">NEAB and DKm: 2D tides</a></li><li><a href="#ideal-2d-and-3d">IDEAL: 2D and 3D</a></li></ol><li><a href="#boundaries-for-another-model">Boundaries for another model</a><li><a href="#analysis-figures-and-animations">Analysis, figures and animations</a><ol class="toc-sub"><li><a href="#tides-against-references">Tides against references</a></li><li><a href="#ideal-3d">IDEAL 3D</a></li><li><a href="#animations">Animations</a></li></ol><li><a href="#this-site">This site</a></ol></details>
 <header class="hero"><p class="draft">Guides</p><h1>How to run it</h1>
@@ -330,7 +330,7 @@ vertical remaps of the rims (on the parent) and the rings (on the child) at ever
   costs: {c_3d: 9.0, exchange_3d_base: 0.45, exchange_3d: 0.2, ring_remaps: 4.0}
 &lt;level&gt;:
   nz: 30
-  split: 10                         # 2D steps per 3D step; a child: its parent&#x27;s x its time ratio</code></pre>
+  split: 10                         # 2D steps per 3D step; a child: its parent&#x27;s x its time ratio, or that / R for a 3D step R times shorter</code></pre>
 <p>The table then has the 3D exchange per model. The numbers above are IDEAL's on one machine, with the compiled remap; calibrate them
 for a setup and machine from measured runs:</p>
 <pre><code># the 2D coupling&#x27;s own work: per rim cell, per ring cell and step, per message (from runs at several splits)

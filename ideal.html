@@ -190,11 +190,11 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 </style></head><body>
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
-<div class="crumbs"><a href="index.html">← Overview</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol></ol></details>
+<div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a></ol></details>
 <header class="hero">
-  <p class="draft">Under development · updated 4 November 2026</p>
+  <p class="draft">Under development · updated 5 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
   <p class="lede">A Cartesian channel with an analytic depth and three nested pyGETM levels, 3 km, 1 km and
   333 m, with every feature of the nesting placed on purpose. It is where the two-way nesting for pyGETM is
@@ -218,7 +218,7 @@ level (333 m, ratio 3, time ratio 3) in the shelf. Planted features:</p>
 interface is not on the window's edge.</li>
 <li><strong>A wall with a 1 km gap</strong>: open in the shelf (1 cell) and the strait level (3 cells), closed in the channel,
 as the Little Belt in NEAB.</li></ul>
-<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/layout.png" aria-label="Open The layout full size"><img src="fig/ideal/layout.png" alt="The layout" loading="lazy"></button><figcaption><strong>The layout</strong><p>Depth and land of the three levels; the shelf's window and active region (red), the strait level's (blue).</p></figcaption></figure>
+<figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/layout.png" aria-label="Open The layout full size"><img src="fig/ideal/layout.png" alt="The layout" loading="lazy"></button><figcaption><strong>The layout</strong><p>Depth and land of the three levels; the shelf's window and active region (red), the strait level's (blue). The edges of the rectangles are the interfaces; the rim lies just inside them, the ring just outside.</p></figcaption></figure>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/bathymetry.png" aria-label="Open The bathymetry of the tests full size"><img src="fig/ideal/bathymetry.png" alt="The bathymetry of the tests" loading="lazy"></button><figcaption><strong>The bathymetry of the tests</strong><p>Every level over the cells it computes, for the three depth configurations: flat at 50 m (the 2D tests and the first 3D tests), 50 → 20 m across the shelf window (V2) and 50 → 10 m (V5, V6). Below: the depth along y = 90 km; dashed: the interfaces; dotted: the pycnocline's initial depth.</p></figcaption></figure>
 <p>Each level is an ordinary pyGETM model (<code>IDEAL/models/&lt;level&gt;/run.py</code>), launched as one MPMD component.
 The nesting (<code>pygetm.nesting</code> on the fork <code>bolding/pygetm</code>) fills the halo zones where the levels overlap
@@ -275,8 +275,8 @@ cells, and a Wadden Sea–like run.</p>
 <p class="lede">The same three levels in 3D: baroclinic, with temperature and constant salinity, and sigma layers of
 their own in each level (channel 10, shelf 15, strait 20). The levels' layers do not line up, so every exchange of
 a profile goes through a conservative vertical remap.</p>
-<p>All levels share the 3D time step (181 s): a child's split factor is its parent's times its time ratio, so every
-3D step is a sync. At each sync (<code>pygetm.nesting.baroclinic.NestedTracers3D</code>):</p>
+<p>In these runs all levels share the 3D time step (181 s): a child's split factor is its parent's times its time ratio, so every
+3D step is a sync. A child can also have a shorter one: <a href="#substep3d">3D sub-stepping</a>. At each sync (<code>pygetm.nesting.baroclinic.NestedTracers3D</code>):</p>
 <ul><li><strong>Rim</strong> (child → parent): the 3 × 3 child columns of each parent rim cell are remapped onto the parent's
 layers (the upper 80 % of the column unstretched, the rest stretched to the parent's depth), with concentrations by
 the volume each parent layer receives. A uniform field stays uniform.</li>
@@ -509,6 +509,29 @@ high. With each level's split (10, 10, 30):</p>
 with T and S alone. The coupling's fixed cost per step no longer sets the limit.</p>
 <p class="seeissues">Issues found and solved along the way: <a href="issues.html#speed-3d">The 3D exchange took a third of a run</a>, <a href="issues.html#balance-split">nesting-balance gave every IDEAL level split 1</a>, <a href="issues.html#fabm-burn">The emulated FABM load fed waiting back into itself</a>.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/ideal/3d/v7_cost.png" aria-label="Open The work per 3D step by part full size"><img src="fig/ideal/3d/v7_cost.png" alt="The work per 3D step by part" loading="lazy"></button><figcaption><strong>The work per 3D step by part</strong><p>Mean over each level's processes, without the waiting for partner levels: numpy, the compiled kernel, and the kernel with compiled gather/scatter; T and S or 14 tracers; 2 or 4 processes per level.</p></figcaption></figure>
+</section>
+<section id="substep3d" class="chapter"><header class="chap"><span class="eyebrow">3D · Sub-stepping</span><h2 id="a-shorter-3d-step-for-a-child">A shorter 3D step for a child</h2></header>
+<p class="lede">A child can run a 3D time step that is its parent's divided by a whole number R, which it needs when its cells are smaller
+and its currents faster. It is set by the split factor in the level's block of the layout; R then follows from the split factors.
+In the runs below the 3D step is 181 s on the channel. R = 3 gives the strait 60 s; the chain gives the shelf 90 s (R = 2) and the strait 30 s (R = 3).</p>
+<div class="tablewrap num"><table><thead><tr><th>Test</th><th>All on 181 s</th><th>Strait R = 3</th><th>Chain, R = 2 and 3</th></tr></thead><tbody>
+<tr><td>closed basin, heat content, 48 h</td><td>4.9e-11</td><td>4.8e-11</td><td>4.6e-11</td></tr>
+<tr><td>uniform temperature with tide, 12 h: largest departure</td><td>2.9e-13 °C</td><td>6.0e-13 °C</td><td>8.0e-13 °C</td></tr>
+<tr><td>dye front with tide, 48 h: largest new maximum</td><td>3.1e-5</td><td>3.2e-5</td><td>4.2e-5</td></tr>
+<tr><td>V2, lake at rest, 48 h: fastest spurious current, channel / shelf / strait</td><td>3.4 / 10.9 / 19.0 mm/s</td><td>3.7 / 9.6 / 7.6 mm/s</td><td>–</td></tr>
+<tr><td>V5, pycnocline depth against the 333 m reference, channel / shelf / strait</td><td>0.126 / 0.115 / 0.073 m</td><td>0.126 / 0.115 / 0.075 m</td><td>0.126 / 0.116 / 0.078 m</td></tr>
+<tr><td>V5, pycnocline thickness, same order</td><td>0.502 / 0.252 / 0.074 m</td><td>0.502 / 0.252 / 0.078 m</td><td>0.502 / 0.252 / 0.087 m</td></tr>
+</tbody></table></div>
+<ul><li><strong>Conservation and uniformity are kept.</strong> The heat content is compared only at times when all levels finish a 3D step together; read in
+between, the levels have reached different times and differ by up to 6e-8, without any real loss.</li>
+<li><strong>With R = 1 nothing changes:</strong> the fields of a 6 h tide run are bit-identical to those of the code before this change. With R = 3 the differences between
+process splits 1/1/1 and 2/3/2 (5e-9 °C) are the same as with R = 1.</li>
+<li><strong>The accuracy in V5 is about the same.</strong> The reference here has a 180 s 3D step and covers only 12–23 h, because its output filled the disk. It therefore cannot show
+any gain from the shorter step. These currents do not need one (Courant number below 0.4 at 180 s: 0.68 m/s, 333 m cells), so these runs test the coupling, not the benefit.</li>
+<li><strong>The cost:</strong> the strait's own computation doubled, 182 → 386 s for the 48 h run. On an unchanged 2 / 2 / 2 process split the run took 417 s against 212 s, because the channel
+and the shelf wait for the strait; the cores have to be rebalanced with <code>nesting-balance</code>, which reads a level's own <code>split</code>.</li></ul>
+<p><strong>Not tested yet:</strong> a flow that actually needs the shorter step, such as DKm's fjords, and real FABM. The ring stays held over the parent's 3D step (no time interpolation). A restart
+must still save the sums the child collects between syncs.</p>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
