@@ -548,8 +548,9 @@ exactly those values (fork <code>a472d87</code>). A single model now restarts bi
 <section class="chapter"><div class="issue" id="restart-nested"><h3>A nested run does not yet restart bit-identically</h3><div class="tags"><span class="open">open</span><span>restart</span></div>
 <p>The nesting's own state is in the restart files (the child's ring at the previous sync, for the time extrapolation), but a
 restarted nested run still differs from an unbroken one by about 1e-6 m after two steps, only around the windows and in the
-children's bands, also without the extrapolation. Something at the interfaces is not restored, or the start-up sync changes it.
-Being looked into.</p></div></section>
+children's bands, also without the extrapolation. Tested again in IDEAL 3D (November 2026): after a restart the elevation, layer transports and tracers are
+now exact in every level, with a closed basin. After 6 h more, temperature still differs by 1e-5 °C and elevation by 5e-9 m: quantities derived from the transports near the
+interfaces are computed before the coupler replaces those transports in an unbroken run, and after it in a restart. Small differences also remain next to an open boundary. Postponed.</p></div></section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
 <dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
