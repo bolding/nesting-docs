@@ -193,7 +193,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#nesting">Nesting</a><a href="#examples">Examples</a></nav>
 
-<header class="hero"><p class="draft">Status · 5 November 2026</p><h1>Where it stands</h1>
+<header class="hero"><p class="draft">Status · 9 November 2026</p><h1>Where it stands</h1>
 <p class="lede">What works, what is being worked on, and what is open: in the nesting itself and in the example setups.</p></header>
 <section id="nesting" class="chapter"><header class="chap"><span class="eyebrow">Nesting</span><h2 id="the-method-and-the-code">The method and the code</h2></header>
 <div class="statusgrid">
@@ -225,6 +225,7 @@ across an interface (a safety net). In 3D pyGETM itself needs a small bottom rou
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
 <li>Limited slopes and time interpolation in the 3D ring.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
+<li>Curvilinear grids as in legacy GETM (checked, not started): pyGETM's advection, diffusion and pressure gradients already use the metrics per cell; missing are the curvature term in the Coriolis force (in a polar-grid test it cuts the elevation error from 0.118 m to 0.0036 m), reading legacy curvilinear topo files, the exact cell area and tests. Nesting assumes regular grids.</li>
 <li>Adaptive vertical coordinates (last; GVC and SIGMA until then).</li>
 <li>Running a single model with its boundaries from a file.</li>
 <li><a href="issues.html#e8-tiles">One process split in IDEAL E8</a> (1e-4 m).</li></ul></div>
