@@ -391,6 +391,10 @@ is too coarse; build the second fallback only when a real setup needs a curved o
 seeds located on the level's own coordinates; the start-up checks (the conforming band, no water counted twice); beyond the band the parent keeps its own land in the
 hole; the 2D rim fills only open faces. The couplers, the exchange plans and the scheduler are unchanged. The <a href="ideal.html#fjord-nested">IDEAL fjord</a> runs as a
 nested level: conservation, uniformity, salinity with a river and a restart behave as for regular levels.</p>
+<p id="rivers"><strong>Rivers.</strong> Every level is its own pyGETM simulation with its own river list, and pyGETM moves a river given by location to the nearest water it computes:
+a river under a child's window would enter the parent next to the interface, and twice if the child has it too. Now a river belongs to the level whose computed region
+holds it (the finest where a curvilinear child lies over its parent's land); every level drops the rivers of the others, and a river no level computes stops the run.
+So a setup may give all its rivers to every level. Checked with three rivers on three levels in a closed basin: the volume grows by their inputs to 1e-8 m³.</p>
 <p><strong>Overhang</strong> (for an estuary at the root's edge): a curvilinear level may be larger than its window (<code>overhang: [w, e, s, n]</code>). The window holds
 only the mouth section; beyond it the level has no parent cells beneath and computes alone. The nesting works on the window part as before; the level's pyGETM domain
 is larger by a fixed index offset; on an overhang side the band is the level's own. A start-up check refuses overhang water over water the parent computes.
@@ -439,6 +443,7 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 <tr><td><code>domain.py</code>, <code>legacy.py</code></td><td><code>Domain(exact_area=True)</code>: cell areas from the corner quadrilaterals
 (as legacy's iow branch), off by default. <code>legacy.domain_from_topo</code> reads planar curvilinear topo files (grid_type 3, the corners
 <code>xx</code>, <code>yx</code>).</td><td>Strongly curved grids; legacy setups</td></tr>
+<tr><td><code>rivers.py</code></td><td><code>GlobalRiverCollection.remove(name)</code></td><td>The nesting keeps each river at the level that computes its cell</td></tr>
 <tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart, the tracers' open boundaries get their values but the
 sponge zones are not relaxed again (the last macro step did so before the restart file was written).</td><td>A restarted run with sponge boundaries
 continues bit-identically</td></tr>

@@ -239,7 +239,8 @@ correction, 2e-4 in the parent from the flux correction.</li>
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
-<li><strong>Next:</strong> rivers and point sources in a parent cell under a child, a sluice between two levels
+<li>Rivers in a nest: each belongs to the level that computes its cell, the others drop it, a river no level computes stops the run (<a href="methods.html#rivers">methods</a>).</li>
+<li><strong>Next:</strong> a sluice between two levels
 (DKm's Ringkøbing Fjord).</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
