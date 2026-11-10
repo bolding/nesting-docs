@@ -217,7 +217,10 @@ velocities and the 3D flux register; heat conserved to 1e-9.</li>
 <li><a href="issues.html#restart-nested">Restart of a nested run</a>: bit-identical in IDEAL 3D (1 and 2 processes per level, with and without sub-stepping); results
 no longer depend on the process split (<a href="ideal.html#rerun-restart">rerun</a>).</li>
 <li>Curvilinear grids in pyGETM: the curvature term of the momentum equations (as legacy GETM), legacy curvilinear topo files, exact cell areas;
-a <a href="ideal.html#fjord">bent fjord</a> as a standalone example. Nesting a curvilinear level is <a href="methods.html#curvi">examined</a>: the same path, with a conforming band.</li></ul></div>
+a <a href="ideal.html#fjord">bent fjord</a> as a standalone example. Nesting a curvilinear level is <a href="methods.html#curvi">examined</a>: the same path, with a conforming band
+(<a href="methods.html#curvi-nomatch">fallbacks</a> where the grids cannot be matched).</li>
+<li>Rotated and curvilinear lon/lat grids: pyGETM's grid angle now includes cos(latitude) (0.4° off before at 56° N), left-handed grids are refused, and
+ocean-prep's mirrored rotated-pole transform is fixed (<a href="methods.html#curvi-sphere">details</a>).</li></ul></div>
 <div><h4>In progress</h4><ul>
 <li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest, against each level's grid run alone: after
 <a href="issues.html#ppm-outer-layers">a fix of the remap's outer layers</a> the coupling adds nothing in the channel, 1.4× on the
@@ -228,12 +231,14 @@ level, mostly from the coarser levels' layers.</li>
 correction, 2e-4 in the parent from the flux correction.</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
 8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026).</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork, nesting code and ocean-prep pushed on 10 November.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
+<li><strong>Next:</strong> rivers and point sources in a parent cell under a child, the same atmospheric forcing on every level, a sluice between two levels
+(DKm's Ringkøbing Fjord).</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
 <li>Limited slopes and time interpolation in the 3D ring.</li>
