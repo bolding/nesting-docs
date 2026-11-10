@@ -193,7 +193,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#nesting">Nesting</a><a href="#examples">Examples</a></nav>
 
-<header class="hero"><p class="draft">Status · 9 November 2026</p><h1>Where it stands</h1>
+<header class="hero"><p class="draft">Status · 10 November 2026</p><h1>Where it stands</h1>
 <p class="lede">What works, what is being worked on, and what is open: in the nesting itself and in the example setups.</p></header>
 <section id="nesting" class="chapter"><header class="chap"><span class="eyebrow">Nesting</span><h2 id="the-method-and-the-code">The method and the code</h2></header>
 <div class="statusgrid">
@@ -204,7 +204,11 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <li>The sub-stepping instability understood and removed by an AGRIF-like sponge.</li>
 <li>3D: temperature and salinity between levels with different vertical grids: rim, ring, 3D transports, ring
 velocities and the 3D flux register; heat conserved to 1e-9.</li>
-<li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number. Tested in IDEAL, not yet in a flow that needs it.</li></ul></div>
+<li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number. Tested in IDEAL, not yet in a flow that needs it.</li>
+<li><a href="issues.html#restart-nested">Restart of a nested run</a>: bit-identical in IDEAL 3D (1 and 2 processes per level, with and without sub-stepping); results
+no longer depend on the process split (<a href="ideal.html#rerun-restart">rerun</a>).</li>
+<li>Curvilinear grids in pyGETM: the curvature term of the momentum equations (as legacy GETM), legacy curvilinear topo files, exact cell areas;
+a <a href="ideal.html#fjord">bent fjord</a> as a standalone example. Nesting a curvilinear level is <a href="methods.html#curvi">examined</a>: the same path, with a conforming band.</li></ul></div>
 <div><h4>In progress</h4><ul>
 <li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest, against each level's grid run alone: after
 <a href="issues.html#ppm-outer-layers">a fix of the remap's outer layers</a> the coupling adds nothing in the channel, 1.4× on the
@@ -219,13 +223,13 @@ correction, 2e-4 in the parent from the flux correction.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
-<li>Restart of a nested run: the state after a restart is exact, the run after it <a href="issues.html#restart-nested">not yet bit-identical</a>. Postponed.</li></ul></div>
+</ul></div>
 <div><h4>Open</h4><ul>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
 <li>Limited slopes and time interpolation in the 3D ring.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
-<li>Curvilinear grids as in legacy GETM (checked, not started): pyGETM's advection, diffusion and pressure gradients already use the metrics per cell; missing are the curvature term in the Coriolis force (in a polar-grid test it cuts the elevation error from 0.118 m to 0.0036 m), reading legacy curvilinear topo files, the exact cell area and tests. Nesting assumes regular grids.</li>
+<li>A curvilinear level in the nest (a grid per level, start-up checks, the fjord in IDEAL); the restart's remaining checks (NEAB 2D, a restart file from upstream).</li>
 <li>Adaptive vertical coordinates (last; GVC and SIGMA until then).</li>
 <li>Running a single model with its boundaries from a file.</li>
 <li><a href="issues.html#e8-tiles">One process split in IDEAL E8</a> (1e-4 m).</li></ul></div>

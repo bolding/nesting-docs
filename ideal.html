@@ -191,8 +191,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a></ol></details>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a><a href="#fjord">Curvilinear fjord</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a><ol class="toc-sub"><li><a href="#rerun-restart">Rerun after the restart fixes (10 November 2026)</a></li></ol><li><a href="#a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</a><ol class="toc-sub"><li><a href="#flow-through-the-bend">Flow through the bend</a></li><li><a href="#tide-and-river">Tide and river</a></li></ol></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 5 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -530,8 +530,50 @@ process splits 1/1/1 and 2/3/2 (5e-9 °C) are the same as with R = 1.</li>
 any gain from the shorter step. These currents do not need one (Courant number below 0.4 at 180 s: 0.68 m/s, 333 m cells), so these runs test the coupling, not the benefit.</li>
 <li><strong>The cost:</strong> the strait's own computation doubled, 182 → 386 s for the 48 h run. On an unchanged 2 / 2 / 2 process split the run took 417 s against 212 s, because the channel
 and the shelf wait for the strait; the cores have to be rebalanced with <code>nesting-balance</code>, which reads a level's own <code>split</code>.</li></ul>
-<p><strong>Not tested yet:</strong> a flow that actually needs the shorter step, such as DKm's fjords, and real FABM. The ring stays held over the parent's 3D step (no time interpolation). A restart
-must still save the sums the child collects between syncs.</p>
+<p><strong>Not tested yet:</strong> a flow that actually needs the shorter step, such as DKm's fjords, and real FABM. The ring stays held over the parent's 3D step (no time interpolation).
+A restart falls on a 3D step of the root, where the child's sums between syncs are empty; it continues <a href="issues.html#restart-nested">bit-identically</a>.</p>
+<h3 id="rerun-restart">Rerun after the restart fixes (10 November 2026)</h3>
+<p>The <a href="issues.html#restart-nested">restart fixes</a> change nested runs slightly: the parent's momentum diagnostics are now computed from the
+transports the nesting replaced, and the summed 2D transports of a 3D step agree between subdomains. The whole table was rerun, and four cases also with
+the code from before, the same script measuring both.</p>
+<div class="tablewrap num"><table><thead><tr><th>Test</th><th>Before</th><th>After: all on 181 s</th><th>Strait R = 3</th><th>Chain</th></tr></thead><tbody>
+<tr><td>closed basin, heat content, 48 h (aligned times)</td><td>4.9e-11</td><td>4.9e-11</td><td>4.7e-11</td><td>4.6e-11</td></tr>
+<tr><td>uniform temperature with tide, 12 h: largest departure</td><td>2.9e-13 °C</td><td>3.0e-13 °C</td><td>5.9e-13 °C</td><td>8.0e-13 °C</td></tr>
+<tr><td>dye front with tide, 48 h: largest new maximum</td><td>3.1e-5</td><td>3.6e-5</td><td>3.7e-5</td><td>4.4e-5</td></tr>
+<tr><td>V2, lake at rest: fastest spurious current, channel / shelf / strait</td><td>3.4 / 8.0 / 4.4 mm/s</td><td>3.5 / 7.1 / 4.8 mm/s</td><td>3.4 / 7.6 / 4.1 mm/s</td><td>–</td></tr>
+<tr><td>process splits 1/1/1 against 2/3/2, 6 h</td><td>5e-9 °C</td><td colspan="3"><strong>bit-identical</strong> (R = 1 and R = 3)</td></tr>
+</tbody></table></div>
+<ul><li>Conservation and uniformity are unchanged. The dye's new maximum grows from 3.1e-5 to 3.6e-5; V2 is better on the shelf and slightly worse in the strait.
+The V2 "before" here is the old code rerun now; it differs from the table above (10.9 / 19.0 mm/s), which is not explained yet.</li>
+<li>Old against new code at the end: temperature differs by 2e-3 °C rms (largest 0.24 °C, in V5's pycnocline), velocities by 1e-4 m/s rms.</li>
+<li>Results no longer depend on the process split: before, the halo copies of the summed transports at an interface face could hold the uncorrected value.</li>
+<li>V5 against its 333 m reference is not repeated: the reference was deleted (its output filled the disk).</li></ul>
+</section>
+<section id="fjord" class="chapter"><header class="chap"><span class="eyebrow">Curvilinear · Fjord</span><h2 id="a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</h2></header>
+<p class="lede">A standalone example of pyGETM on a curvilinear grid with the new curvature term, prepared to become a child level of the IDEAL nest
+(<a href="methods.html#curvi">curvilinear levels</a>). 2 km wide, 10 × 125 cells of 200 m (a 1 km parent divided by 5), 40 m deep with a 20 m sill; from the mouth
+a straight section, a 90° bend with a 6 km radius, 12 km straight to the head. 3D, 20 layers.</p>
+<figure><img src="fig/ideal/fjord/fjord_grid.png" alt="The fjord's grid and depth"><figcaption>The grid follows the fjord. The straight part at the mouth is exactly the parent's
+grid refined by 5 over 15 cells, where a nested level needs 12 (red): the parent's rim of 2 parent cells and the child's ring and halo.</figcaption></figure>
+<h3 id="flow-through-the-bend">Flow through the bend</h3>
+<p>Open at both ends, 0.5 m/s in at the mouth and out at the head (Flather; the transports are given east and north and pyGETM rotates them to the grid, which points
+east at the head). Steady after about 3 h. Flow round a bend raises the outer bank by u² W / (g R), 8.3 mm here; the Earth's rotation raises the right bank by f u W / g, 10 mm.</p>
+<figure><img src="fig/ideal/fjord/fjord_tilt.png" alt="The surface across the fjord"><figcaption>The steady surface across the fjord in the middle of the bend and in the straight part
+near the head. In the bend the two tilts nearly cancel with the curvature term; without it only the rotation's tilt is left.</figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th></th><th>Straight: rotation</th><th>Bend minus rotation: the bend</th></tr></thead><tbody>
+<tr><td>expected</td><td>10.0 mm</td><td>8.3 mm</td></tr>
+<tr><td>curvature term on (pyGETM's default here)</td><td>9.1 mm</td><td><strong>7.6 mm</strong></td></tr>
+<tr><td>curvature term off</td><td>9.2 mm</td><td><strong>0.08 mm</strong></td></tr>
+</tbody></table></div>
+<p>Without the term the flow does not feel the bend: in grid coordinates the centripetal acceleration is the curvature term. With it the outer bank rises by 91 % of the simple
+estimate, which assumes the same speed across the fjord; the rotation's tilt in the straight part comes out at the same 91 %.</p>
+<h3 id="tide-and-river">Tide and river</h3>
+<figure><img src="fig/ideal/fjord/fjord_salt.png" alt="Surface salinity"><figcaption>Surface salinity after 48 h with a 0.5 m M2 tide at the mouth and 50 m³/s of fresh water at the
+head, and the difference the curvature term makes: up to 0.3 along the bend.</figcaption></figure>
+<ul><li>Stable for 48 h. A closed fjord with only the river changes its volume by exactly the river's input; at rest it stays at rest with the term on.</li>
+<li>Cell areas from the corner quadrilaterals instead of dx × dy change the elevation by 3e-5 m (the grid is orthogonal).</li>
+<li>The tidal currents are only 3 cm/s: the fjord's tidal prism is small. The flow-through case is the test of the term.</li>
+<li><strong>Not done:</strong> the fjord as a level of the IDEAL nest, which needs a grid per level in the nesting, start-up checks and a coast in the parent.</li></ul>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
