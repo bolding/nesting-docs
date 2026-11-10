@@ -355,9 +355,10 @@ pyGETM's domain takes 2D lon/lat directly, as ocean-prep writes them. The curvat
 rectilinear (rotated pole, coast-following) and off for regular lon/lat grids, as in upstream pyGETM.</li>
 <li><strong>Checked, a rotated-pole grid</strong> (0.05°, centred on 8° E 56° N on the rotated equator), once as a regular grid in rotated
 coordinates and once in geographic lon/lat: dx, dy and area agree to 10<sup>-12</sup>, the curvature coefficients to 10<sup>-16</sup> (of 3 × 10<sup>-9</sup>).</li>
-<li><strong>Found, not fixed:</strong> ocean-prep's rotated-pole transform is mirrored in longitude (one cell east in rotated lon goes west), so its
-grids are left-handed: in pyGETM that gives a wrong grid angle (±90°), wrongly rotated wind and boundary velocities and the Coriolis force in
-the wrong sense relative to the grid. pyGETM does not check handedness. Separately, pyGETM's grid angle on rotated lon/lat grids is taken in
+<li><strong>Found:</strong> ocean-prep's rotated-pole transform was mirrored in longitude (one cell east in rotated lon went west), so its
+grids were left-handed: in pyGETM that gives a wrong grid angle (±90°), wrongly rotated wind and boundary velocities and the Coriolis force in
+the wrong sense relative to the grid. <strong>Fixed</strong> in ocean-prep (10 November 2026: the CF form, checked against cartopy); grids made with
+it before need regenerating. pyGETM does not check handedness. <strong>Not fixed:</strong> pyGETM's grid angle on rotated lon/lat grids is taken in
 degrees without cos(lat): about 17 % too large at 56° N (2.69° against 2.26°), so wind and boundary velocities are rotated 0.4° wrongly there.
 Regular lon/lat grids are not affected. NEAB and DKm use regular lon/lat levels.</li></ul>
 <p class="small">To do in the nesting: an optional grid per level instead of <code>lon0</code>/<code>dlon</code>; seed and barriers located
