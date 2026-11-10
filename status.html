@@ -222,7 +222,12 @@ conforming band and start-up checks; conservation, salinity with a river and a r
 edge</a> with an overhang beyond its window (an "Elbe"; stable with its own 3D step and a sponge one parent cell wide)
 (<a href="methods.html#curvi-nomatch">fallbacks</a> where the grids cannot be matched).</li>
 <li>Rotated and curvilinear lon/lat grids: pyGETM's grid angle now includes cos(latitude) (0.4° off before at 56° N), left-handed grids are refused, and
-ocean-prep's mirrored rotated-pole transform is fixed (<a href="methods.html#curvi-sphere">details</a>).</li></ul></div>
+ocean-prep's mirrored rotated-pole transform is fixed (<a href="methods.html#curvi-sphere">details</a>).</li>
+<li><a href="methods.html#rivers">Rivers in a nest</a>: a setup may give all its rivers to every level; each belongs to the level that computes its cell, the
+others drop it, and a river no level computes stops the run. Volume to 1e-8 m³ with three rivers on three levels.</li>
+<li><a href="methods.html#dams">Dams and sluices</a>: dams of zero width (faces closed along a line; refused on an interface) and sluices with their ends on
+two levels. A <a href="ideal.html#sluice">fjord behind a dam</a> drained to the shelf by a flap gate conserves volume and salt exactly and restarts bit-identically.</li>
+<li>Meteorology: each level is a pyGETM simulation and reads its own; nothing for the nesting to do.</li></ul></div>
 <div><h4>In progress</h4><ul>
 <li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest, against each level's grid run alone: after
 <a href="issues.html#ppm-outer-layers">a fix of the remap's outer layers</a> the coupling adds nothing in the channel, 1.4× on the
@@ -233,22 +238,19 @@ level, mostly from the coarser levels' layers.</li>
 correction, 2e-4 in the parent from the flux correction.</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
 8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork, nesting code and ocean-prep pushed on 10 November.</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 10 November (last: dams and sluices).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
-<li>Rivers in a nest: each belongs to the level that computes its cell, the others drop it, a river no level computes stops the run (<a href="methods.html#rivers">methods</a>).</li>
-<li>Dams of zero width and sluices between two levels: a fjord behind a dam drained to the shelf by a flap gate conserves volume and salt exactly and restarts
-bit-identically (<a href="ideal.html#sluice">example</a>, <a href="methods.html#dams">methods</a>). Next for DKm: Ringkøbing Fjord as a level with the sluice at Hvide Sande.</li>
-<li><strong>Next:</strong> the 3D ring (time interpolation, limited slopes).</li>
+<li><strong>Next:</strong> the 3D ring: time interpolation and limited slopes.</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
 <li>The safeguard against new extrema from the flux correction on the parent's side (2e-4 in IDEAL V6).</li>
-<li>Limited slopes and time interpolation in the 3D ring.</li>
+<li>Ring and rim refreshed between the advection sweeps; turbulence and FABM's 2D fields across interfaces (whether needed).</li>
+<li>Output across levels: the levels merged onto one grid, budgets over all levels.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
-<li>The restart's remaining checks (NEAB 2D, a restart file from upstream); an overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level;
-</li>
+<li>The restart's remaining checks (NEAB 2D, a restart file from upstream); an overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level.</li>
 <li>Adaptive vertical coordinates (last; GVC and SIGMA until then).</li>
 <li>Running a single model with its boundaries from a file.</li>
 <li><a href="issues.html#e8-tiles">One process split in IDEAL E8</a> (1e-4 m).</li></ul></div>
@@ -259,7 +261,8 @@ bit-identically (<a href="ideal.html#sluice">example</a>, <a href="methods.html#
 <div><h4><a href="ideal.html">IDEAL</a></h4><ul>
 <li>2D: E1, E2, E3, E8, E9 done.</li>
 <li>3D with temperature, 10 / 15 / 20 layers: conservation and uniformity passed; the lake at rest (V2), a pycnocline over
-the slope (V5), a dye front (V6) and the cost (V7) done.</li></ul></div>
+the slope (V5), a dye front (V6) and the cost (V7) done.</li>
+<li>Curvilinear: a bent fjord standalone and as a level, an estuary at the root's edge (overhang), rivers on every level, a dam with a sluice between two levels.</li></ul></div>
 <div><h4><a href="neab.html">NEAB</a></h4><ul>
 <li>Five levels, 31-day tidal runs on 64 cores (coarse); gauge and TPXO9 comparisons.</li>
 <li><a href="issues.html#neab-skagerrak">The tide east of the Skagerrak amphidrome</a> is open: the depth datum
@@ -269,7 +272,8 @@ the slope (V5), a dye front (V6) and the cost (V7) done.</li></ul></div>
 <li>Ten levels down to 57 m from Denmark's Depth Model; open boundaries from NEAB, TPXO9 or CMEMS.</li>
 <li>A nested variant (the Belt Sea inside the Kattegat) gives the same tide on fewer cores.</li>
 <li>Automatic thalwegs from the 50 m source for every level (nesting-thalwegs), with a page per level, applied in the bathymetry: Roskilde Fjord and the Bodden are joined to the sea. DKm's bathymetry now comes from ocean-prep (DDM 50 m, closed passages, only the main water); its first tidal run (TPXO9, 1 + 7 days) matches v4 at the gauges and is closer in the Belts (<a href="dkm.html#tides-ocean-prep">tides</a>); Thyborøn is lower.</li>
-<li>Open: water cut off from the sea in the fine levels, the dredged channels, sluices, the island fjords, the Wadden Sea.</li></ul></div>
+<li>Next: Ringkøbing Fjord as a level of its own with the sluice at Hvide Sande (the tools exist: dams, sluices between levels; still the gate rules).</li>
+<li>Open: water cut off from the sea in the fine levels, the dredged channels, the island fjords, the Wadden Sea.</li></ul></div>
 </div>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
