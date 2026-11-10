@@ -219,7 +219,7 @@ no longer depend on the process split (<a href="ideal.html#rerun-restart">rerun<
 <li>Curvilinear grids in pyGETM: the curvature term of the momentum equations (as legacy GETM), legacy curvilinear topo files, exact cell areas;
 a <a href="ideal.html#fjord">bent fjord</a>, standalone and <a href="ideal.html#fjord-nested">as a level of the IDEAL nest</a> (the same path as regular levels, with a
 conforming band and start-up checks; conservation, salinity with a river and a restart as for regular levels), and <a href="ideal.html#estuary">attached at the root's
-edge</a> with an overhang beyond its window (an "Elbe")
+edge</a> with an overhang beyond its window (an "Elbe"; stable with its own 3D step and a sponge one parent cell wide)
 (<a href="methods.html#curvi-nomatch">fallbacks</a> where the grids cannot be matched).</li>
 <li>Rotated and curvilinear lon/lat grids: pyGETM's grid angle now includes cos(latitude) (0.4° off before at 56° N), left-handed grids are refused, and
 ocean-prep's mirrored rotated-pole transform is fixed (<a href="methods.html#curvi-sphere">details</a>).</li></ul></div>
