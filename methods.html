@@ -192,7 +192,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#method">2D</a><a href="#threed">3D</a><a href="#threed-impl">3D as implemented</a><a href="#threed-sub">3D sub-stepping</a><a href="#curvi">Curvilinear levels</a><a href="#pygetm">Changes to pyGETM</a><a href="#names">Names used</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#levels-halos-and-exchanges">Levels, halos and exchanges</a><ol class="toc-sub"><li><a href="#land-active-regions-and-decomposition">Land, active regions and decomposition</a></li><li><a href="#the-exchanges">The exchanges</a></li><li><a href="#load-balancing">Load balancing</a></li></ol><li><a href="#3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</a><ol class="toc-sub"><li><a href="#a-synthetic-comparison">A synthetic comparison</a></li><li><a href="#cost-and-what-the-scalars-share">Cost, and what the scalars share</a></li><li><a href="#threed-impl">The 3D coupling as implemented</a></li><li><a href="#threed-sub">3D sub-stepping</a></li></ol><li><a href="#curvilinear-levels">Curvilinear levels</a><ol class="toc-sub"><li><a href="#curvi-depends">What the nesting depends on</a></li><li><a href="#curvi-answer">The same path, with a conforming band</a></li><li><a href="#curvi-enforce">Forcing a curvilinear grid to follow the parent</a></li><li><a href="#curvi-sphere">Spherical curvilinear grids</a></li></ol><li><a href="#what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</a><li><a href="#names-used-on-these-pages">Names used on these pages</a><ol class="toc-sub"><li><a href="#levels-and-geometry">Levels and geometry</a></li><li><a href="#what-is-exchanged">What is exchanged</a></li><li><a href="#time-stepping">Time stepping</a></li><li><a href="#in-the-vertical">In the vertical</a></li><li><a href="#processes-and-tools">Processes and tools</a></li><li><a href="#setups-and-tests">Setups and tests</a></li></ol></ol></details>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#levels-halos-and-exchanges">Levels, halos and exchanges</a><ol class="toc-sub"><li><a href="#land-active-regions-and-decomposition">Land, active regions and decomposition</a></li><li><a href="#the-exchanges">The exchanges</a></li><li><a href="#load-balancing">Load balancing</a></li></ol><li><a href="#3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</a><ol class="toc-sub"><li><a href="#a-synthetic-comparison">A synthetic comparison</a></li><li><a href="#cost-and-what-the-scalars-share">Cost, and what the scalars share</a></li><li><a href="#threed-impl">The 3D coupling as implemented</a></li><li><a href="#threed-sub">3D sub-stepping</a></li></ol><li><a href="#curvilinear-levels">Curvilinear levels</a><ol class="toc-sub"><li><a href="#curvi-depends">What the nesting depends on</a></li><li><a href="#curvi-answer">The same path, with a conforming band</a></li><li><a href="#curvi-enforce">Forcing a curvilinear grid to follow the parent</a></li><li><a href="#curvi-sphere">Spherical curvilinear grids</a></li><li><a href="#curvi-nomatch">When the grids cannot be matched</a></li></ol><li><a href="#what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</a><li><a href="#names-used-on-these-pages">Names used on these pages</a><ol class="toc-sub"><li><a href="#levels-and-geometry">Levels and geometry</a></li><li><a href="#what-is-exchanged">What is exchanged</a></li><li><a href="#time-stepping">Time stepping</a></li><li><a href="#in-the-vertical">In the vertical</a></li><li><a href="#processes-and-tools">Processes and tools</a></li><li><a href="#setups-and-tests">Setups and tests</a></li></ol></ol></details>
 <header class="hero"><p class="draft">Methods</p><h1>How the nesting works</h1>
 <p class="lede">Every level of a nest is an ordinary pyGETM simulation with its own grid, time step and processes. The
 nesting fills the halo zones where the levels overlap, and matches the fluxes through the faces between them, so that
@@ -355,12 +355,29 @@ pyGETM's domain takes 2D lon/lat directly, as ocean-prep writes them. The curvat
 rectilinear (rotated pole, coast-following) and off for regular lon/lat grids, as in upstream pyGETM.</li>
 <li><strong>Checked, a rotated-pole grid</strong> (0.05°, centred on 8° E 56° N on the rotated equator), once as a regular grid in rotated
 coordinates and once in geographic lon/lat: dx, dy and area agree to 10<sup>-12</sup>, the curvature coefficients to 10<sup>-16</sup> (of 3 × 10<sup>-9</sup>).</li>
-<li><strong>Found:</strong> ocean-prep's rotated-pole transform was mirrored in longitude (one cell east in rotated lon went west), so its
+<li><strong>Found and fixed:</strong> ocean-prep's rotated-pole transform was mirrored in longitude (one cell east in rotated lon went west), so its
 grids were left-handed: in pyGETM that gives a wrong grid angle (±90°), wrongly rotated wind and boundary velocities and the Coriolis force in
 the wrong sense relative to the grid. <strong>Fixed</strong> in ocean-prep (10 November 2026: the CF form, checked against cartopy); grids made with
-it before need regenerating. pyGETM does not check handedness. <strong>Not fixed:</strong> pyGETM's grid angle on rotated lon/lat grids is taken in
-degrees without cos(lat): about 17 % too large at 56° N (2.69° against 2.26°), so wind and boundary velocities are rotated 0.4° wrongly there.
-Regular lon/lat grids are not affected. NEAB and DKm use regular lon/lat levels.</li></ul>
+it before need regenerating. pyGETM now refuses left-handed grids. <strong>Also fixed</strong> (fork): pyGETM's grid angle on rotated lon/lat grids was taken in
+degrees without cos(lat), about 17 % too large at 56° N (2.69° against 2.26°), so wind and boundary velocities were rotated 0.4° wrongly there; now within
+3 × 10<sup>-7</sup>°. Regular lon/lat grids are not affected. NEAB and DKm use regular lon/lat levels.</li></ul>
+<h3 id="curvi-nomatch">When the grids cannot be matched</h3>
+<p>The blend into the curvilinear grid costs orthogonality in its transition zone. That is too costly, or impossible, for an <strong>oblique mouth</strong>
+(the grid lines must turn by that angle within the zone: workable over a few km, with skewed cells), a <strong>long, curved interface</strong> (a child along a
+shelf edge or a whole coast), or a <strong>given grid</strong> that cannot be changed. The fallbacks, from cheap to costly:</p>
+<div class="tablewrap"><table><thead><tr><th>Fallback</th><th>What it does</th><th>Cost</th></tr></thead><tbody>
+<tr><td>Intermediate level</td><td>Spherical parent → a regular refined child that conforms → the curvilinear grandchild, conforming to the intermediate level.
+All on the existing path. Helps where the parent is too coarse for a smooth transition, not for an oblique or curved interface.</td><td>a level more</td></tr>
+<tr><td>Conforming interface, non-conforming band</td><td>Only the interface line lies on parent faces; the band behind it can be curvilinear. Fluxes stay
+conservative (each child face covers part of a parent face, no integer ratio needed); rim and ring by geometric interpolation (no longer exact); ring velocities
+rotated by the angle between the grids.</td><td>about 1–2 weeks</td></tr>
+<tr><td>Full overset coupling</td><td>The child's boundary anywhere: weights from geometric overlap, flux matching with cut cells where the boundary crosses parent
+cells; only approximately conservative unless done properly.</td><td>several weeks</td></tr>
+<tr><td>One-way nesting</td><td>The curvilinear model gets its open boundaries from the parent, online or from a file; no feedback (or a non-conservative
+relaxation).</td><td>small, but not two-way</td></tr>
+</tbody></table></div>
+<p>Recommended: keep the conforming band as the rule and let the layout checker say where and why it cannot be met; use an intermediate level where the parent
+is too coarse; build the second fallback only when a real setup needs a curved or oblique interface.</p>
 <p class="small">To do in the nesting: an optional grid per level instead of <code>lon0</code>/<code>dlon</code>; seed and barriers located
 with the level's own coordinates; the start-up checks above; output across levels with the levels' coordinates; and in IDEAL a coast in the
 parent where the fjord attaches. The couplers, the exchange plans and the scheduler need no change.</p>
@@ -369,9 +386,10 @@ parent where the fjord attaches. The couplers, the exchange plans and the schedu
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
 model through a small set of hooks in pyGETM's core: about 400 changed lines in twelve files. All of them are optional.
-A model without nesting runs exactly as before (the optional arguments default to nothing), with three exceptions: a
-bug fix in the transport damping, fixes that make a restarted run continue bit-identically, and the curvature term on curvilinear
-grids (on regular longitude/latitude grids it is off unless asked for).</p>
+A model without nesting runs exactly as before (the optional arguments default to nothing), with four exceptions: a
+bug fix in the transport damping, fixes that make a restarted run continue bit-identically, the curvature term on curvilinear
+grids (on regular longitude/latitude grids it is off unless asked for), and the grid angle of rotated or curvilinear longitude/latitude grids
+(fixed; left-handed grids are now refused).</p>
 <div class="tablewrap"><table><thead><tr><th>Where</th><th>Change</th><th>Why</th></tr></thead><tbody>
 <tr><th colspan="3">Fortran</th></tr>
 <tr><td><code>advection.F90.template</code>, <code>advection_base.F90</code></td><td><code>u2d</code>/<code>v2d</code>: optional
@@ -407,6 +425,10 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 <tr><td><code>domain.py</code>, <code>legacy.py</code></td><td><code>Domain(exact_area=True)</code>: cell areas from the corner quadrilaterals
 (as legacy's iow branch), off by default. <code>legacy.domain_from_topo</code> reads planar curvilinear topo files (grid_type 3, the corners
 <code>xx</code>, <code>yx</code>).</td><td>Strongly curved grids; legacy setups</td></tr>
+<tr><td><code>domain.py</code> (rotation)</td><td>The grid angle of longitude/latitude grids from the local east and north components, longitude differences
+scaled by cos(latitude) (before: taken in degrees, 17 % too large at 56° N on a rotated-pole grid; regular lon/lat grids unchanged, exactly 0). A
+left-handed (mirrored) grid is refused at domain creation.</td><td>Rotated-pole and curvilinear lon/lat grids (e.g. from ocean-prep): wind and
+boundary velocities rotated correctly; mirrored grids caught</td></tr>
 <tr><td><code>parallel.py</code></td><td><code>get_logger(name=)</code>, <code>file_prefix()</code></td><td>Several models in one MPI job, each with its own logs and dumps</td></tr>
 <tr><td><code>util/interpolate.py</code></td><td><code>interp_columns</code>: vertical interpolation between water columns of different depth</td><td>Parent → child in 3D (in preparation)</td></tr>
 <tr><td><code>input/tpxo.py</code></td><td><code>tpxo.get(..., components=)</code></td><td>Convenience: a subset of the constituents</td></tr>
