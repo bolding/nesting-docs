@@ -395,6 +395,15 @@ nested level: conservation, uniformity, salinity with a river and a restart beha
 a river under a child's window would enter the parent next to the interface, and twice if the child has it too. Now a river belongs to the level whose computed region
 holds it (the finest where a curvilinear child lies over its parent's land); every level drops the rivers of the others, and a river no level computes stops the run.
 So a setup may give all its rivers to every level. Checked with three rivers on three levels in a closed basin: the volume grows by their inputs to 1e-8 m³.</p>
+<p id="dams"><strong>Dams and sluices.</strong> A <strong>dam</strong> is a line of zero width: every U or V face whose connection between the two cell centres
+crosses the line is closed, and the corners between two closed faces, so the dam acts as a coast on both sides while the cells on both sides stay water
+(<code>pygetm.dams</code>; on regular, curvilinear and longitude/latitude grids, a staircase where the line runs at an angle). pyGETM needs nothing else: its U and V
+masks come from the supergrid mask. In a nest every level gets the dam and closes its own faces; a dam on an interface is refused at start-up (the two levels' fluxes
+there would differ), one in a child's band or a parent's hole is left to the level that computes those cells. A <strong>sluice</strong> (<code>pygetm.sluice</code>: a pair
+of rivers with opposite flows, the orifice law from the levels at both ends, gates and flap gates, tracers with the water) may now have its ends on two levels, e.g.
+a fjord behind a dam and the sea in its parent: each end belongs to the level that computes its cell, as a river, and the two levels compute the flow together at every
+time they share, from both ends, with one small allreduce; each applies it to its own end until the next shared time, so both move the same volume.
+<a href="ideal.html#sluice">Example</a>.</p>
 <p><strong>Overhang</strong> (for an estuary at the root's edge): a curvilinear level may be larger than its window (<code>overhang: [w, e, s, n]</code>). The window holds
 only the mouth section; beyond it the level has no parent cells beneath and computes alone. The nesting works on the window part as before; the level's pyGETM domain
 is larger by a fixed index offset; on an overhang side the band is the level's own. A start-up check refuses overhang water over water the parent computes.
@@ -444,6 +453,10 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 (as legacy's iow branch), off by default. <code>legacy.domain_from_topo</code> reads planar curvilinear topo files (grid_type 3, the corners
 <code>xx</code>, <code>yx</code>).</td><td>Strongly curved grids; legacy setups</td></tr>
 <tr><td><code>rivers.py</code></td><td><code>GlobalRiverCollection.remove(name)</code></td><td>The nesting keeps each river at the level that computes its cell</td></tr>
+<tr><td><code>dams.py</code> (new)</td><td><code>pygetm.dams.close(domain, line)</code>: closes the U/V faces a polyline crosses and the corners between
+them (a dam or thin wall of zero width); only the supergrid mask is changed, before the grids are built</td><td>Dams, barriers; Ringkøbing Fjord</td></tr>
+<tr><td><code>sluice.py</code> (new)</td><td><code>pygetm.sluice.Sluice</code>: a controlled connection between two water cells (gate, flap gate, pipe in a dam) as a pair
+of rivers; <code>attach(sim, nest=)</code>: its ends on two nesting levels, the flow from both at their shared times</td><td>Sluices, locks, pumping stations; Hvide Sande</td></tr>
 <tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart, the tracers' open boundaries get their values but the
 sponge zones are not relaxed again (the last macro step did so before the restart file was written).</td><td>A restarted run with sponge boundaries
 continues bit-identically</td></tr>
