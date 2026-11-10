@@ -627,6 +627,18 @@ the grey line at y = 180 km is the channel's edge.</figcaption></figure>
 <figure><img src="fig/ideal/fjord/estuary_zseries.png" alt="Elevation at the open boundary, the channel's end and the estuary's end"><figcaption>Elevation at the
 channel's open west boundary (0.31 m) and closed east end (0.47 m), and at the estuary's mouth (0.19 m) and its end beyond the channel (0.20 m): the head follows
 the mouth, with no growing mode over the 48 h.</figcaption></figure>
+<p><strong>Why mouth and head are in phase.</strong> Both inlets are far too short for the tide to travel along them. In 50 m of water a long wave runs at √(gH) ≈ 22 m/s,
+so an M2 wave is about 990 km long; the estuary is 33 km (3 % of that), the fjord 25 km. In an inlet closed at its head the incoming and the reflected tide form a standing
+wave with its antinode at the head: the surface rises and falls everywhere at the same time, and only the amplitude grows towards the head, by 1/cos(2πL/λ). The 25 minutes
+a wave needs from the mouth to the head show up in that small amplification, not as a delay; a phase lag needs friction strong enough to dissipate the reflected wave,
+which is small in 50 m of water. An M2 fit to the second day:</p>
+<div class="tablewrap num"><table><thead><tr><th></th><th>Expected head / mouth</th><th>M2 amplitude, mouth → head</th><th>Phase difference</th></tr></thead><tbody>
+<tr><td>estuary (33 km)</td><td>1.022</td><td>0.190 → 0.193 m (× 1.020)</td><td>+0.03° (0.1 min)</td></tr>
+<tr><td>fjord in the shelf (25 km)</td><td>1.013</td><td>0.074 → 0.076 m (× 1.040)</td><td>−0.01°</td></tr>
+</tbody></table></div>
+<p class="small">The estuary matches the theory. The fjord's tide is only 7 cm, so the fresh-water circulation and its own seiches (period about 1.2 h, the wiggles early in the
+run) weigh more there (not checked which). A real estuary shows a tidal phase lag when it is long against the wavelength (the Elbe runs about 140 km to Hamburg, in
+shallower water with slower waves) or friction dissipates the reflected wave.</p>
 <div class="tablewrap num"><table><thead><tr><th>Check (12 h)</th><th>Result</th></tr></thead><tbody>
 <tr><td>closed, uniform salinity: volume / heat / dye</td><td>2.1e-8 m³ / 1.9e-11 / 6.8e-11</td></tr>
 <tr><td>closed, fresh layer and river: volume change minus the river's input / salt</td><td>-4e-9 m³ (of 2.0e6) / 6.2e-10</td></tr>
