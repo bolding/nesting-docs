@@ -387,9 +387,10 @@ relaxation).</td><td>small, but not two-way</td></tr>
 </tbody></table></div>
 <p>Recommended: keep the conforming band as the rule and let the layout checker say where and why it cannot be met; use an intermediate level where the parent
 is too coarse; build the second fallback only when a real setup needs a curved or oblique interface.</p>
-<p class="small">To do in the nesting: an optional grid per level instead of <code>lon0</code>/<code>dlon</code>; seed and barriers located
-with the level's own coordinates; the start-up checks above; output across levels with the levels' coordinates; and in IDEAL a coast in the
-parent where the fjord attaches. The couplers, the exchange plans and the scheduler need no change.</p>
+<p><strong>Implemented</strong> (10 November 2026): a level's optional <code>grid</code> (its supergrid with the band) instead of <code>lon0</code>/<code>dlon</code>;
+seeds located on the level's own coordinates; the start-up checks (the conforming band, no water counted twice); beyond the band the parent keeps its own land in the
+hole; the 2D rim fills only open faces. The couplers, the exchange plans and the scheduler are unchanged. The <a href="ideal.html#fjord-nested">IDEAL fjord</a> runs as a
+nested level: conservation, uniformity, salinity with a river and a restart behave as for regular levels.</p>
 </section>
 <section id="pygetm" class="chapter"><header class="chap"><span class="eyebrow">Code</span><h2 id="what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</h2></header>
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
@@ -434,6 +435,9 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 <tr><td><code>domain.py</code>, <code>legacy.py</code></td><td><code>Domain(exact_area=True)</code>: cell areas from the corner quadrilaterals
 (as legacy's iow branch), off by default. <code>legacy.domain_from_topo</code> reads planar curvilinear topo files (grid_type 3, the corners
 <code>xx</code>, <code>yx</code>).</td><td>Strongly curved grids; legacy setups</td></tr>
+<tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart, the tracers' open boundaries get their values but the
+sponge zones are not relaxed again (the last macro step did so before the restart file was written).</td><td>A restarted run with sponge boundaries
+continues bit-identically</td></tr>
 <tr><td><code>domain.py</code> (rotation)</td><td>The grid angle of longitude/latitude grids from the local east and north components, longitude differences
 scaled by cos(latitude) (before: taken in degrees, 17 % too large at 56° N on a rotated-pole grid; regular lon/lat grids unchanged, exactly 0). A
 left-handed (mirrored) grid is refused at domain creation.</td><td>Rotated-pole and curvilinear lon/lat grids (e.g. from ocean-prep): wind and

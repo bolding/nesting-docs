@@ -565,7 +565,10 @@ at the interface, but after a restart from the replaced ones. A new stage of the
 they are computed once, at the same point of the step, from the transports actually used. This changes nested results slightly (<a href="ideal.html#rerun-restart">rerun</a>).</li>
 <li><strong>The summed 2D transports of a 3D step</strong> receive the parent's flux correction of the last micro step after their reset, so they are state; and the correction
 was applied by the subdomain owning the face only, leaving the neighbour's halo with the old value. They are now in the restart file, and their halos are updated once per
-3D step. With that, results are also bit-identical between process splits.</li></ul>
+3D step. With that, results are also bit-identical between process splits.</li>
+<li><strong>Sponge boundaries (pyGETM itself, found with the <a href="ideal.html#fjord-nested">nested fjord</a>):</strong> at the start after a restart pyGETM relaxed
+the tracers' sponge zones a second time. Now it only sets the boundary values; the nested fjord with salinity relaxed at the sea boundary and a river restarts
+bit-identically.</li></ul>
 <p>All fields use pyGETM's own restart file (fields marked as part of the state). Still to check: NEAB in 2D, and a restart file written by upstream pyGETM.</p></div></section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>

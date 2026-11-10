@@ -201,7 +201,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a><a href="#fjord">Curvilinear fjord</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a><ol class="toc-sub"><li><a href="#rerun-restart">Rerun after the restart fixes (10 November 2026)</a></li></ol><li><a href="#a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</a><ol class="toc-sub"><li><a href="#flow-through-the-bend">Flow through the bend</a></li><li><a href="#tide-and-river">Tide and river</a></li></ol></ol></details>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a><ol class="toc-sub"><li><a href="#rerun-restart">Rerun after the restart fixes (10 November 2026)</a></li></ol><li><a href="#a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</a><ol class="toc-sub"><li><a href="#flow-through-the-bend">Flow through the bend</a></li><li><a href="#tide-and-river">Tide and river</a></li><li><a href="#fjord-nested">The fjord as a level of the IDEAL nest</a></li></ol></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 5 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -582,7 +582,30 @@ head, and the difference the curvature term makes: up to 0.3 along the bend.</fi
 <ul><li>Stable for 48 h. A closed fjord with only the river changes its volume by exactly the river's input; at rest it stays at rest with the term on.</li>
 <li>Cell areas from the corner quadrilaterals instead of dx × dy change the elevation by 3e-5 m (the grid is orthogonal).</li>
 <li>The tidal currents are only 3 cm/s: the fjord's tidal prism is small. The flow-through case is the test of the term.</li>
-<li><strong>Not done:</strong> the fjord as a level of the IDEAL nest, which needs a grid per level in the nesting, start-up checks and a coast in the parent.</li></ul>
+</ul>
+<h3 id="fjord-nested">The fjord as a level of the IDEAL nest</h3>
+<p>Channel (3 km) → shelf (1 km) → fjord (200 m, curvilinear), the strait left out (<code>IDEAL/config/ideal3d_fjord.yaml</code>). A coast on the shelf holds the fjord;
+its mouth sits on shelf cell corners, and its straight mouth section is the shelf's grid refined by 5. The fjord steps 3.3 s against the shelf's 16.5 s, all on one
+165 s 3D step. Salinity is 34 at the open west boundary and far away, with an initial fresh surface layer around the fjord's head; a river brings 50 m³/s of fresh water
+at the head; the tide (0.5 m M2) comes from the west.</p>
+<figure><img src="fig/ideal/fjord/fjord_nested_anim.gif" alt="Elevation and surface salinity of the nested system"><figcaption>Elevation of the whole system and around the fjord, and the
+surface salinity, every 15 minutes over 48 h. Every level is drawn over the cells it computes, finer on top.</figcaption></figure>
+<div class="tablewrap num"><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody>
+<tr><td>closed basin, 12 h: volume / heat / dye of all levels</td><td>2.7e-8 m³ / 1.4e-11 / 1.5e-10</td></tr>
+<tr><td>uniform temperature with tide, 12 h</td><td>2–3e-13 °C in all levels, the fjord included</td></tr>
+<tr><td>closed, the river on: volume change minus the river's input / salt content</td><td>1.4e-8 m³ (of 2.0e6) / 2.6e-10</td></tr>
+<tr><td>restart halfway, tide, river and salinity, 2/2/1 processes</td><td><strong>bit-identical</strong> in all fields and levels</td></tr>
+<tr><td>start-up checks: too short a straight section, no coast, the mouth off its window</td><td>refused, each with its reason</td></tr>
+</tbody></table></div>
+<figure><img src="fig/ideal/fjord/fjord_nested_series.png" alt="Elevation and transport at the mouth"><figcaption>Top: elevation just outside the mouth (shelf) and at the fjord's
+mouth, bend and head. Bottom: the transport into the fjord seen from both levels: the shelf's faces carry the fjord's transport.</figcaption></figure>
+<figure><img src="fig/ideal/fjord/fjord_nested_map.png" alt="Surface salinity"><figcaption>Surface salinity after 48 h on the shelf and in the fjord on its own grid (black: the end
+of the conforming band).</figcaption></figure>
+<figure><img src="fig/ideal/fjord/fjord_nested_section.png" alt="Salinity along the fjord"><figcaption>Salinity along the fjord's axis after 48 h: the fresh layer over the sill
+and in the inner fjord.</figcaption></figure>
+<p>Found on the way, and fixed: the parent's hole beyond the conforming band was wetted from the child cells with the same indices, which lie in the bend
+("phantom water", reaching the channel's rim); the 2D rim wrote the child's transports into the parent's land faces; and pyGETM relaxed the tracers' sponge zones
+a second time after a restart (<a href="issues.html#restart-nested">restart</a>).</p>
 </section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
