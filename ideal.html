@@ -610,16 +610,22 @@ a second time after a restart (<a href="issues.html#restart-nested">restart</a>)
 <p>Can such a level be attached at the edge of the root, as the Elbe at the edge of a North Sea model? Its window now only needs to hold the mouth section; the rest of
 the level is its <strong>overhang</strong>, computed by the level alone, with no parent cells beneath (<code>IDEAL/config/ideal3d_estuary.yaml</code>). Here the channel
 (3 km) and an estuary (200 m, ratio 15): its window is 3 × 1 channel cells at the channel's north edge; beyond it the estuary runs out of the channel and bends east.
-A river at its head, salinity 34 at sea, the tide from the west. The estuary needs its own 3D step (88 s against the channel's 439 s): with the channel's, its tracer
-advection is unstable in the river plume. And at a time ratio of 15 it needs a sponge one parent cell wide: with the default 3 child cells the 2D coupling's
-sub-stepping instability grew from about 16 h (a cross-estuary mode, 7 m after 40 h).</p>
-<figure><img src="fig/ideal/fjord/estuary_anim.gif" alt="An estuary at the root's edge"><figcaption>Elevation and surface salinity every 15 minutes over 48 h; the grey line
-at y = 180 km is the channel's edge.</figcaption></figure>
+A river at its head, salinity 34 at sea, the tide from the west.</p>
+<div class="callout"><p><strong>Stable</strong> over the 48 h run (largest elevation in the estuary 0.27 m, currents up to 0.9 m/s in the river plume),
+with two settings in the estuary's block of the layout:</p>
+<ul><li><strong>its own 3D step</strong> (<code>split: 30</code>: 88 s against the channel's 439 s). With the channel's step the tracer advection is unstable in the river plume
+(3D Courant number 1.8): the salinity blows up within 5 hours.</li>
+<li><strong>a sponge one parent cell wide</strong> (<code>sponge_cells: 15</code>). With the default 3 child cells a cross-estuary mode grows from about 16 h (1 m at 24 h,
+7 m at 40 h): the 2D coupling's sub-stepping instability, here at a time ratio of 15. It grows the same with the curvature term off, without the river and with uniform
+salinity; a stronger sponge (alpha 0.3) is unstable itself.</li></ul>
+<p>Everything below is with both settings.</p></div>
+<figure><img src="fig/ideal/fjord/estuary_anim.gif" alt="An estuary at the root's edge"><figcaption>The stable run: elevation and surface salinity every 15 minutes over 48 h;
+the grey line at y = 180 km is the channel's edge.</figcaption></figure>
 <div class="tablewrap num"><table><thead><tr><th>Check (12 h)</th><th>Result</th></tr></thead><tbody>
 <tr><td>closed, uniform salinity: volume / heat / dye</td><td>2.1e-8 m³ / 1.9e-11 / 6.8e-11</td></tr>
 <tr><td>closed, fresh layer and river: volume change minus the river's input / salt</td><td>-4e-9 m³ (of 2.0e6) / 6.2e-10</td></tr>
 <tr><td>uniform temperature with tide</td><td>2–4e-13 °C</td></tr>
-<tr><td>restart halfway, tide, river, salinity, own 3D step</td><td><strong>bit-identical</strong></td></tr>
+<tr><td>restart halfway, tide, river, salinity</td><td><strong>bit-identical</strong></td></tr>
 </tbody></table></div>
 <p class="small">With strong baroclinic currents (the fresh layer) heat and salt are conserved to 6e-10, as for the fjord in the shelf; 2e-11 with uniform salinity.</p>
 </section>
