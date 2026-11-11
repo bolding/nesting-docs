@@ -244,18 +244,25 @@ against 1.4 / 2.6 / 0.7 for each grid run alone; reproducible since <a href="ide
 level, mostly from the coarser levels' layers. V6, a dye front: within 0.04 of the reference's surface dye, conserved to 2e-10.</li>
 <li><a href="ideal.html#current">IDEAL V7, the cost</a>: the 3D exchange adds 23 % to a run with T and S and 66 % with 14 tracers (21 % and 52 % with PCM). The largest part
 is the ring's slopes, 12 column remaps per ring cell and tracer instead of 4 (+12 % and +36 % without them); the remaps are compiled.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: the couplers renamed Nested2D / Nested3D and their options cleaned up, ring slopes from anomalies on the parent's layers).</li>
+<li>The fork follows upstream pyGETM's devel (7ac33c7, merged 11 November 2026); without nesting it runs bit-identically to upstream
+(<code>tools/upstream_check.py</code>, after every merge). Fork, nesting code and pygetm-config pushed on 11 November.</li>
+<li><strong>Nested setups in pygetm-config</strong> (its branch <code>nesting</code>): one master YAML (a base, per-level overrides, levels switched
+on or off) from which <code>pygetm-config nest</code> writes every level's configuration and run script and one launch script; a single-model
+setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Still open: refusing a restart written
+with another set of levels, the launch through <code>nesting-balance</code>.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
-<li><strong>Next:</strong> DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between the advection sweeps.</li>
+<li><strong>Next:</strong> pygetm-config's open points; DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between
+the advection sweeps; a nested 3D run started from a non-flat surface (its volume changes once, in the first 3D step).</li>
 <li>The 3D ring in time where it should pay: the extrapolation is there, but in IDEAL it gains nothing over holding; to try in DKm's fjords.</li>
 <li>The ring's slopes cheaper still: fewer remaps, or a kernel that shares them.</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %. The 3D costs to recalibrate
 after the changes of 11 November.</li>
-<li>Ring and rim refreshed between the advection sweeps; turbulence and FABM's 2D fields across interfaces (whether needed).</li>
+<li>Ring and rim refreshed between the advection sweeps. Turbulence across interfaces waits (turbulent quantities are usually not advected), and
+so does a realistic 3D run (NEAB 3D, real FABM).</li>
 <li>Output across levels: the levels merged onto one grid, budgets over all levels.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
 <li>An overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level.</li>
