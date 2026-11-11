@@ -438,7 +438,7 @@ transports a coupler replaced; with couplers the 2D Coriolis terms are computed 
 <code>_restart_optional</code>: a file without them still loads): the order of U and V in the 2D and 3D momentum, the old U/V layer thicknesses,
 the 3D step's sums of U and V. After a restart, the depths and thicknesses at open boundaries are kept instead of mirrored again; z is restored
 from zin only at boundary cells. With couplers the halos of the summed U/V are updated once per 3D step.</td><td>A restarted run, nested or not,
-continues bit-identically</td></tr>
+continues bit-identically; a restart file from upstream pyGETM loads and continues as the unbroken run</td></tr>
 <tr><td><code>operators.py</code></td><td><code>Advection(..., flux_u=, flux_v=)</code>; <code>apply_3d_batch(..., get_flux=)</code>, the tracer amount through every face and layer</td><td>Python side of the face fluxes (2D and 3D)</td></tr>
 <tr><td><code>src/vertical_remap.F90</code>, <code>_pygetm.pyx</code>, <code>CMakeLists.txt</code></td><td>The vertical remap kernel
 (<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>

@@ -569,7 +569,15 @@ was applied by the subdomain owning the face only, leaving the neighbour's halo 
 <li><strong>Sponge boundaries (pyGETM itself, found with the <a href="ideal.html#fjord-nested">nested fjord</a>):</strong> at the start after a restart pyGETM relaxed
 the tracers' sponge zones a second time. Now it only sets the boundary values; the nested fjord with salinity relaxed at the sea boundary and a river restarts
 bit-identically.</li></ul>
-<p>All fields use pyGETM's own restart file (fields marked as part of the state). Still to check: NEAB in 2D, and a restart file written by upstream pyGETM.</p></div></section>
+<p>All fields use pyGETM's own restart file (fields marked as part of the state).</p>
+<p><strong>NEAB in 2D</strong> (five levels, the TPXO9 tide; November 2026): a quarter day, a restart and another quarter day are bit-identical to half a day in
+all levels, after two more fixes. <strong>The model time:</strong> pyGETM advances its time by the time step rounded to microseconds, while the restart file holds
+the time as steps × time step. With a time step from the CFL limit (18.5242126654 s) the restarted run started 0.4 ms before the unbroken run's model time,
+and the tide at the open boundary, predicted at the model time, differed by 1e-7 m. IDEAL computes its tide from the step count and did not show it. The nesting
+now rounds every level's time step to whole microseconds. <strong>The parent's hole:</strong> the restart file holds no values in a parent's cells under its
+child, and pyGETM's start-up check stopped on the Coriolis term there; these cells are now set to 0 after a restart (they are not computed).</p>
+<p><strong>A restart file from upstream pyGETM</strong> (one model, 3D, with a tide, a front and a river) continues in the fork exactly as the fork's unbroken
+run. <strong>A restart file written in the middle of a root 3D step</strong> is refused at the start. The fork's test suite has a restart test of a nested run.</p></div></section>
 <footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
 <dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>

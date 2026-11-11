@@ -214,7 +214,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <li>3D: temperature and salinity between levels with different vertical grids: rim, ring, 3D transports, ring
 velocities and the 3D flux register; heat conserved to 1e-9.</li>
 <li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number. Tested in IDEAL, not yet in a flow that needs it.</li>
-<li><a href="issues.html#restart-nested">Restart of a nested run</a>: bit-identical in IDEAL 3D (1 and 2 processes per level, with and without sub-stepping); results
+<li><a href="issues.html#restart-nested">Restart of a nested run</a>: bit-identical in IDEAL 3D (1 and 2 processes per level, with and without sub-stepping)
+and NEAB 2D (five levels, tide); a restart file from upstream pyGETM continues exactly; one written in the middle of a root 3D step is refused. Results
 no longer depend on the process split (<a href="ideal.html#rerun-restart">rerun</a>).</li>
 <li>Curvilinear grids in pyGETM: the curvature term of the momentum equations (as legacy GETM), legacy curvilinear topo files, exact cell areas;
 a <a href="ideal.html#fjord">bent fjord</a>, standalone and <a href="ideal.html#fjord-nested">as a level of the IDEAL nest</a> (the same path as regular levels, with a
@@ -238,7 +239,7 @@ level, mostly from the coarser levels' layers.</li>
 correction, 2e-4 in the parent from the flux correction; with 3D sub-stepping the dye differs from R = 1 by 1e-6 to 2e-4 (rms) (<a href="ideal.html#ring-time">ring in time</a>).</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
 8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 10 November (last: the 3D ring in time).</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: the restart's remaining checks).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
@@ -251,7 +252,7 @@ across an interface (a safety net). In 3D pyGETM itself needs a small bottom rou
 <li>Ring and rim refreshed between the advection sweeps; turbulence and FABM's 2D fields across interfaces (whether needed).</li>
 <li>Output across levels: the levels merged onto one grid, budgets over all levels.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
-<li>The restart's remaining checks (NEAB 2D, a restart file from upstream); an overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level.</li>
+<li>An overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level.</li>
 <li>Adaptive vertical coordinates (last; GVC and SIGMA until then).</li>
 <li>Running a single model with its boundaries from a file.</li>
 <li><a href="issues.html#e8-tiles">One process split in IDEAL E8</a> (1e-4 m).</li></ul></div>
