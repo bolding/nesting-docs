@@ -223,7 +223,7 @@ the child's ring.</p>
 <figure class="fig"><button class="plate" type="button" data-full="fig/ideal/e2_snapshot.png" aria-label="Open The strait level after 12 h full size"><img src="fig/ideal/e2_snapshot.png" alt="The strait level after 12 h" loading="lazy"></button><figcaption><strong>The strait level after 12 h</strong><p>Unstable (time ratio 3) against stable (time ratio 1).</p></figcaption></figure>
 </div>
 <p><strong>Fix:</strong> an AGRIF-like sponge (Debreu et al. 2012). The child's transports are damped next to the interface
-through pyGETM's horizontal viscosity (<code>momentum.An</code>, land-aware): <code>NestedBarotropic(sponge_width=,
+through pyGETM's horizontal viscosity (<code>momentum.An</code>, land-aware): <code>Nested2D(sponge_width=,
 sponge_alpha=)</code>. It acts on momentum only, so the volume stays exactly conserved. It is stable for α = 0.03–0.2, default 0.1.</p>
 <div class="grid2">
 <figure class="fig"><button class="plate" type="button" data-full="fig/ideal/sponge.png" aria-label="Open The sponge stabilises the sub-stepping child full size"><img src="fig/ideal/sponge.png" alt="The sponge stabilises the sub-stepping child" loading="lazy"></button><figcaption><strong>The sponge stabilises the sub-stepping child</strong><p>Strait level, max |z|, M2 tide with a 3 h ramp.</p></figcaption></figure>
@@ -268,7 +268,7 @@ exact conservation is left to the 3D flux register.</p></div></section>
 between parent and child, although the 2D coupling matches them.</p>
 <p><strong>Cause:</strong> pyGETM sums the 2D transports over the 3D step for the 3D momentum (<code>Ui</code>) in
 <code>advance_depth_integrated</code>, before the 2D coupler replaces the parent's transports at the window faces.</p>
-<p><strong>Fix:</strong> <code>NestedBarotropic</code> adds its replacement to that sum as well (fork 02a1eb1). The difference is
+<p><strong>Fix:</strong> <code>Nested2D</code> adds its replacement to that sum as well (fork 02a1eb1). The difference is
 1e-4. This affects every nested 3D run.</p></div></section>
 <section class="chapter"><div class="issue" id="layer-flux"><h3>Parent and child move different water through each layer of the interface</h3><div class="tags"><span class="solved">solved</span><span>IDEAL</span><span>3D</span></div>
 <p><strong>Seen:</strong> a per-layer tracer correction that conserves the content exactly made a uniform field 15 °C non-uniform.</p>

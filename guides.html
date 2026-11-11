@@ -400,9 +400,9 @@ python IDEAL/scripts/run_ideal.py --layout IDEAL/config/ideal3d_v5.yaml --script
 # the 333 m reference: one level everywhere
 python IDEAL/scripts/run_ideal.py --layout IDEAL/config/ideal3d_v5_ref.yaml --script run3d.py \
     --ranks channel=32 --out /data/kb/IDEAL/runs/v5_ref -- --hours 48</code></pre>
-<p>3D options (<code>IDEAL/models/ideal3d.py</code>): <code>--remap-scheme ppm|pcm</code>, <code>--vertical-map z|stretch</code>,
-<code>--no-ring-detail</code>, <code>--no-flux-matching-3d</code>, <code>--no-replace-transport-3d</code>, <code>--no-ring-velocities</code>,
-<code>--no-3d-coupling</code>; <code>--extra-tracers N</code>; <code>--profile</code> (pyGETM's profiler per process). Per level a layout can set
+<p>3D options (<code>IDEAL/models/ideal3d.py</code>): <code>--remap-scheme ppm|pcm</code> (per level also <code>remap_scheme:</code> in the layout;
+the child's setting decides its interface), <code>--no-ring-slopes</code>, <code>--ring-time-3d hold|extrapolate</code>,
+<code>--no-3d-coupling</code>; <code>--extra-tracers N</code>; all options of the coupling: <a href="methods.html#options">Methods</a>; <code>--profile</code> (pyGETM's profiler per process). Per level a layout can set
 <code>vertical: adaptive</code> with <code>config.adaptive</code> parameters (not investigated yet).</p>
 </section>
 <section id="boundaries" class="chapter"><header class="chap"><span class="eyebrow">5</span><h2 id="boundaries-for-another-model">Boundaries for another model</h2></header>

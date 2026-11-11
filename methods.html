@@ -200,8 +200,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html" aria-current="page">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#method">2D</a><a href="#threed">3D</a><a href="#threed-impl">3D as implemented</a><a href="#threed-sub">3D sub-stepping</a><a href="#curvi">Curvilinear levels</a><a href="#pygetm">Changes to pyGETM</a><a href="#names">Names used</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#levels-halos-and-exchanges">Levels, halos and exchanges</a><ol class="toc-sub"><li><a href="#land-active-regions-and-decomposition">Land, active regions and decomposition</a></li><li><a href="#the-exchanges">The exchanges</a></li><li><a href="#load-balancing">Load balancing</a></li></ol><li><a href="#3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</a><ol class="toc-sub"><li><a href="#a-synthetic-comparison">A synthetic comparison</a></li><li><a href="#cost-and-what-the-scalars-share">Cost, and what the scalars share</a></li><li><a href="#threed-impl">The 3D coupling as implemented</a></li><li><a href="#threed-sub">3D sub-stepping</a></li></ol><li><a href="#curvilinear-levels">Curvilinear levels</a><ol class="toc-sub"><li><a href="#curvi-depends">What the nesting depends on</a></li><li><a href="#curvi-answer">The same path, with a conforming band</a></li><li><a href="#curvi-enforce">Forcing a curvilinear grid to follow the parent</a></li><li><a href="#curvi-sphere">Spherical curvilinear grids</a></li><li><a href="#curvi-nomatch">When the grids cannot be matched</a></li></ol><li><a href="#what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</a><li><a href="#names-used-on-these-pages">Names used on these pages</a><ol class="toc-sub"><li><a href="#levels-and-geometry">Levels and geometry</a></li><li><a href="#what-is-exchanged">What is exchanged</a></li><li><a href="#time-stepping">Time stepping</a></li><li><a href="#in-the-vertical">In the vertical</a></li><li><a href="#processes-and-tools">Processes and tools</a></li><li><a href="#setups-and-tests">Setups and tests</a></li></ol></ol></details>
+<nav class="subnav" aria-label="On this page"><a href="#method">2D</a><a href="#threed">3D</a><a href="#threed-impl">3D as implemented</a><a href="#threed-sub">3D sub-stepping</a><a href="#curvi">Curvilinear levels</a><a href="#options">Options</a><a href="#pygetm">Changes to pyGETM</a><a href="#names">Names used</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#levels-halos-and-exchanges">Levels, halos and exchanges</a><ol class="toc-sub"><li><a href="#land-active-regions-and-decomposition">Land, active regions and decomposition</a></li><li><a href="#the-exchanges">The exchanges</a></li><li><a href="#load-balancing">Load balancing</a></li></ol><li><a href="#3d-exchanging-between-vertical-grids-that-differ">3D: exchanging between vertical grids that differ</a><ol class="toc-sub"><li><a href="#a-synthetic-comparison">A synthetic comparison</a></li><li><a href="#cost-and-what-the-scalars-share">Cost, and what the scalars share</a></li><li><a href="#threed-impl">The 3D coupling as implemented</a></li><li><a href="#threed-sub">3D sub-stepping</a></li></ol><li><a href="#curvilinear-levels">Curvilinear levels</a><ol class="toc-sub"><li><a href="#curvi-depends">What the nesting depends on</a></li><li><a href="#curvi-answer">The same path, with a conforming band</a></li><li><a href="#curvi-enforce">Forcing a curvilinear grid to follow the parent</a></li><li><a href="#curvi-sphere">Spherical curvilinear grids</a></li><li><a href="#curvi-nomatch">When the grids cannot be matched</a></li></ol><li><a href="#what-can-be-configured">What can be configured</a><li><a href="#what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</a><li><a href="#names-used-on-these-pages">Names used on these pages</a><ol class="toc-sub"><li><a href="#levels-and-geometry">Levels and geometry</a></li><li><a href="#what-is-exchanged">What is exchanged</a></li><li><a href="#time-stepping">Time stepping</a></li><li><a href="#in-the-vertical">In the vertical</a></li><li><a href="#processes-and-tools">Processes and tools</a></li><li><a href="#setups-and-tests">Setups and tests</a></li></ol></ol></details>
 <header class="hero"><p class="draft">Methods</p><h1>How the nesting works</h1>
 <p class="lede">Every level of a nest is an ordinary pyGETM simulation with its own grid, time step and processes. The
 nesting fills the halo zones where the levels overlap, and matches the fluxes through the faces between them, so that
@@ -276,8 +276,8 @@ the horizontal mean at fixed depth. All four forms conserve the content to 5e-16
 <ul><li><strong>The remap setup is shared</strong> by T, S and all FABM tracers: where every parent interface lies in each child column, and the volume per parent layer. It is about 80 % of B″'s cost for one scalar and has to be redone every exchange, because adaptive layers move.</li><li><strong>The parent's layer heights</strong> go to the child once per sync, for all scalars.</li><li><strong>The ring and the flux register need the same remap</strong> (one parent column onto each child column, and child face profiles onto parent faces), so the machinery is needed anyway; A only saves on the rim.</li><li>A compiled kernel (a merge of the two interface lists per column) should be 10–20× faster than numpy. That is the step before NEAB in 3D.</li></ul>
 
 <h3 id="threed-impl">The 3D coupling as implemented</h3>
-<p><code>pygetm.nesting.baroclinic.NestedTracers3D</code> is a coupler next to the 2D one
-(<code>NestedBarotropic</code>, which keeps coupling elevation and transports at every 2D step). By default all levels share the 3D time
+<p><code>pygetm.nesting.nested3d.Nested3D</code> is a coupler next to the 2D one
+(<code>Nested2D</code>, which keeps coupling elevation and transports at every 2D step). By default all levels share the 3D time
 step: a child's split factor is its parent's times its time ratio, so every 3D step is a sync. A child can instead have a 3D step that is its
 parent's divided by a whole number R (<a href="#threed-sub">below</a>). Per 3D step of the parent:</p>
 <div class="tablewrap"><table><thead><tr><th>Exchange</th><th>Direction, stage</th><th>What is done</th></tr></thead><tbody>
@@ -299,8 +299,9 @@ limited to the range of the two.</td></tr>
 <p>The concentrations of the rim and the ring are remapped with every interface kept at its depth below the surface (only
 the bottom layer is cut or extended), so that flat isopycnals stay flat over a sloping bottom, and with a limited
 piecewise-parabolic reconstruction (PPM, Colella and Woodward 1984) inside each source layer, which carries a thin
-pycnocline from coarse onto fine layers 5–20 times more accurately than a constant. The remap runs in a compiled
-kernel in pyGETM (<code>_pygetm.vertical_remap</code>), 15 times faster than the numpy version, which stays as the fallback
+pycnocline from coarse onto fine layers 5–20 times more accurately than a constant (PCM, the cheaper alternative, can be chosen per
+interface: <a href="#options">options</a>). The remap runs in compiled kernels in pyGETM (<code>_pygetm.vertical_remap</code>, and
+<code>_pygetm.remap_z</code> for a whole column in one pass), 15 times faster than the numpy version, which stays as the fallback
 (<code>PYGETM_NESTING_REMAP=numpy</code>). The load balancer (<code>nesting-balance</code>) includes the 3D exchange per model. The amounts of the flux
 register and the transports are remapped with the stretch, which keeps their sums exactly. With all of it, a closed basin
 conserves its heat content to 1e-9 over 48 h, and a uniform field stays uniform to round-off
@@ -409,6 +410,31 @@ only the mouth section; beyond it the level has no parent cells beneath and comp
 is larger by a fixed index offset; on an overhang side the band is the level's own. A start-up check refuses overhang water over water the parent computes.
 <a href="ideal.html#estuary">Example</a>.</p>
 </section>
+<section id="options" class="chapter"><header class="chap"><span class="eyebrow">Options</span><h2 id="what-can-be-configured">What can be configured</h2></header>
+<p class="lede">The two couplers are <code>Nested2D</code> (the depth-integrated fields: elevation, transports, the sponge) and
+<code>Nested3D</code> (everything on layers: tracers, the ring's 3D velocities, the layer transports). On 11 November 2026 they were renamed from
+<code>NestedBarotropic</code> and <code>NestedTracers3D</code>, and the alternatives that had been tried once and did not lead anywhere were removed.
+What had been the default is now fixed; default results are unchanged (IDEAL and NEAB bit-identical before and after).</p>
+<div class="tablewrap"><table><thead><tr><th>Where</th><th>Option</th><th>Default</th><th>What it does</th></tr></thead><tbody>
+<tr><td rowspan="2"><code>Nested2D</code></td><td><code>sponge_width</code></td><td>0</td><td>damping of the transports over n parent cells inside a child's interface; needed with time ratio &gt; 1</td></tr>
+<tr><td><code>sponge_alpha</code></td><td>0.1</td><td>its strength at the interface (A<sub>n</sub> Δt / Δx²), decaying inward</td></tr>
+<tr><td rowspan="4"><code>Nested3D</code></td><td><code>tracers</code></td><td>temperature, salinity</td><td>the tracers exchanged</td></tr>
+<tr><td><code>remap_scheme</code></td><td>"ppm"</td><td>the profile inside each layer when columns are remapped: a limited parabola or constant. <strong>Per interface</strong>: a child's setting
+decides its ring and its rim in the parent. PCM makes the 3D exchange 25–35 % cheaper; IDEAL's pycnocline next to the interfaces is 4–8 % less accurate</td></tr>
+<tr><td><code>ring_slopes</code></td><td>True</td><td>the ring linear within each parent cell; the children's error in a dye front 45 % smaller, about +10 % on a run</td></tr>
+<tr><td><code>ring_time</code></td><td>"hold"</td><td>the ring of a child with a shorter 3D step: held, or extrapolated from the last two syncs (to try in fjords)</td></tr>
+<tr><td rowspan="4"><code>NestedModel</code></td><td><code>layout</code></td><td>–</td><td>the levels: grid, window, ratio, time ratio, active region, curvilinear grid, overhang, least interface depth</td></tr>
+<tr><td><code>halo</code>, <code>root_band</code></td><td>2, 0</td><td>pyGETM's halo; band around the root's window</td></tr>
+<tr><td><code>abort_on_error</code></td><td>True</td><td>an error on one level stops all</td></tr>
+<tr><td><code>timestep(maxdt, period)</code></td><td>3600 s</td><td>simple time steps: the root's step is the period divided by a whole number</td></tr>
+</tbody></table></div>
+<p><strong>Removed</strong> (now always the former default): in 2D the transport replacement, the extrapolated ring in time, the sync schedule
+(not "sequential"), the message order "up_first" (not "chain" or "cross"), the child's own edge transports (not the parent's), and
+the late correction; in 3D the flux register, its limiter, the layer-transport replacement, the ring's velocities and vertical detail,
+the remap that keeps every interface at its depth (not "stretch"), the "consistent" flux correction (not "content"); the per-interface
+communicators; diagnostics that switched off one direction; the first one-tracer prototype. The full table with the evidence
+for each: <code>docs/notes/options.md</code> in pygetm-nesting.</p>
+</section>
 <section id="pygetm" class="chapter"><header class="chap"><span class="eyebrow">Code</span><h2 id="what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</h2></header>
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
@@ -472,7 +498,7 @@ boundary velocities rotated correctly; mirrored grids caught</td></tr>
 <tr><td><code>util/interpolate.py</code></td><td><code>interp_columns</code>: vertical interpolation between water columns of different depth</td><td>Parent → child in 3D (in preparation)</td></tr>
 <tr><td><code>input/tpxo.py</code></td><td><code>tpxo.get(..., components=)</code></td><td>Convenience: a subset of the constituents</td></tr>
 </tbody></table></div>
-<p class="small">The 3D coupling (<code>pygetm.nesting.baroclinic</code>, with the vertical remap <code>pygetm.nesting.vremap</code>) uses
+<p class="small">The 3D coupling (<code>pygetm.nesting.nested3d</code>, with the vertical remap <code>pygetm.nesting.vremap</code>) uses
 the hooks <code>momentum_3d_transports</code> and <code>tracers</code> and the 3D face fluxes. Interfaces between two sibling children that touch are designed but
 not yet implemented.</p>
 </section>
