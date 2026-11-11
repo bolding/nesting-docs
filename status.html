@@ -215,6 +215,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <a href="ideal.html#ring-slopes">limited slopes</a>), 3D transports, ring velocities and the 3D flux register with a
 <a href="ideal.html#flux-limit">limiter</a>: heat conserved to 5e-11, uniform fields uniform to 8e-13, no new extrema in a dye front
 (<a href="ideal.html#current">all IDEAL 3D tests rerun on 11 November</a>). The remap is PPM or PCM, chosen per interface.</li>
+<li>FABM in a nested run: its pelagic state is exchanged with the other tracers, nitrogen is conserved over the levels; its
+bottom and surface state needs no exchange (it does not move, and FABM computes only in a level's own cells).</li>
 <li><a href="methods.html#options">Few options, each with its evidence</a>: the couplers are <code>Nested2D</code> and <code>Nested3D</code>; the alternatives that did
 not lead anywhere were removed on 11 November (results bit-identical).</li>
 <li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number, its ring held or
