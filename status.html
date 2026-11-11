@@ -211,9 +211,14 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <li>Active regions, land-aware exchanges, M:N exchange plans between any tilings; bit-identical across process splits.</li>
 <li>One MPMD component per model; load balancing with <code>nesting-balance</code>, launch by mpiexec or Slurm.</li>
 <li>The sub-stepping instability understood and removed by an AGRIF-like sponge.</li>
-<li>3D: temperature and salinity between levels with different vertical grids: rim, ring, 3D transports, ring
-velocities and the 3D flux register; heat conserved to 1e-9.</li>
-<li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number. Tested in IDEAL, not yet in a flow that needs it.</li>
+<li>3D (<code>Nested3D</code>): tracers between levels with different vertical grids: rim, ring (with the child's vertical detail and
+<a href="ideal.html#ring-slopes">limited slopes</a>), 3D transports, ring velocities and the 3D flux register with a
+<a href="ideal.html#flux-limit">limiter</a>: heat conserved to 5e-11, uniform fields uniform to 8e-13, no new extrema in a dye front
+(<a href="ideal.html#current">all IDEAL 3D tests rerun on 11 November</a>). The remap is PPM or PCM, chosen per interface.</li>
+<li><a href="methods.html#options">Few options, each with its evidence</a>: the couplers are <code>Nested2D</code> and <code>Nested3D</code>; the alternatives that did
+not lead anywhere were removed on 11 November (results bit-identical).</li>
+<li><a href="ideal.html#substep3d">3D sub-stepping</a>: a child's 3D step can be its parent's divided by a whole number, its ring held or
+<a href="ideal.html#ring-time">extrapolated in time</a>. Tested in IDEAL, not yet in a flow that needs it.</li>
 <li><a href="issues.html#restart-nested">Restart of a nested run</a>: bit-identical in IDEAL 3D (1 and 2 processes per level, with and without sub-stepping)
 and NEAB 2D (five levels, tide); a restart file from upstream pyGETM continues exactly; one written in the middle of a root 3D step is refused. Results
 no longer depend on the process split (<a href="ideal.html#rerun-restart">rerun</a>).</li>
@@ -230,30 +235,24 @@ others drop it, and a river no level computes stops the run. Volume to 1e-8 m³ 
 two levels. A <a href="ideal.html#sluice">fjord behind a dam</a> drained to the shelf by a flap gate conserves volume and salt exactly and restarts bit-identically.</li>
 <li>Meteorology: each level is a pyGETM simulation and reads its own; nothing for the nesting to do.</li></ul></div>
 <div><h4>In progress</h4><ul>
-<li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest, against each level's grid run alone: after
-<a href="issues.html#ppm-outer-layers">a fix of the remap's outer layers</a> the coupling adds nothing in the channel, 1.4× on the
-shelf and 2.1× in the strait (one face where a wall meets the interface; being looked at).</li>
+<li><a href="ideal.html#v2">IDEAL V2</a>, a stratified lake at rest: the largest spurious speed 2.8 / 6.7 / 3.8 mm/s in channel, shelf and strait,
+against 1.4 / 2.6 / 0.7 for each grid run alone; reproducible since <a href="ideal.html#adaptive-fix">a fix of pyGETM's adaptive layers</a>
+(the strait's maximum is one face where a wall meets the interface).</li>
 <li>IDEAL V5, a pycnocline over the shelf slope against one level at 333 m: within 8–13 cm of pycnocline depth in every
-level, mostly from the coarser levels' layers.</li>
-<li>IDEAL V6, a dye front through the levels: conserved to 4e-9; no new extrema in any level (below 1e-13) since the ring correction
-and the parent's flux correction are both limited (<a href="ideal.html#flux-limit">flux correction</a>); with 3D sub-stepping the dye differs from R = 1 by 1e-6 to 2e-4 (rms) (<a href="ideal.html#ring-time">ring in time</a>).</li>
-<li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange was 4–9 % of a run with T and S,
-8–17 % with 14 tracers; the ring's slopes (now the default) need four times the ring's remaps: a run +23 % with T and S, +66 % with 14 tracers (+12 % and +36 % without them, +21 % and +52 % with PCM; <a href="ideal.html#current">current</a>; the remap now one compiled pass); 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
+level, mostly from the coarser levels' layers. V6, a dye front: within 0.04 of the reference's surface dye, conserved to 2e-10.</li>
+<li><a href="ideal.html#current">IDEAL V7, the cost</a>: the 3D exchange adds 23 % to a run with T and S and 66 % with 14 tracers (21 % and 52 % with PCM). The largest part
+is the ring's slopes, 12 column remaps per ring cell and tracer instead of 4 (+12 % and +36 % without them); the remaps are compiled.</li>
 <li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: the couplers renamed Nested2D / Nested3D and their options cleaned up, ring slopes from anomalies on the parent's layers).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
-<li>The 3D ring in time: extrapolation (limited, restart-safe) added for children with 3D sub-stepping; in IDEAL no gain over holding it, so holding stays the default
-(<a href="ideal.html#ring-time">results</a>). To try in DKm's fjords.</li>
-<li><a href="ideal.html#ring-slopes">Limited slopes in the 3D ring</a>: reworked and now the default; in the dye front the children's error against one model at 1 km is 45 % smaller.</li>
-<li><a href="ideal.html#current">The whole 3D test list rerun</a> with the current code (11 November): uniform to 8e-13, heat to 7e-11, no new extrema,
-V2 now reproducible (<a href="ideal.html#adaptive-fix">adaptive layers fixed</a>).</li>
-<li><a href="methods.html#options">The options cleaned up</a>: the couplers are now <code>Nested2D</code> and <code>Nested3D</code>, the alternatives that did not lead anywhere
-removed and the defaults fixed (results bit-identical); the remap scheme is chosen per interface.</li>
-<li><strong>Next:</strong> DKm's Ringkøbing Fjord; ring and rim between the advection sweeps.</li>
-<li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
+<li><strong>Next:</strong> DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between the advection sweeps.</li>
+<li>The 3D ring in time where it should pay: the extrapolation is there, but in IDEAL it gains nothing over holding; to try in DKm's fjords.</li>
+<li>The ring's slopes cheaper still: fewer remaps, or a kernel that shares them.</li>
+<li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %. The 3D costs to recalibrate
+after the changes of 11 November.</li>
 <li>Ring and rim refreshed between the advection sweeps; turbulence and FABM's 2D fields across interfaces (whether needed).</li>
 <li>Output across levels: the levels merged onto one grid, budgets over all levels.</li>
 <li>Interfaces between sibling children that touch (when a setup needs them).</li>
