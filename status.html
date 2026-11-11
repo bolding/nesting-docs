@@ -239,7 +239,7 @@ level, mostly from the coarser levels' layers.</li>
 correction, 2e-4 in the parent from the flux correction; with 3D sub-stepping the dye differs from R = 1 by 1e-6 to 2e-4 (rms) (<a href="ideal.html#ring-time">ring in time</a>).</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
 8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: the restart's remaining checks).</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: limited slopes in the 3D ring).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
@@ -247,7 +247,8 @@ across an interface (a safety net). In 3D pyGETM itself needs a small bottom rou
 <div><h4>Open</h4><ul>
 <li>The 3D ring in time: extrapolation (limited, restart-safe) added for children with 3D sub-stepping; in IDEAL no gain over holding it, so holding stays the default
 (<a href="ideal.html#ring-time">results</a>). To try in DKm's fjords.</li>
-<li><strong>Next:</strong> limited slopes in the 3D ring (an option today, worse on the shelf in V2); the safeguard against new extrema from the flux correction.</li>
+<li><a href="ideal.html#ring-slopes">Limited slopes in the 3D ring</a>: reworked and now the default; in the dye front the children's error against one model at 1 km is 45 % smaller.</li>
+<li><strong>Next:</strong> the safeguard against new extrema from the flux correction.</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %.</li>
 <li>Ring and rim refreshed between the advection sweeps; turbulence and FABM's 2D fields across interfaces (whether needed).</li>
 <li>Output across levels: the levels merged onto one grid, budgets over all levels.</li>
