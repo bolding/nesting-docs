@@ -238,7 +238,7 @@ level, mostly from the coarser levels' layers.</li>
 <li>IDEAL V6, a dye front through the levels: conserved to 4e-9; no new extrema in any level (below 1e-13) since the ring correction
 and the parent's flux correction are both limited (<a href="ideal.html#flux-limit">flux correction</a>); with 3D sub-stepping the dye differs from R = 1 by 1e-6 to 2e-4 (rms) (<a href="ideal.html#ring-time">ring in time</a>).</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange was 4–9 % of a run with T and S,
-8–17 % with 14 tracers; the ring's slopes (now the default) double the ring's part: 4–16 % and 6–30 % (<a href="ideal.html#current">current</a>, to be made cheaper); 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
+8–17 % with 14 tracers; the ring's slopes (now the default) need four times the ring's remaps: a run +22 % with T and S, +69 % with 14 tracers (+12 % and +36 % without them; <a href="ideal.html#current">current</a>; the remap now one compiled pass); 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
 <li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 11 November (last: the flux correction without new extrema, the adaptive-layers fix, the 3D tables rerun).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat

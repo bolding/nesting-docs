@@ -343,13 +343,17 @@ against one model at 333 m everywhere. The tables in the chapters below are hist
 </tbody></table></div>
 <p class="small">The chain: shelf R = 2, strait R = 3. The 333 m reference's own dye stays within 8e-14 of [0, 1].</p>
 <p><strong>The cost (V7):</strong> V5 over 24 h, 2 processes per level, one run at a time.</p>
-<div class="tablewrap num"><table><thead><tr><th>Run</th><th>3D exchange work per 3D step, channel / shelf / strait</th><th>share of the run</th><th>run time vs. no 3D coupling</th></tr></thead><tbody>
-<tr><td>T, S</td><td>4.5 / 19.6 / 17.2 ms</td><td>4 / 16 / 14 %</td><td>+27 %</td></tr>
-<tr><td>T, S, ring without slopes</td><td>4.2 / 9.7 / 6.3 ms</td><td>4 / 9 / 6 %</td><td>+13 %</td></tr>
-<tr><td>14 tracers</td><td>14.8 / 80.0 / 71.9 ms</td><td>6 / 30 / 27 %</td><td>+76 %</td></tr>
+<div class="tablewrap num"><table><thead><tr><th>Run</th><th>3D exchange work per 3D step, channel / shelf / strait</th><th>run time vs. no 3D coupling</th></tr></thead><tbody>
+<tr><td>T, S</td><td>5.3 / 17.7 / 14.8 ms</td><td>+22 %</td></tr>
+<tr><td>T, S, ring without slopes</td><td>4.8 / 9.8 / 5.7 ms</td><td>+12 %</td></tr>
+<tr><td>14 tracers</td><td>16.1 / 78.3 / 71.8 ms</td><td>+69 %</td></tr>
+<tr><td>14 tracers, ring without slopes</td><td>15.0 / 35.2 / 20.7 ms</td><td>+36 %</td></tr>
 </tbody></table></div>
-<p><strong>The ring's slopes double the cost of the ring:</strong> each of the four neighbouring parent columns is remapped onto the ring cell's
-layers, and the child's own column through each of them and back. Making that cheaper is next; the flux correction's limiter costs little (about 1 % of the shelf's exchange).</p>
+<p><strong>The ring's slopes are the dearest part:</strong> per ring cell and tracer they need 16 vertical remaps instead of 4. The remap is now one compiled pass
+(<code>_pygetm.remap_z</code>), the slopes' remaps are stacked into 5 calls per sync, and a neighbour with exactly the same layers reuses its result, all with
+bit-identical results. With temperature and salinity the run's overhead fell from +27 % to +22 %. With 14 tracers nothing measurable changed: the time is the
+reconstruction inside the kernel itself. Going further needs fewer remaps, which would change the results slightly. The flux correction's limiter costs little,
+about 1 % of the shelf's exchange.</p>
 <h3 id="flux-limit">The flux correction without new extrema</h3>
 <p>The parent's flux correction adds to each cell next to the hole the difference between the children's and its own tracer flux through
 the interface. Near a sharp front that could push a cell outside its neighbours' range: in V6 the channel reached 1 + 1.3e-4. Without the

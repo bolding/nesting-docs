@@ -445,7 +445,7 @@ from zin only at boundary cells. With couplers the halos of the summed U/V are u
 continues bit-identically; a restart file from upstream pyGETM loads and continues as the unbroken run</td></tr>
 <tr><td><code>operators.py</code></td><td><code>Advection(..., flux_u=, flux_v=)</code>; <code>apply_3d_batch(..., get_flux=)</code>, the tracer amount through every face and layer</td><td>Python side of the face fluxes (2D and 3D)</td></tr>
 <tr><td><code>src/vertical_remap.F90</code>, <code>_pygetm.pyx</code>, <code>CMakeLists.txt</code></td><td>The vertical remap kernel
-(<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>
+(<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column; <code>remap_z</code>: the whole remap with the interfaces kept at their depths, volumes and division included)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>
 <tr><td><code>tracer.py</code></td><td><code>TracerCollection.face_fluxes</code>: per tracer the arrays the 3D advection adds to</td><td>The 3D flux register</td></tr>
 <tr><td><code>momentum.py</code></td><td><code>advance(..., diagnostics=)</code>: the caller may compute the diagnostics. Transport damping (An) is defined at EXTERNAL faces. <b>Bug fix:</b> the damping was multiplied by the time step twice (also upstream).</td>
 <td>Sponge at a child's interface; stability</td></tr>
