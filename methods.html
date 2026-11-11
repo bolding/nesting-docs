@@ -413,8 +413,8 @@ is larger by a fixed index offset; on an overhang side the band is the level's o
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
 model through a small set of hooks in pyGETM's core: about 400 changed lines in twelve files. All of them are optional.
-A model without nesting runs exactly as before (the optional arguments default to nothing), with four exceptions: a
-bug fix in the transport damping, fixes that make a restarted run continue bit-identically, the curvature term on curvilinear
+A model without nesting runs exactly as before (the optional arguments default to nothing), with five exceptions: a
+bug fix in the transport damping, one in the adaptive vertical coordinates (uninitialized values at open-boundary cells), fixes that make a restarted run continue bit-identically, the curvature term on curvilinear
 grids (on regular longitude/latitude grids it is off unless asked for), and the grid angle of rotated or curvilinear longitude/latitude grids
 (fixed; left-handed grids are now refused).</p>
 <div class="tablewrap"><table><thead><tr><th>Where</th><th>Change</th><th>Why</th></tr></thead><tbody>
@@ -423,6 +423,10 @@ grids (on regular longitude/latitude grids it is off unless asked for), and the 
 <code>flux_acc</code>, which accumulates dt × the flux through each face. Faces of type EXTERNAL (5) count as open in the stencils.</td>
 <td>Tracer flux matching at the interfaces; advection into and out of the ring</td></tr>
 <tr><td><code>wrapper.F90</code>, <code>_pygetm.pyx</code></td><td>Pass the optional flux array through (NULL: as before)</td><td>As above</td></tr>
+<tr><td><code>vertical_adaptive.F90</code></td><td><b>Bug fix:</b> the layer heights the adaptive coordinates work from were set only in cells
+with mask 1, but used in all cells with mask ≥ 1. In open-boundary cells (mask 2–4) and a nesting ring (EXTERNAL, 5) they were uninitialized
+memory, so two identical runs could differ (also upstream). Now set in every cell with mask ≥ 1. Runs without such cells are unchanged.</td>
+<td>Reproducible runs with adaptive layers: IDEAL V2 on two runs differed by up to 1 °C after an hour; now bit-identical</td></tr>
 <tr><th colspan="3">Python core (injections)</th></tr>
 <tr><td><code>constants.py</code>, <code>core.py</code></td><td>New cell type <code>CellType.EXTERNAL</code>: wet and with open faces, but its
 values are set from outside, not by the model. Valid wherever ACTIVE is.</td><td>A child's ring and a parent's hole</td></tr>

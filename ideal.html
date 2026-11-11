@@ -200,8 +200,8 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary aria-current="page">Examples</summary><div class="menu-items"><a href="ideal.html" aria-current="page">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
 <main id="top">
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
-<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a><a href="#fjord">Curvilinear fjord</a></nav>
-<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a><ol class="toc-sub"><li><a href="#rerun-restart">Rerun after the restart fixes (10 November 2026)</a></li><li><a href="#ring-time">The 3D ring in time (10 November 2026)</a></li><li><a href="#ring-slopes">Limited slopes in the 3D ring (11 November 2026)</a></li></ol><li><a href="#a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</a><ol class="toc-sub"><li><a href="#flow-through-the-bend">Flow through the bend</a></li><li><a href="#tide-and-river">Tide and river</a></li><li><a href="#fjord-nested">The fjord as a level of the IDEAL nest</a></li><li><a href="#estuary">At the root's edge: an estuary with an overhang</a></li><li><a href="#sluice">A dam and a sluice between two levels</a></li></ol></ol></details>
+<nav class="subnav" aria-label="On this page"><a href="#layout">Layout</a><a href="#twod">2D</a><a href="#drying">2D drying</a><a href="#threed">3D</a><a href="#current">3D now</a><a href="#v2">Lake at rest</a><a href="#v5">Pycnocline over a slope</a><a href="#v6">Dye front</a><a href="#v7">Cost</a><a href="#substep3d">3D sub-stepping</a><a href="#fjord">Curvilinear fjord</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#a-channel-a-shelf-and-a-strait">A channel, a shelf and a strait</a><li><a href="#the-barotropic-experiments">The barotropic experiments</a><ol class="toc-sub"><li><a href="#nested-against-one-level-at-333-m-everywhere">Nested against one level at 333 m everywhere</a></li></ol><li><a href="#a-tidal-flat-across-an-interface">A tidal flat across an interface</a><li><a href="#temperature-with-a-different-number-of-layers-pe">Temperature, with a different number of layers per level</a><ol class="toc-sub"><li><a href="#3d-velocities-in-the-child-s-ring">3D velocities in the child's ring</a></li></ol><li><a href="#current-results">Current results</a><ol class="toc-sub"><li><a href="#flux-limit">The flux correction without new extrema</a></li><li><a href="#adaptive-fix">Adaptive layers next to an interface</a></li></ol><li><a href="#a-stratified-lake-at-rest">A stratified lake at rest</a><li><a href="#a-pycnocline-over-the-shelf-slope">A pycnocline over the shelf slope</a><li><a href="#a-dye-front-through-the-levels">A dye front through the levels</a><li><a href="#what-the-3d-exchange-costs">What the 3D exchange costs</a><ol class="toc-sub"><li><a href="#v7-kernel">A compiled remap kernel</a></li></ol><li><a href="#a-shorter-3d-step-for-a-child">A shorter 3D step for a child</a><ol class="toc-sub"><li><a href="#rerun-restart">Rerun after the restart fixes (10 November 2026)</a></li><li><a href="#ring-time">The 3D ring in time (10 November 2026)</a></li><li><a href="#ring-slopes">Limited slopes in the 3D ring (11 November 2026)</a></li></ol><li><a href="#a-bent-fjord-on-a-curvilinear-grid">A bent fjord on a curvilinear grid</a><ol class="toc-sub"><li><a href="#flow-through-the-bend">Flow through the bend</a></li><li><a href="#tide-and-river">Tide and river</a></li><li><a href="#fjord-nested">The fjord as a level of the IDEAL nest</a></li><li><a href="#estuary">At the root's edge: an estuary with an overhang</a></li><li><a href="#sluice">A dam and a sluice between two levels</a></li></ol></ol></details>
 <header class="hero">
   <p class="draft">Under development · updated 5 November 2026</p>
   <h1>IDEAL: three nested levels with known answers</h1>
@@ -327,6 +327,51 @@ over the 48 h tidal run:</p>
 </tbody></table></div>
 <p class="small">The across-channel velocity v is small, so its relative jumps are large. Heat stays conserved to 1e-9 and a uniform field uniform to 3e-13.</p>
 </section>
+<section id="current" class="chapter"><header class="chap"><span class="eyebrow">3D · Now</span><h2 id="current-results">Current results</h2></header>
+<p class="lede">The whole 3D test list rerun on 11 November 2026 with the current code: limited ring slopes, simple time steps (root 18 s,
+strait 6 s), the flux correction without new extrema and the fix for adaptive layers below. 48 h, 2 processes per level; V5 and V6
+against one model at 333 m everywhere. The tables in the chapters below are history, each right for the code of its date.</p>
+<div class="tablewrap num"><table><thead><tr><th>Test</th><th>R = 1</th><th>strait R = 3</th><th>chain</th></tr></thead><tbody>
+<tr><td>uniform temperature, tide, 12 h: largest departure (°C)</td><td>2.4e-13</td><td>3.6e-13</td><td>7.9e-13</td></tr>
+<tr><td>closed basin: heat of all levels, 48 h</td><td>6.3e-11</td><td>6.4e-11</td><td>6.5e-11</td></tr>
+<tr><td>dye with tide, 48 h: new extrema / content of all levels</td><td>&lt; 1e-13 / −1.0e-9</td><td>&lt; 1e-13 / −9.9e-10</td><td>&lt; 1e-13 / −1.0e-9</td></tr>
+<tr><td>V2 at rest: largest spurious speed, channel / shelf / strait (mm/s)</td><td>2.9 / 6.9 / 3.7</td><td>2.9 / 6.9 / 3.7</td><td>2.9 / 6.9 / 3.7</td></tr>
+<tr><td>V2, each grid alone (mm/s)</td><td colspan="3">1.4 / 2.6 / 0.7</td></tr>
+<tr><td>V5: pycnocline depth, rms against 333 m (m)</td><td>0.131 / 0.118 / 0.080</td><td>0.131 / 0.118 / 0.090</td><td>0.131 / 0.117 / 0.090</td></tr>
+<tr><td>V6: surface dye, rms against 333 m</td><td>0.037 / 0.025 / 3.9e-4</td><td>0.037 / 0.025 / 4.0e-4</td><td>0.037 / 0.025 / 3.9e-4</td></tr>
+<tr><td>V6: new extrema / dye content of all levels</td><td>&lt; 2e-13 / −2.5e-10</td><td>&lt; 1e-13 / −2.5e-10</td><td>&lt; 2e-13 / −2.3e-10</td></tr>
+</tbody></table></div>
+<p class="small">The chain: shelf R = 2, strait R = 3. The 333 m reference's own dye stays within 8e-14 of [0, 1].</p>
+<p><strong>The cost (V7):</strong> V5 over 24 h, 2 processes per level, one run at a time.</p>
+<div class="tablewrap num"><table><thead><tr><th>Run</th><th>3D exchange work per 3D step, channel / shelf / strait</th><th>share of the run</th><th>run time vs. no 3D coupling</th></tr></thead><tbody>
+<tr><td>T, S</td><td>4.5 / 19.6 / 17.2 ms</td><td>4 / 16 / 14 %</td><td>+27 %</td></tr>
+<tr><td>T, S, ring without slopes</td><td>4.2 / 9.7 / 6.3 ms</td><td>4 / 9 / 6 %</td><td>+13 %</td></tr>
+<tr><td>14 tracers</td><td>14.8 / 80.0 / 71.9 ms</td><td>6 / 30 / 27 %</td><td>+76 %</td></tr>
+</tbody></table></div>
+<p><strong>The ring's slopes double the cost of the ring:</strong> each of the four neighbouring parent columns is remapped onto the ring cell's
+layers, and the child's own column through each of them and back. Making that cheaper is next; the flux correction's limiter costs little (about 1 % of the shelf's exchange).</p>
+<h3 id="flux-limit">The flux correction without new extrema</h3>
+<p>The parent's flux correction adds to each cell next to the hole the difference between the children's and its own tracer flux through
+the interface. Near a sharp front that could push a cell outside its neighbours' range: in V6 the channel reached 1 + 1.3e-4. Without the
+correction there are no new extrema, but the content drifts by 1e-3, so the correction is right and only its distribution in space is not.
+<strong>Now</strong> (<code>limit_correction</code>, the default) the corrections of all children are collected per cell, the corrected value is
+clipped to the range of the cell, its four neighbours and the layers above and below, and the net amount cut off in a column is spread
+over that column's layers that have room left. What still does not fit is kept as an amount and added at the next sync (restart state),
+so nothing is lost. A first version deferred everything cut off; at rest it kept putting the excess back into the same cells, and
+spreading over the column leaves practically nothing to defer.</p>
+<div class="tablewrap num"><table><thead><tr><th>V6, 48 h</th><th>without</th><th>limited</th></tr></thead><tbody>
+<tr><td>new extrema, channel / shelf / strait</td><td>1.3e-4 / 2.2e-5 / 0</td><td><strong>&lt; 1e-13 everywhere</strong></td></tr>
+<tr><td>dye content of all levels</td><td>−4e-10</td><td>−2.5e-10</td></tr>
+<tr><td>surface dye against 333 m; V5 pycnocline</td><td colspan="2">unchanged</td></tr>
+<tr><td>restart halfway</td><td>–</td><td>bit-identical</td></tr>
+</tbody></table></div>
+<h3 id="adaptive-fix">Adaptive layers next to an interface</h3>
+<p>Two identical runs of V2 differed by up to 1 °C after an hour, even on one process per level, while V6 (sigma layers) and every grid alone
+were bit-identical. The difference began in the strait's ring cells at the first 3D step: pyGETM's adaptive coordinates set their layer
+heights only in cells with mask 1 but used them in all cells with mask ≥ 1, which includes the nesting's ring (and open boundaries), where they
+were uninitialized memory. Fixed in the fork (<a href="methods.html#pygetm">changes to pyGETM</a>); V2 is now bit-identical from run to run.
+The V2 speeds in the older tables are therefore single draws.</p>
+</section>
 <section id="v2" class="chapter"><header class="chap"><span class="eyebrow">3D · V2</span><h2 id="a-stratified-lake-at-rest">A stratified lake at rest</h2></header>
 <p class="lede">A closed basin, no tide, no wind, and a flat pycnocline at 15 m over a bottom sloping from 50 to 20 m
 across the shelf window. Nothing should move: every current is error. A single model has some, from the pressure
@@ -422,8 +467,8 @@ extremum. pyGETM's advection (SUPERBEE) creates none in a single model: the 333 
 <ul><li><strong>The dye is conserved</strong> over all levels to 4e-9 at most (2e-10 at the end), with every part of the coupling on.</li>
 <li><strong>New extrema are small but real:</strong> up to 3.6e-4 on the shelf, from the ring's child-detail correction (an addition):
 without it the shelf and strait stay within 1e-7. Limiting the corrected ring value to the range of the parent's value and the
-child's adjacent one (now the default) brings the shelf to 1.2e-5 and the strait to 6e-11. What remains is on the parent's side:
-the channel, 1.9e-4 above and 4e-5 below, from the flux correction.</li>
+child's adjacent one (now the default) brings the shelf to 1.2e-5 and the strait to 6e-11. What remained was on the parent's side:
+the channel, 1.9e-4 above and 4e-5 below, from the flux correction; <a href="#flux-limit">limited since 11 November</a>, now below 1e-13.</li>
 <li><strong>PPM and PCM do not differ here.</strong> The front stays within 0.03–0.04 of the reference's surface dye.</li>
 <li><strong>A weak test so far:</strong> the tidal excursion is only 3–5 km, so the fronts cross the interfaces but do not travel far into the
 next level (the dye reaches 0.06 in the strait). A mean current would test it harder.</li></ul>
