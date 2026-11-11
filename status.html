@@ -202,7 +202,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#nesting">Nesting</a><a href="#examples">Examples</a></nav>
 
-<header class="hero"><p class="draft">Status · 10 November 2026</p><h1>Where it stands</h1>
+<header class="hero"><p class="draft">Status · 11 November 2026</p><h1>Where it stands</h1>
 <p class="lede">What works, what is being worked on, and what is open: in the nesting itself and in the example setups.</p></header>
 <section id="nesting" class="chapter"><header class="chap"><span class="eyebrow">Nesting</span><h2 id="the-method-and-the-code">The method and the code</h2></header>
 <div class="statusgrid">
@@ -235,10 +235,10 @@ shelf and 2.1× in the strait (one face where a wall meets the interface; being 
 <li>IDEAL V5, a pycnocline over the shelf slope against one level at 333 m: within 8–13 cm of pycnocline depth in every
 level, mostly from the coarser levels' layers.</li>
 <li>IDEAL V6, a dye front through the levels: conserved to 4e-9; new extrema 1e-5 in the children after limiting the ring
-correction, 2e-4 in the parent from the flux correction.</li>
+correction, 2e-4 in the parent from the flux correction; with 3D sub-stepping the dye differs from R = 1 by 1e-6 to 2e-4 (rms) (<a href="ideal.html#ring-time">ring in time</a>).</li>
 <li>IDEAL V7, the cost: with the compiled remap kernel (15× faster than numpy) the 3D exchange is 4–9 % of a run with T and S,
 8–17 % with 14 tracers, 3–8 % with 32 tracers and a FABM-like load; with that load the balanced split is 5–9 % faster than the uniform one.</li>
-<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 10 November (last: dams and sluices).</li>
+<li>The fork follows pyGETM v0.9.29 (merged 3 November 2026); fork and nesting code pushed on 10 November (last: the 3D ring in time).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
