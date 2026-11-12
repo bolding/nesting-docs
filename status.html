@@ -251,7 +251,9 @@ them on); the check now covers damping, curvilinear and rotated grids and restar
 <li><strong>Code review</strong> (12 November, fork, pygetm-config, pygetm-nesting): a level's results depended on how its parent was
 divided over processes where a subdomain boundary lay on the interface (NEAB: up to 1.7 mm); fixed, a nest now gives the same
 result on any number of processes. Further fixes at start-up and restart, unused code removed, the 2D and 3D couplers share their
-exchange order.</li>
+exchange order. The NEAB control run (30 days) and the DKm nested run with TPXO9 (1 + 7 days), redone with the fixed code, agree
+with the published ones within 1 mm of M2 amplitude at every gauge (NEAB: rms error 0.173 m at 369 gauges, DKm: 0.128 m at 89,
+both unchanged).</li>
 <li><strong>Nested setups in pygetm-config</strong> (its branch <code>nesting</code>): one master YAML (a base, per-level overrides, levels switched
 on or off) from which <code>pygetm-config nest</code> writes every level's configuration and run script and one launch script; a single-model
 setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Restart files are per level, and a
