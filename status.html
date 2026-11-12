@@ -248,8 +248,11 @@ is the ring's slopes, 12 column remaps per ring cell and tracer instead of 4 (+1
 (<code>tools/upstream_check.py</code>, after every merge). Fork, nesting code and pygetm-config pushed on 11 November.</li>
 <li><strong>Nested setups in pygetm-config</strong> (its branch <code>nesting</code>): one master YAML (a base, per-level overrides, levels switched
 on or off) from which <code>pygetm-config nest</code> writes every level's configuration and run script and one launch script; a single-model
-setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Still open: refusing a restart written
-with another set of levels, the launch through <code>nesting-balance</code>.</li>
+setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Restart files are per level, and a
+restart written with another set of levels is refused (a layout signature in the restart file). One generator (<code>pygetm_nesting.config_master</code>)
+writes the masters of NEAB and DKm (nine levels, open boundaries on children at the root's edge). Optional ERA5 forcing (bulk formulae) and,
+in 3D, initial temperature and salinity from WOA or CMEMS: the first short NEAB and DKm 3D runs work. Still open: the launch through
+<code>nesting-balance</code>, domain methods other than a bathymetry file.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
