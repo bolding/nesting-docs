@@ -245,7 +245,13 @@ level, mostly from the coarser levels' layers. V6, a dye front: within 0.04 of t
 <li><a href="ideal.html#current">IDEAL V7, the cost</a>: the 3D exchange adds 23 % to a run with T and S and 66 % with 14 tracers (21 % and 52 % with PCM). The largest part
 is the ring's slopes, 12 column remaps per ring cell and tracer instead of 4 (+12 % and +36 % without them); the remaps are compiled.</li>
 <li>The fork follows upstream pyGETM's devel (7ac33c7, merged 11 November 2026); without nesting it runs bit-identically to upstream
-(<code>tools/upstream_check.py</code>, after every merge). Fork, nesting code and pygetm-config pushed on 11 November.</li>
+(<code>tools/upstream_check.py</code>, after every merge). Fork, nesting code and pygetm-config pushed on 11 November.
+Since 12 November the fork's other changes of pyGETM's core are options that default to upstream's behaviour (nested runs switch
+them on); the check now covers damping, curvilinear and rotated grids and restarts.</li>
+<li><strong>Code review</strong> (12 November, fork, pygetm-config, pygetm-nesting): a level's results depended on how its parent was
+divided over processes where a subdomain boundary lay on the interface (NEAB: up to 1.7 mm); fixed, a nest now gives the same
+result on any number of processes. Further fixes at start-up and restart, unused code removed, the 2D and 3D couplers share their
+exchange order.</li>
 <li><strong>Nested setups in pygetm-config</strong> (its branch <code>nesting</code>): one master YAML (a base, per-level overrides, levels switched
 on or off) from which <code>pygetm-config nest</code> writes every level's configuration and run script and one launch script; a single-model
 setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Restart files are per level, and a

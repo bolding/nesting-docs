@@ -361,8 +361,9 @@ rad of excess) and the metrics act per cell. So a rotated-pole grid, or one that
 <ul>
 <li><strong>Limits:</strong> the grid must be (nearly) orthogonal, as in the plane; the cell area is dx × dy (the exact quadrilateral area is
 planar only); legacy grid_type 4 files are not read (building the points from the corners' lon/lat breaks at the date line and the poles).
-pyGETM's domain takes 2D lon/lat directly, as ocean-prep writes them. The curvature term is on by default for every lon/lat grid that is not
-rectilinear (rotated pole, coast-following) and off for regular lon/lat grids, as in upstream pyGETM.</li>
+pyGETM's domain takes 2D lon/lat directly, as ocean-prep writes them. The curvature term is off by default, as in upstream pyGETM;
+<code>Momentum(curvature=None)</code> turns it on for every grid that is not rectilinear (rotated pole, coast-following), leaving regular
+lon/lat grids without it. For the grid angle of such lon/lat grids use <code>Domain(rotation_lonlat=True)</code>.</li>
 <li><strong>Checked, a rotated-pole grid</strong> (0.05°, centred on 8° E 56° N on the rotated equator), once as a regular grid in rotated
 coordinates and once in geographic lon/lat: dx, dy and area agree to 10<sup>-12</sup>, the curvature coefficients to 10<sup>-16</sup> (of 3 × 10<sup>-9</sup>).</li>
 <li><strong>Found and fixed:</strong> ocean-prep's rotated-pole transform was mirrored in longitude (one cell east in rotated lon went west), so its
@@ -439,10 +440,14 @@ for each: <code>docs/notes/options.md</code> in pygetm-nesting.</p>
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
 model through a small set of hooks in pyGETM's core: about 400 changed lines in twelve files. All of them are optional.
-A model without nesting runs exactly as before (the optional arguments default to nothing), with five exceptions: a
-bug fix in the transport damping, one in the adaptive vertical coordinates (uninitialized values at open-boundary cells), fixes that make a restarted run continue bit-identically, the curvature term on curvilinear
-grids (on regular longitude/latitude grids it is off unless asked for), and the grid angle of rotated or curvilinear longitude/latitude grids
-(fixed; left-handed grids are now refused).</p>
+A model without nesting runs exactly as upstream pyGETM: the other changes of the core are options that default to
+upstream's behaviour (since 12 November 2026; checked by <code>tools/upstream_check.py</code> on Cartesian, curvilinear and rotated
+longitude/latitude grids, with damping, 2D and 3D, unbroken and restarted). They are the transport damping applied with the time step once
+(<code>Momentum(An_timestep_once=True)</code>), the curvature term (<code>Momentum(curvature=None)</code>: on for curvilinear grids), the
+grid angle of rotated or curvilinear longitude/latitude grids (<code>Domain(rotation_lonlat=True)</code>), refusing left-handed grids
+(<code>Domain(refuse_left_handed=True)</code>; else a warning) and a restart that continues bit-identically
+(<code>Simulation(exact_restart=True)</code>; on by itself in a nested run). The one exception is the adaptive vertical coordinates, where
+upstream reads uninitialized values at open-boundary cells (below).</p>
 <div class="tablewrap"><table><thead><tr><th>Where</th><th>Change</th><th>Why</th></tr></thead><tbody>
 <tr><th colspan="3">Fortran</th></tr>
 <tr><td><code>advection.F90.template</code>, <code>advection_base.F90</code></td><td><code>u2d</code>/<code>v2d</code>: optional
@@ -467,17 +472,19 @@ transports a coupler replaced; with couplers the 2D Coriolis terms are computed 
 <tr><td><code>simulation.py</code>, <code>momentum.py</code> (restart)</td><td>Optional state fields in pyGETM's restart file (<code>_part_of_state</code>; new
 <code>_restart_optional</code>: a file without them still loads): the order of U and V in the 2D and 3D momentum, the old U/V layer thicknesses,
 the 3D step's sums of U and V. After a restart, the depths and thicknesses at open boundaries are kept instead of mirrored again; z is restored
-from zin only at boundary cells. With couplers the halos of the summed U/V are updated once per 3D step.</td><td>A restarted run, nested or not,
-continues bit-identically; a restart file from upstream pyGETM loads and continues as the unbroken run</td></tr>
+from zin only at boundary cells. With couplers the halos of the summed U/V are updated once per 3D step. All of this with
+<code>Simulation(exact_restart=)</code>: <code>None</code> (default) with couplers only, else as upstream.</td><td>A restarted run continues
+bit-identically (nested always, single models with <code>exact_restart=True</code>); a restart file from upstream pyGETM loads and continues</td></tr>
 <tr><td><code>operators.py</code></td><td><code>Advection(..., flux_u=, flux_v=)</code>; <code>apply_3d_batch(..., get_flux=)</code>, the tracer amount through every face and layer</td><td>Python side of the face fluxes (2D and 3D)</td></tr>
 <tr><td><code>src/vertical_remap.F90</code>, <code>_pygetm.pyx</code>, <code>CMakeLists.txt</code></td><td>The vertical remap kernel
 (<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column; <code>remap_z</code>: the whole remap with the interfaces kept at their depths, volumes and division included)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>
 <tr><td><code>tracer.py</code></td><td><code>TracerCollection.face_fluxes</code>: per tracer the arrays the 3D advection adds to</td><td>The 3D flux register</td></tr>
-<tr><td><code>momentum.py</code></td><td><code>advance(..., diagnostics=)</code>: the caller may compute the diagnostics. Transport damping (An) is defined at EXTERNAL faces. <b>Bug fix:</b> the damping was multiplied by the time step twice (also upstream).</td>
+<tr><td><code>momentum.py</code></td><td><code>advance(..., diagnostics=)</code>: the caller may compute the diagnostics. Transport damping (An) is defined at EXTERNAL faces. <code>Momentum(An_timestep_once=True)</code>: the damping multiplied by the time step once,
+not twice as upstream (default: as upstream).</td>
 <td>Sponge at a child's interface; stability</td></tr>
 <tr><td><code>momentum.py</code> (curvature)</td><td><code>Momentum(curvature=)</code>: the curvature term of the momentum equations
-(legacy GETM's <code>cord_curv</code>), added to the Coriolis parameter in 2D and 3D. Default: on for curvilinear grids, off for regular
-longitude/latitude grids (<code>True</code> includes it there too); zero on Cartesian grids with regular metrics.</td><td>Curvilinear grids
+(legacy GETM's <code>cord_curv</code>), added to the Coriolis parameter in 2D and 3D. Default <code>False</code> (as upstream); <code>None</code>: on for curvilinear grids, off
+for regular longitude/latitude grids; <code>True</code>: everywhere. Zero on Cartesian grids with regular metrics.</td><td>Curvilinear grids
 as in legacy GETM: steady circular flow on a polar grid stays steady (elevation error 0.118 → 0.00004 m in 6 h)</td></tr>
 <tr><td><code>domain.py</code>, <code>legacy.py</code></td><td><code>Domain(exact_area=True)</code>: cell areas from the corner quadrilaterals
 (as legacy's iow branch), off by default. <code>legacy.domain_from_topo</code> reads planar curvilinear topo files (grid_type 3, the corners
@@ -487,12 +494,14 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 them (a dam or thin wall of zero width); only the supergrid mask is changed, before the grids are built</td><td>Dams, barriers; Ringkøbing Fjord</td></tr>
 <tr><td><code>sluice.py</code> (new)</td><td><code>pygetm.sluice.Sluice</code>: a controlled connection between two water cells (gate, flap gate, pipe in a dam) as a pair
 of rivers; <code>attach(sim, nest=)</code>: its ends on two nesting levels, the flow from both at their shared times</td><td>Sluices, locks, pumping stations; Hvide Sande</td></tr>
-<tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart, the tracers' open boundaries get their values but the
-sponge zones are not relaxed again (the last macro step did so before the restart file was written).</td><td>A restarted run with sponge boundaries
+<tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart (with <code>exact_restart</code>), the
+tracers' open boundaries get their values but the sponge zones are not relaxed again (the last macro step did so before the restart file was
+written).</td><td>A restarted run with sponge boundaries
 continues bit-identically</td></tr>
-<tr><td><code>domain.py</code> (rotation)</td><td>The grid angle of longitude/latitude grids from the local east and north components, longitude differences
-scaled by cos(latitude) (before: taken in degrees, 17 % too large at 56° N on a rotated-pole grid; regular lon/lat grids unchanged, exactly 0). A
-left-handed (mirrored) grid is refused at domain creation.</td><td>Rotated-pole and curvilinear lon/lat grids (e.g. from ocean-prep): wind and
+<tr><td><code>domain.py</code> (rotation)</td><td><code>Domain(rotation_lonlat=True)</code>: the grid angle of longitude/latitude grids from
+the local east and north components, longitude differences scaled by cos(latitude) (upstream, the default: taken in degrees, 17 % too large at
+56° N on a rotated-pole grid; regular lon/lat grids are not rotated either way). A left-handed (mirrored) grid gives a warning, with
+<code>refuse_left_handed=True</code> an error.</td><td>Rotated-pole and curvilinear lon/lat grids (e.g. from ocean-prep): wind and
 boundary velocities rotated correctly; mirrored grids caught</td></tr>
 <tr><td><code>parallel.py</code></td><td><code>get_logger(name=)</code>, <code>file_prefix()</code></td><td>Several models in one MPI job, each with its own logs and dumps</td></tr>
 <tr><td><code>util/interpolate.py</code></td><td><code>interp_columns</code>: vertical interpolation between water columns of different depth</td><td>Parent → child in 3D (in preparation)</td></tr>
