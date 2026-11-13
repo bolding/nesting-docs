@@ -264,14 +264,16 @@ on or off) from which <code>pygetm-config nest</code> writes every level's confi
 setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Restart files are per level, and a
 restart written with another set of levels is refused (a layout signature in the restart file). One generator (<code>pygetm_nesting.config_master</code>)
 writes the masters of NEAB and DKm (nine levels, open boundaries on children at the root's edge). Optional ERA5 forcing (bulk formulae) and,
-in 3D, initial temperature and salinity from WOA or CMEMS: the first short NEAB and DKm 3D runs work. Still open: the launch through
-<code>nesting-balance</code>, domain methods other than a bathymetry file, and one depth reader shared by the generator and the run.</li>
+in 3D, initial temperature and salinity from WOA or CMEMS: the first short NEAB and DKm 3D runs work. Since 13 November the depths are
+read and the open boundaries along the levels' edges computed by the fork when the run starts (one reader and one rule; switching off a
+child at the root's edge now works), the processes per level come from <code>nesting-balance</code>, a Slurm job can be written, and
+curvilinear and overhanging levels are generated. Still open: Cartesian levels and other domain methods.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
 </ul></div>
 <div><h4>Open</h4><ul>
-<li><strong>Next:</strong> pygetm-config's open points; DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between
+<li><strong>Next:</strong> DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between
 the advection sweeps.</li>
 <li>The 3D ring in time where it should pay: the extrapolation is there, but in IDEAL it gains nothing over holding; to try in DKm's fjords.</li>
 <li>The ring's slopes cheaper still: fewer remaps, or a kernel that shares them.</li>
