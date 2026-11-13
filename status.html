@@ -267,7 +267,7 @@ writes the masters of NEAB and DKm (nine levels, open boundaries on children at 
 in 3D, initial temperature and salinity from WOA or CMEMS: the first short NEAB and DKm 3D runs work. Since 13 November the depths are
 read and the open boundaries along the levels' edges computed by the fork when the run starts (one reader and one rule; switching off a
 child at the root's edge now works), the processes per level come from <code>nesting-balance</code>, a Slurm job can be written, and
-curvilinear and overhanging levels are generated. Still open: Cartesian levels and other domain methods.</li>
+curvilinear and overhanging levels are generated, and Cartesian levels too (IDEAL generated this way conserves its volume to round-off).</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
