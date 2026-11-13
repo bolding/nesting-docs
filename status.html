@@ -253,7 +253,9 @@ divided over processes where a subdomain boundary lay on the interface (NEAB: up
 result on any number of processes. Further fixes at start-up and restart, unused code removed, the 2D and 3D couplers share their
 exchange order. The NEAB control run (30 days) and the DKm nested run with TPXO9 (1 + 7 days), redone with the fixed code, agree
 with the published ones within 1 mm of M2 amplitude at every gauge (NEAB: rms error 0.173 m at 369 gauges, DKm: 0.128 m at 89,
-both unchanged).</li>
+both unchanged). The volume change of a 3D run started from a raised surface was not the nesting: pyGETM derives the
+layer thicknesses when the simulation is created, so an elevation set afterwards needs <code>sim.initialize_depth()</code>
+(a single model behaves the same; a lock exchange alone changes nothing).</li>
 <li><strong>Nested setups in pygetm-config</strong> (its branch <code>nesting</code>): one master YAML (a base, per-level overrides, levels switched
 on or off) from which <code>pygetm-config nest</code> writes every level's configuration and run script and one launch script; a single-model
 setup is unchanged. NEAB's five levels generated this way are bit-identical to NEAB's own nested models. Restart files are per level, and a
@@ -267,7 +269,7 @@ across an interface (a safety net). In 3D pyGETM itself needs a small bottom rou
 </ul></div>
 <div><h4>Open</h4><ul>
 <li><strong>Next:</strong> pygetm-config's open points; DKm's Ringkøbing Fjord (a level of its own, the sluice at Hvide Sande); ring and rim between
-the advection sweeps; a nested 3D run started from a non-flat surface (its volume changes once, in the first 3D step).</li>
+the advection sweeps.</li>
 <li>The 3D ring in time where it should pay: the extrapolation is there, but in IDEAL it gains nothing over holding; to try in DKm's fjords.</li>
 <li>The ring's slopes cheaper still: fewer remaps, or a kernel that shares them.</li>
 <li><code>nesting-balance</code> with every cost calibrated (2D and 3D exchanges): IDEAL on 12 cores 7 % faster balanced; predictions within 5–13 %. The 3D costs to recalibrate
