@@ -202,13 +202,16 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 <div class="crumbs"><a href="index.html">← Overview</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#nesting">Nesting</a><a href="#examples">Examples</a></nav>
 
-<header class="hero"><p class="draft">Status · 11 November 2026</p><h1>Where it stands</h1>
+<header class="hero"><p class="draft">Status · 13 November 2026</p><h1>Where it stands</h1>
 <p class="lede">What works, what is being worked on, and what is open: in the nesting itself and in the example setups.</p></header>
 <section id="nesting" class="chapter"><header class="chap"><span class="eyebrow">Nesting</span><h2 id="the-method-and-the-code">The method and the code</h2></header>
 <div class="statusgrid">
 <div><h4>Working</h4><ul>
 <li>2D two-way nesting over any number of levels; volume conserved to round-off.</li>
-<li>Active regions, land-aware exchanges, M:N exchange plans between any tilings; bit-identical across process splits.</li>
+<li>Active regions, land-aware exchanges, M:N exchange plans between any tilings; bit-identical across process splits (also where a
+tile edge lies on an interface, since 12 November: <a href="issues.html#e8-tiles">IDEAL E8</a>).</li>
+<li>Tested automatically: 87 fork tests in 45 s, among them a 3D nested run, the 3D restart, three levels, failing levels, a removed
+subdomain, outer sides, rivers, dams, a sluice and drying at an interface.</li>
 <li>One MPMD component per model; load balancing with <code>nesting-balance</code>, launch by mpiexec or Slurm.</li>
 <li>The sub-stepping instability understood and removed by an AGRIF-like sponge.</li>
 <li>3D (<code>Nested3D</code>): tracers between levels with different vertical grids: rim, ring (with the child's vertical detail and
@@ -262,7 +265,7 @@ setup is unchanged. NEAB's five levels generated this way are bit-identical to N
 restart written with another set of levels is refused (a layout signature in the restart file). One generator (<code>pygetm_nesting.config_master</code>)
 writes the masters of NEAB and DKm (nine levels, open boundaries on children at the root's edge). Optional ERA5 forcing (bulk formulae) and,
 in 3D, initial temperature and salinity from WOA or CMEMS: the first short NEAB and DKm 3D runs work. Still open: the launch through
-<code>nesting-balance</code>, domain methods other than a bathymetry file.</li>
+<code>nesting-balance</code>, domain methods other than a bathymetry file, and one depth reader shared by the generator and the run.</li>
 <li><a href="ideal.html#drying">Drying and flooding</a>: layouts keep the interfaces out of water that floods and dries
 (<code>interface_min_depth</code>, checked at start-up); drying happens inside a level. In 2D the coupling also handles a flat
 across an interface (a safety net). In 3D pyGETM itself needs a small bottom roughness on flats (z0 ≈ 0.001 m).</li>
@@ -281,7 +284,7 @@ so does a realistic 3D run (NEAB 3D, real FABM).</li>
 <li>An overlay of nested grids in ocean-plot; a real estuary (DKm, NEAB) as a curvilinear level.</li>
 <li>Adaptive vertical coordinates (last; GVC and SIGMA until then).</li>
 <li>Running a single model with its boundaries from a file.</li>
-<li><a href="issues.html#e8-tiles">One process split in IDEAL E8</a> (1e-4 m).</li></ul></div>
+</ul></div>
 </div>
 </section>
 <section id="examples" class="chapter"><header class="chap"><span class="eyebrow">Examples</span><h2 id="the-setups">The setups</h2></header>
