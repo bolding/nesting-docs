@@ -503,6 +503,13 @@ the local east and north components, longitude differences scaled by cos(latitud
 56° N on a rotated-pole grid; regular lon/lat grids are not rotated either way). A left-handed (mirrored) grid gives a warning, with
 <code>refuse_left_handed=True</code> an error.</td><td>Rotated-pole and curvilinear lon/lat grids (e.g. from ocean-prep): wind and
 boundary velocities rotated correctly; mirrored grids caught</td></tr>
+<tr><td><code>simulation.py</code> (start; suggested upstream, not changed in the fork)</td><td>In a 3D run an initial elevation set on
+<code>sim.T.z</code> after the simulation is created reaches the 2D depths at the start, but the layer thicknesses only in the first
+3D step: <code>Simulation()</code> derives them once (<code>initialize_depth</code>), <code>start()</code> again only after a restart.
+The water volume is right throughout, but tracer contents jump once (3.4e-4 for a 0.8 m hill in a 25 m basin). Workaround: call
+<code>sim.initialize_depth()</code> after setting the elevation. Suggested: <code>start()</code> calls it for a run that does not continue
+from a restart file (bit-identical for a flat start), or at least the docstring says so.</td><td>Found as a one-time volume change of a
+nested 3D run started from a raised surface; a single model behaves the same. Our setups start flat</td></tr>
 <tr><td><code>parallel.py</code></td><td><code>get_logger(name=)</code>, <code>file_prefix()</code></td><td>Several models in one MPI job, each with its own logs and dumps</td></tr>
 <tr><td><code>util/interpolate.py</code></td><td><code>interp_columns</code>: vertical interpolation between water columns of different depth</td><td>Parent → child in 3D (in preparation)</td></tr>
 <tr><td><code>input/tpxo.py</code></td><td><code>tpxo.get(..., components=)</code></td><td>Convenience: a subset of the constituents</td></tr>
