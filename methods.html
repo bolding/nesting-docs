@@ -439,7 +439,7 @@ for each: <code>docs/notes/options.md</code> in pygetm-nesting.</p>
 <section id="pygetm" class="chapter"><header class="chap"><span class="eyebrow">Code</span><h2 id="what-the-nesting-changes-in-pygetm">What the nesting changes in pyGETM</h2></header>
 <p>The nesting itself is a new package, <code>pygetm.nesting</code>: about 4,000 lines of Python with mpi4py, holding
 the geometry of the levels, the MPI exchanges, restriction, flux matching and the time loop. It attaches to each
-model through a small set of hooks in pyGETM's core: about 400 changed lines in twelve files. All of them are optional.
+model through hooks in pyGETM's core: about 1,100 changed lines in 19 files, 290 of them the new vertical remap kernel. All of them are optional.
 A model without nesting runs exactly as upstream pyGETM: the other changes of the core are options that default to
 upstream's behaviour (since 12 November 2026; checked by <code>tools/upstream_check.py</code> on Cartesian, curvilinear and rotated
 longitude/latitude grids, with damping, 2D and 3D, unbroken and restarted). They are the transport damping applied with the time step once
@@ -500,7 +500,7 @@ as in legacy GETM: steady circular flow on a polar grid stays steady (elevation 
 <tr><td><code>dams.py</code> (new)</td><td><code>pygetm.dams.close(domain, line)</code>: closes the U/V faces a polyline crosses and the corners between
 them (a dam or thin wall of zero width); only the supergrid mask is changed, before the grids are built</td><td>Dams, barriers; Ringkøbing Fjord</td></tr>
 <tr><td><code>sluice.py</code> (new)</td><td><code>pygetm.sluice.Sluice</code>: a controlled connection between two water cells (gate, flap gate, pipe in a dam) as a pair
-of rivers; <code>attach(sim, nest=)</code>: its ends on two nesting levels, the flow from both at their shared times</td><td>Sluices, locks, pumping stations; Hvide Sande</td></tr>
+of rivers; <code>attach(sim, comm=, every=)</code>: its ends in two simulations, the flow from both at their shared times (in a nested run <code>NestingRun.attach_sluice</code>, in <code>pygetm.nesting</code>)</td><td>Sluices, locks, pumping stations; Hvide Sande</td></tr>
 <tr><td><code>open_boundaries.py</code>, <code>simulation.py</code> (sponge)</td><td>At the start after a restart (with <code>exact_restart</code>), the
 tracers' open boundaries get their values but the sponge zones are not relaxed again (the last macro step did so before the restart file was
 written).</td><td>A restarted run with sponge boundaries
@@ -517,8 +517,7 @@ The water volume is right throughout, but tracer contents jump once (3.4e-4 for 
 <code>sim.initialize_depth()</code> after setting the elevation. Suggested: <code>start()</code> calls it for a run that does not continue
 from a restart file (bit-identical for a flat start), or at least the docstring says so.</td><td>Found as a one-time volume change of a
 nested 3D run started from a raised surface; a single model behaves the same. Our setups start flat</td></tr>
-<tr><td><code>parallel.py</code></td><td><code>get_logger(name=)</code>, <code>file_prefix()</code></td><td>Several models in one MPI job, each with its own logs and dumps</td></tr>
-<tr><td><code>util/interpolate.py</code></td><td><code>interp_columns</code>: vertical interpolation between water columns of different depth</td><td>Parent → child in 3D (in preparation)</td></tr>
+<tr><td><code>parallel.py</code></td><td><code>get_logger(name=)</code>, <code>file_prefix()</code>; an optional count of the time the halo updates wait (<code>time_halo_waits()</code>, <code>halo_wait_time</code>; off by default)</td><td>Several models in one MPI job, each with its own logs and dumps; the nesting's load balance</td></tr>
 <tr><td><code>input/tpxo.py</code></td><td><code>tpxo.get(..., components=)</code></td><td>Convenience: a subset of the constituents</td></tr>
 </tbody></table></div>
 <p class="small">The 3D coupling (<code>pygetm.nesting.nested3d</code>, with the vertical remap <code>pygetm.nesting.vremap</code>) uses
