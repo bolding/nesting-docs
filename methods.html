@@ -447,7 +447,8 @@ longitude/latitude grids, with damping, 2D and 3D, unbroken and restarted). They
 grid angle of rotated or curvilinear longitude/latitude grids (<code>Domain(rotation_lonlat=True)</code>), refusing left-handed grids
 (<code>Domain(refuse_left_handed=True)</code>; else a warning) and a restart that continues bit-identically
 (<code>Simulation(exact_restart=True)</code>; on by itself in a nested run). The one exception is the adaptive vertical coordinates, where
-upstream reads uninitialized values at open-boundary cells (below).</p>
+upstream reads uninitialized values at open-boundary cells (below). The results are the same; the restart files are not quite: they
+hold a few more fields than upstream's (below), which upstream pyGETM ignores when it loads them.</p>
 <div class="tablewrap"><table><thead><tr><th>Where</th><th>Change</th><th>Why</th></tr></thead><tbody>
 <tr><th colspan="3">Fortran</th></tr>
 <tr><td><code>advection.F90.template</code>, <code>advection_base.F90</code></td><td><code>u2d</code>/<code>v2d</code>: optional
@@ -475,6 +476,12 @@ the 3D step's sums of U and V. After a restart, the depths and thicknesses at op
 from zin only at boundary cells. With couplers the halos of the summed U/V are updated once per 3D step. All of this with
 <code>Simulation(exact_restart=)</code>: <code>None</code> (default) with couplers only, else as upstream.</td><td>A restarted run continues
 bit-identically (nested always, single models with <code>exact_restart=True</code>); a restart file from upstream pyGETM loads and continues</td></tr>
+<tr><td><code>simulation.py</code>, <code>momentum.py</code> (restart files)</td><td><b>A deviation:</b> the fields above are written in every
+restart file, with or without nesting: <code>split_order</code> (the order of U and V, one small number stored as a 2D field over the domain,
+the carrier pyGETM's restart files offer), <code>U_cum</code> and <code>V_cum</code>, and in 3D the old U/V layer thicknesses. They are optional:
+upstream pyGETM ignores them when it loads a restart file from the fork, and continues it exactly as its own
+(<code>tools/upstream_check.py</code>); a file from upstream loads in the fork without them</td><td>Restart files differ in content from
+upstream's, not in what they continue</td></tr>
 <tr><td><code>operators.py</code></td><td><code>Advection(..., flux_u=, flux_v=)</code>; <code>apply_3d_batch(..., get_flux=)</code>, the tracer amount through every face and layer</td><td>Python side of the face fluxes (2D and 3D)</td></tr>
 <tr><td><code>src/vertical_remap.F90</code>, <code>_pygetm.pyx</code>, <code>CMakeLists.txt</code></td><td>The vertical remap kernel
 (<code>_pygetm.vertical_remap</code>: PCM or PPM, one pass per column; <code>remap_z</code>: the whole remap with the interfaces kept at their depths, volumes and division included)</td><td>The 3D exchanges between levels with different vertical grids</td></tr>
