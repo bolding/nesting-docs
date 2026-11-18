@@ -1,68 +1,20 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>little_belt — DKm — pyGETM nesting</title><meta name="description" content="DKm level little_belt: setup, bathymetry and automatic thalwegs.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
-<style>:root{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+<link rel="icon" href="theme/logo_stacked.png">
+<link rel="stylesheet" href="theme/style.css"><link rel="stylesheet" href="theme/code.css"><style>[hidden]{display:none!important}</style><style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
    a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
    teal for links, the interface magenta of the figures for emphasis. */
-:root {
-  --paper: #f3f5f4;
-  --paper-2: #e7ecea;
-  --ink: #142028;
-  --ink-2: #4a5a63;
-  --rule: #c9d3d1;
-  --teal: #0b6b72;
-  --magenta: #b0216f;
-  --plate: #ffffff;
-  --ok: #2c7a3f;
-  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --measure: 68ch;
-  --wide: 1120px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
-    --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #0f171c; --paper-2: #17222a; --ink: #dfe7e9; --ink-2: #9fb0b7; --rule: #2a3a43;
-  --teal: #57bcc4; --magenta: #e26aa9; --plate: #f7f8f8; --ok: #6fc285; color-scheme: dark;
-}
-
+/* Colours and fonts: the B&B docs-theme (theme/style.css); these are nesting-docs' own components. */
 html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body {
-  background: var(--paper); color: var(--ink);
-  font: 400 1.06rem/1.6 var(--body);
-  -webkit-font-smoothing: antialiased;
-}
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
-a { color: var(--teal); text-underline-offset: 2px; }
 code, pre { font-family: var(--mono); font-size: 0.86em; }
 code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
 :focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
 
-/* top bar */
-.topbar {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
-  backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule);
-}
-.topin {
-  max-width: var(--wide); margin: 0 auto; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;
-  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-.brand { font: 700 0.95rem/1 var(--display); font-stretch: 85%; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
-.topbar nav { display: flex; gap: 0.2rem 1rem; flex-wrap: wrap; }
-.topbar nav a { font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); text-decoration: none; }
-.topbar nav a:hover { color: var(--teal); }
-
 main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+h1, h2 { color: var(--head); }
+h3 { color: var(--teal); }
 main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
 .chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
 .chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
@@ -72,7 +24,7 @@ main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-ri
 .draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
 h1 {
   font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
-  letter-spacing: -0.01em; margin: 0; max-width: 18ch; text-wrap: balance;
+  margin: 0; max-width: 22ch; text-wrap: balance;
 }
 .lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
@@ -145,13 +97,12 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 #lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
 #lbclose { margin: 0 0 0.5rem auto; display: block; }
 
-.foot { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink-2); }
-</style>
-<style>main > .chapter { max-width: var(--wide); }
+.chapter > .chap { margin-left: 0; }
+</style><style>main > .chapter { max-width: var(--wide); }
 .topbar nav { align-items: center; }
-.topbar nav a[aria-current="page"], .menu > summary[aria-current="page"] { color: var(--ink); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.menu > summary[aria-current="page"] { color: var(--teal); border-bottom: 2px solid var(--teal); }
 .menu { position: relative; }
-.menu > summary { list-style: none; cursor: pointer; font: 600 0.88rem/1.4 var(--display); color: var(--ink-2); }
+.menu > summary { list-style: none; cursor: pointer; font: 600 0.98rem/1.4 var(--display); color: var(--head); padding: 0.2rem 0; border-bottom: 2px solid transparent; }
 .menu > summary::-webkit-details-marker { display: none; }
 .menu > summary::after { content: " ▾"; font-size: 0.8em; }
 .menu > summary:hover { color: var(--teal); }
@@ -196,8 +147,9 @@ dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
 .toc a { color: var(--teal); text-decoration: none; }
 .toc a:hover { text-decoration: underline; }
 h2[id], h3[id] { scroll-margin-top: 4.5rem; }
-</style></head><body>
-<div class="topbar"><div class="topin"><a class="brand" href="index.html">pyGETM nesting</a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></div>
+</style></head>
+<body>
+<header class="topbar"><div class="topin"><a class="brand" href="index.html"><img src="theme/logo_wide.png" alt="Bolding &amp; Bruggeman"><span>pyGETM nesting</span></a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></header>
 <main id="top">
 <div class="crumbs"><a href="dkm.html">← DKm</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
 <nav class="subnav" aria-label="On this page"><a href="#setup">Setup</a><a href="#bathymetry">Bathymetry</a><a href="#thalwegs">Thalwegs</a></nav>
@@ -263,8 +215,8 @@ channels:
   depth: 13.63
 </code></pre></details>
 </section><p class="small">Contains data from Denmark's Depth Model (DDM) v2.0, Geodatastyrelsen, downloaded 1 November 2026; EMODnet Bathymetry; E.U. Copernicus Marine Service Information (NWSHELF_MULTIYEAR_PHY_004_009, BALTICSEA_MULTIYEAR_PHY_003_011); GESLA tide gauges; TPXO9 tides, directly and through NEAB.</p>
-<footer class="foot"><p>Two-way, multi-level nesting for pyGETM, developed by Bolding &amp; Bruggeman. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p><p>Related: <a href="https://bolding.github.io/config-docs/">pygetm-config</a> (configuration and nested setups) · <a href="https://bolding.github.io/ocean-docs/">ocean-* documentation</a> (data, model input, validation, plots).</p><p>Karsten Bolding, Bolding &amp; Bruggeman.</p></footer>
 </main>
+<footer class="foot"><div class="footin"><img src="theme/logo_stacked.png" alt="Bolding &amp; Bruggeman"><div><p>Bolding &amp; Bruggeman · <a href="https://www.bolding-bruggeman.com">www.bolding-bruggeman.com</a></p><p class="bb-related" data-self="nesting-docs"></p><p class="note">Two-way, multi-level nesting for pyGETM. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p></div></div></footer><script src="theme/related.js" defer></script>
 <dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
 <script>(function () {
   // stepper: build the nest one step at a time
