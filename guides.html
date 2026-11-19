@@ -277,13 +277,15 @@ slowest model, in the same units; busy: the share of the root step a model compu
 <h3 id="launching-what-it-chose">Launching what it chose</h3>
 <pre><code># mpiexec, one component per model, ranks pinned to cores
 nesting-balance NEAB/config/coarse.yaml --cores 64 --bathymetry NEAB/Bathymetry/coarse --mpiexec --bind core \
-    --args &#x27;--nesting {config} --bathymetry NEAB/Bathymetry/coarse --out /data/kb/NEAB/runs/test&#x27;
+    --script &#x27;RUN/generated_neab_coarse_{level}.py&#x27; --args &#x27;--stop 2020-01-31T00:00:00&#x27;
 
 # a Slurm job (srun --multi-prog)
 nesting-balance NEAB/config/fine.yaml --cores 128 --bathymetry NEAB/Bathymetry/fine \
-    --srun job.sh --partition short --time 02:00:00 --bind core --setup &#x27;conda activate pygetm-nesting&#x27;</code></pre>
-<p>The run scripts default to <code>&lt;config dir&gt;/../models/{level}/run.py</code> (<code>--script</code> to change);
-<code>{level}</code> and <code>{config}</code> in <code>--args</code> are replaced.</p>
+    --srun job.sh --script &#x27;RUN/generated_neab_fine_{level}.py&#x27; --partition short --time 02:00:00 --bind core \
+    --setup &#x27;conda activate pygetm-nesting&#x27;</code></pre>
+<p>The launch forms need <code>--script</code>, the run script per level (e.g. the scripts <code>pygetm-config nest</code> generates);
+<code>{level}</code> and <code>{config}</code> in <code>--script</code> and <code>--args</code> are replaced. <code>pygetm-config nest</code> writes its
+own launch with the same code (<code>pygetm.nesting.launch</code>).</p>
 <h3 id="3d-and-the-cost-model">3D and the cost model</h3>
 <p>The work per wet cell and 2D step is <code>c_2d + nz (c_3d + c_fabm) / split</code>; in 3D the exchange at the interfaces adds the
 vertical remaps of the rims (on the parent) and the rings (on the child) at every 3D step. The costs go into the layout:</p>
@@ -314,24 +316,22 @@ nesting-balance NEAB/config/coarse.yaml --cores 64 --bathymetry NEAB/Bathymetry/
     --evaluate neab_root=7,north_sea_baltic=39,danish_straits=14,northern_little_belt=2,northern_sound=2</code></pre>
 </section>
 <section id="runs" class="chapter"><header class="chap"><span class="eyebrow">4</span><h2 id="running-the-models">Running the models</h2></header>
-<p>Every level is an ordinary pyGETM run script; with <code>--nesting LAYOUT</code> it is one component of an MPMD launch, one
-<code>mpiexec</code> component per level (parents first). Everything a model writes goes to <code>&lt;out&gt;/&lt;level&gt;/</code>.</p>
+<p>Every level is an ordinary pyGETM run script, one <code>mpiexec</code> component per level (parents first). Everything a level
+writes goes to <code>&lt;out&gt;/&lt;level&gt;/</code>.</p>
 <h3 id="neab-and-dkm-2d-tides">NEAB and DKm: 2D tides</h3>
-<pre><code>L=NEAB/config/coarse.yaml; B=NEAB/Bathymetry/coarse; O=/data/kb/NEAB/runs/test
-A=&quot;--nesting $L --bathymetry $B --out $O --constituents all --days 30 --z0 0.015 --hourly&quot;
-mpiexec -bind-to core -map-by core \
-    -n 7  python NEAB/models/neab_root/run.py $A \
-  : -n 39 python NEAB/models/north_sea_baltic/run.py $A \
-  : -n 14 python NEAB/models/danish_straits/run.py $A \
-  : -n 2  python NEAB/models/northern_little_belt/run.py $A \
-  : -n 2  python NEAB/models/northern_sound/run.py $A</code></pre>
-<ul><li><code>--constituents</code> m2 or all (TPXO9 at the root's open boundaries), <code>--spinup</code>, <code>--days</code>, <code>--start</code>.</li>
-<li><code>--z0</code>, <code>--z0-map FILE</code> (nesting-z0), <code>--z0-depth HREF</code> (z0 reduced in shallow water); <code>--z0 X</code> after the common
-arguments of one level overrides it there.</li>
-<li><code>--hourly</code>: <code>zt.nc</code>; <code>--fields MINUTES</code>: zt, U, V, u1, v1 for <code>nesting-boundaries</code>;
-<code>--boundaries FILE</code>: the root's open boundaries from another model instead of TPXO9 (DKm from NEAB or CMEMS).</li>
-<li>Output per level: <code>zt.nc</code>, <code>m2.npz</code> (M2 amplitude and phase), <code>timing.json</code> (per process: compute, nesting work,
-waiting; the input of <code>--fit</code> and <code>--calibrate</code>).</li></ul>
+<p>Their runs are pygetm-config nested setups: <code>make_master.py</code> writes the master from the layout and the level
+bathymetries, <code>pygetm-config nest</code> one script per level and the launch, <code>nesting-m2</code> the M2 fit afterwards. (Until
+19 November 2026 a hand-written driver per level did this; the generated scripts give bit-identical results.)</p>
+<pre><code>python NEAB/config/pygetm-config/make_master.py --cores 64        # NEAB/config/pygetm-config/neab_coarse.yaml
+pygetm-config nest NEAB/config/pygetm-config/neab_coarse.yaml --out RUN --bind core
+RUN/run_neab_coarse.sh --stop 2020-01-31T00:00:00 --data-root NEAB_BATHYMETRY=$PWD/NEAB/Bathymetry/coarse \
+    --data-root TPXO_FOLDER=/server/data/TPXO9 --data-root OUTPUT_FOLDER=/data/kb/NEAB/runs/test
+nesting-m2 /data/kb/NEAB/runs/test --layout NEAB/config/coarse.yaml --bathymetry NEAB/Bathymetry/coarse --spinup 1</code></pre>
+<ul><li><code>make_master.py</code>: <code>--cores N</code> (processes per level from nesting-balance), <code>--meteo era5</code>, <code>--3d</code>;
+NEAB also <code>--layout coarse_wadden</code> (with the Wadden level).</li>
+<li><code>--fields MINUTES</code>: zt, U, V, u1, v1 for <code>nesting-boundaries</code>; <code>--boundaries FILE</code> (<code>{level}</code>: one per level):
+the open boundaries from another model instead of TPXO9 (DKm from NEAB or CMEMS), the Flather type from the file's variables.</li>
+<li>Output per level: <code>zt.nc</code> (hourly); <code>nesting-m2</code> adds <code>m2.npz</code> (M2 amplitude and phase, the gauges' series).</li></ul>
 <h3 id="ideal-2d-and-3d">IDEAL: 2D and 3D</h3>
 <p><code>IDEAL/scripts/run_ideal.py</code> builds the <code>mpiexec</code> command, runs it and summarises (volume, heat, timings). Arguments after
 <code>--</code> go to every model; <code>--layout-set</code> and <code>--level-set</code> change the layout for one run (written to
@@ -362,11 +362,13 @@ the child's setting decides its interface), <code>--no-ring-slopes</code>, <code
 <p><code>nesting-boundaries</code> samples a run's output at another model's open-boundary points, the finest level with water at each
 point, in ocean-prep's layout (values at the model's own points, read with <code>on_grid=True</code>).</p>
 <pre><code># 1. a NEAB run with hourly fields of every level
-#    (as above, with --fields 60 in the common arguments, --out /data/kb/NEAB/runs/dkm_bdy)
+#    (as above, make_master.py --fields 60, OUTPUT_FOLDER=/data/kb/NEAB/runs/dkm_bdy)
 # 2. the DKm root&#x27;s and Belt Sea&#x27;s boundaries from its north_sea_baltic and danish_straits levels
 nesting-boundaries /data/kb/NEAB/runs/dkm_bdy/{north_sea_baltic,danish_straits}/fields.nc \
     --like DKm/config/dkm.yaml dkm_root,belt_sea DKm/Bathymetry \
-    --write-points DKm/Bathymetry/dkm_bdy_lonlat.txt --out /data/kb/DKm/boundaries/neab_dkm.nc</code></pre>
+    --write-points DKm/Bathymetry/dkm_bdy_lonlat.txt --out /data/kb/DKm/boundaries/neab_dkm.nc
+# 3. DKm&#x27;s master reading them (each level its own points; a shared file is split per level next to it)
+python DKm/config/pygetm-config/make_master.py --boundaries /data/kb/DKm/boundaries/neab_dkm.nc</code></pre>
 </section>
 <section id="analysis" class="chapter"><header class="chap"><span class="eyebrow">6</span><h2 id="analysis-figures-and-animations">Analysis, figures and animations</h2></header>
 <h3 id="tides-against-references">Tides against references</h3>
