@@ -208,6 +208,9 @@ the east, beyond Bornholm, would then only take a larger root.</p>
 1.09. The largest difference at a gauge is 4 mm, at Hvide Sande next to the left-out Ringkøbing Fjord. The variant
 ran on 28 cores instead of 63. Its Kattegat, on 2 cores, waited a third of the time for the levels around it, so it
 needs a few more.</p>
+<p>Since 20 November every level's depth is relative to mean sea level (the EMODnet part of the source was below the
+lowest astronomical tide before; the DDM was already at MSL). The figure shows the eight-day run with those depths:
+rms 0.129 m at the 89 gauges, median ratio 1.06. The run with the earlier depths gave the same rms.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/dkm_nested_m2.png" aria-label="Open M2 in the nested variant full size"><img src="fig/dkm/dkm_nested_m2.png" alt="M2 in the nested variant" loading="lazy"></button><figcaption><strong>M2 in the nested variant</strong><p>M2 amplitude of every level over the cells it computes (finest on top), TPXO9 at the open boundaries, with the GESLA gauges (dots: observed amplitude). Right: model against gauges.</p></figcaption></figure>
 </section>
 <section id="fjords" class="chapter"><header class="chap"><span class="eyebrow">Fjords</span><h2 id="the-children">The children</h2></header>
@@ -227,7 +230,7 @@ needs a few more.</p>
 </section>
 <section id="bathymetry" class="chapter"><header class="chap"><span class="eyebrow">Bathymetry</span><h2 id="denmark-s-depth-model-completed-with-emodnet">Denmark's Depth Model, completed with EMODnet</h2></header>
 <p>Denmark's Depth Model (DDM, version 2.0, Geodatastyrelsen) is a 50 m grid of the Danish waters. It covers the
-Danish EEZ only, so Swedish, German and Norwegian waters are filled from EMODnet: the DDM is averaged onto a 45 m
+Danish EEZ only, so Swedish, German and Norwegian waters are filled from EMODnet: the DDM is averaged onto a 50 m
 lon/lat grid, and EMODnet is used only in water outside the DDM's coverage. Inside it, a cell without a DDM value
 stays land. Every level takes its block means from this one product.</p>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/ddm_emodnet.png" aria-label="Open DDM and EMODnet full size"><img src="fig/dkm/ddm_emodnet.png" alt="DDM and EMODnet" loading="lazy"></button><figcaption><strong>DDM and EMODnet</strong><p>Overview and five zooms (the Sound, the Little Belt, the eastern Limfjord, Mariager and Randers, the Kattegat's Swedish side). Red line: the area filled from EMODnet; the seam at the EEZ border is smooth.</p></figcaption></figure>
