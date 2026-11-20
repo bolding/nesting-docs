@@ -209,11 +209,11 @@ the halo band and aligned with its parent's cells, and with <code>--run</code> r
 emodnet, ddm) overrides <code>--source</code>.</p>
 <pre><code>nesting-bathymetry NEAB/config/coarse.yaml --outdir NEAB/Bathymetry/coarse --run
 nesting-bathymetry DKm/config/dkm.yaml --levels limfjord_east,mariager_randers --outdir DKm/Bathymetry --run</code></pre>
-<p>For DKm, Denmark's Depth Model is first put on a lon/lat grid and completed with EMODnet outside Danish waters (in
-<code>ocean-stack</code>, for rasterio); levels then use it with <code>source: ddm</code>:</p>
-<pre><code>conda run -n ocean-stack python cli/nesting_ddm.py /data/DDM/ddm_50m.dybde.tiff \
-    --emodnet /data/cache/emodnet/emodnet_-8.5400_14.0200_47.4750_62.0250_0p0020833333.nc \
-    --region 7.0 13.6 53.8 58.3 --out /data/cache/ddm/ddm_emodnet_dkm.nc</code></pre>
+<p>For DKm, the layout names ocean-prep's source for Denmark's Depth Model completed with EMODnet outside Danish waters
+(it reads the GeoTIFF with rasterio: <code>ocean-stack</code>); levels then use it with <code>source: ddm</code>:</p>
+<pre><code>config:
+  sources:
+    ddm: ddm+emodnet:/data/DDM/ddm_50m.dybde.tiff</code></pre>
 <h3 id="automatic-thalwegs">Automatic thalwegs</h3>
 <p><code>nesting-thalwegs</code> compares every level's grid with its fine source and finds what the grid closes: gaps (source water
 through the level's dry cells joining two basins) and shortcuts (joining two parts of one basin far apart around it). Through each it
@@ -247,13 +247,14 @@ can be accepted or rejected:</p>
 <h3 id="from-lat-to-msl">From LAT to MSL</h3>
 <p>EMODnet's depths are below the lowest astronomical tide (LAT); pyGETM's elevation is relative to mean sea level (MSL).
 ocean-prep's <code>source_datum</code> shifts the fine source by MSL − LAT before the block means. The shift is a lon/lat field, for
-example minus the lowest level of a two-year TPXO9 prediction (<code>NEAB/scripts/lat_to_msl.py</code> writes it). With
-<code>mask_land: false</code> the flats become sea above MSL. Denmark's Depth Model is already at MSL; in the merged DDM + EMODnet
-file only the EMODnet fill is shifted:</p>
-<pre><code>source_datum:
-  offset: NEAB/Bathymetry/coarse_wadden_msl/msl_minus_lat.npz
-  only_flag: {{file: /data/cache/ddm/ddm_emodnet_dkm.nc, variable: source, values: [2]}}   # 2 = EMODnet
-  flats_max_height: 1.0</code></pre>
+example minus the lowest level of a two-year TPXO9 prediction (<code>NEAB/scripts/lat_to_msl.py</code> writes it). Every NEAB
+and DKm layout sets it in <code>config.bathymetry</code>, for all levels. With <code>mask_land: false</code> the flats become sea
+above MSL. Each ocean-prep source knows its datum: Denmark's Depth Model is already at MSL and is left alone, and in
+<code>ddm+emodnet</code> only the EMODnet fill is shifted. A LAT source without <code>source_datum</code> gives a warning.</p>
+<pre><code>config:
+  bathymetry:
+    source_datum:
+      offset: /data/cache/datum/msl_minus_lat_tpxo9_amm7_baltic.npz</code></pre>
 <p>A bottom roughness map from EMODnet Geology's seabed substrate (Folk 7 classes, each given a z0), read by the NEAB/DKm models with
 <code>--z0-map</code>:</p>
 <pre><code>nesting-z0 --region -20 31 42 66.5 --res 0.01 --out /data/cache/emodnet_geology/z0_folk7_neab.nc
