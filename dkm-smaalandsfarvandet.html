@@ -162,7 +162,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
   <dl class="facts">
     <div><dt>grid</dt><dd>360 × 324</dd><p>237 × 247 m, parent and ratio belt_sea, 3</p></div>
     <div><dt>active cells</dt><dd>58730</dd><p>time ratio 3, dt 3.4 s</p></div>
-    <div><dt>source cells per cell</dt><dd>28</dd><p>DDM/EMODnet at 44 × 46 m</p></div>
+    <div><dt>source cells per cell</dt><dd>22</dd><p>DDM/EMODnet at 53 × 50 m</p></div>
     <div><dt>thalwegs found</dt><dd>6</dd><p>gaps and shortcuts the grid closes</p></div>
   </dl>
 </header>
@@ -190,7 +190,7 @@ h2[id], h3[id] { scroll-margin-top: 4.5rem; }
 0.5 m (this level its own).</p>
 </section>
 <section id="bathymetry" class="chapter"><header class="chap"><span class="eyebrow">Bathymetry</span><h2 id="what-the-grid-keeps-of-the-source">What the grid keeps of the source</h2></header>
-<ul><li>The level's own water (not under its children, not behind its barriers): 3,447 km² on the grid, 3,415 km² deeper than min_depth in the source.</li><li>Source water in the level's dry cells: 20.2 km² (0.6 %), 16.7 million m³. In its wet cells 1.5 % of the source cells are land or shallower.</li><li>Inside a wet cell the source depths spread by 0.7 m (p90 − p10, median over the cells; 2.4 m in the 10 % most varied). The block mean lies at the 50th percentile of its cell's source depths (10–90 % of the cells: 40th–60th).</li><li>4 basins of at least 4 cells with no connection found in the source (deeper than min_depth): 116 cells at 11.69°E 55.20°N; 76 cells at 12.29°E 54.98°N; 15 cells at 11.28°E 55.25°N; 9 cells at 11.01°E 54.81°N.</li></ul>
+<ul><li>The level's own water (not under its children, not behind its barriers): 3,447 km² on the grid, 3,413 km² deeper than min_depth in the source.</li><li>Source water in the level's dry cells: 20.5 km² (0.6 %), 16.8 million m³. In its wet cells 1.5 % of the source cells are land or shallower.</li><li>Inside a wet cell the source depths spread by 0.7 m (p90 − p10, median over the cells; 2.3 m in the 10 % most varied). The block mean lies at the 50th percentile of its cell's source depths (10–90 % of the cells: 40th–60th).</li><li>4 basins of at least 4 cells with no connection found in the source (deeper than min_depth): 114 cells at 11.69°E 55.20°N; 76 cells at 12.29°E 54.98°N; 15 cells at 11.28°E 55.25°N; 10 cells at 11.01°E 54.81°N.</li></ul>
 <figure class="fig wide"><button class="plate" type="button" data-full="fig/dkm/bathymetry/smaalandsfarvandet.png" aria-label="Open smaalandsfarvandet: bathymetry and thalwegs full size"><img src="fig/dkm/bathymetry/smaalandsfarvandet.png" alt="smaalandsfarvandet: bathymetry and thalwegs" loading="lazy"></button><figcaption><strong>smaalandsfarvandet: bathymetry and thalwegs</strong><p>Left: block-mean depth of the level's wet cells, children's windows dashed, the thalwegs found (red, numbered as in the table) and the source water the grid loses (orange). Middle: the spread of the source depths inside each of the level's own wet cells. Right: the source depth along each thalweg; dots where it runs through the level's dry cells.</p></figcaption></figure>
 <h3 id="thalwegs">Thalwegs</h3>
 <p>Source water deeper than 4 m (then down to 0.5 m and 0.25 m for basins still cut off, also through other basins)
@@ -198,106 +198,106 @@ that crosses the level's dry cells and joins two basins (gap) or two parts of on
 each, the path whose shallowest point is deepest; each dry cell on it gets the p50 of the source depths along
 the path in that cell, not its deepest point, and at least 2.5 m. All of them are applied in the level's
 bathymetry (<code>config: thalwegs: apply</code> in dkm.yaml).</p>
-<div class="tablewrap num"><table><thead><tr><th>#</th><th>Kind</th><th>Sill at</th><th>Sill</th><th>Path</th><th>Cells to open, depth</th></tr></thead><tbody><tr><td>1</td><td>shortcut: same basin</td><td>11.893°E 54.996°N</td><td>8.1 m</td><td>0.23 km</td><td>1: 8.3 m</td></tr><tr><td>2</td><td>gap: another basin, 2 cells</td><td>11.719°E 55.124°N</td><td>4.5 m</td><td>0.09 km</td><td>1: 4.5 m</td></tr><tr><td>3</td><td>gap: another basin, 25 cells</td><td>11.723°E 55.129°N</td><td>2.0 m</td><td>0.36 km</td><td>1: 2.9 m</td></tr><tr><td>4</td><td>gap: another basin, 4 cells</td><td>11.756°E 55.076°N</td><td>2.0 m</td><td>0.09 km</td><td>1: 2.5 m</td></tr><tr><td>5</td><td>gap: another basin, 4 cells</td><td>11.586°E 54.654°N</td><td>0.7 m</td><td>0.14 km</td><td>1: 2.5 m</td></tr><tr><td>6</td><td>gap: another basin, 17 cells</td><td>11.468°E 55.194°N</td><td>0.4 m</td><td>0.41 km</td><td>2: 2.5, 2.5 m</td></tr></tbody></table></div>
+<div class="tablewrap num"><table><thead><tr><th>#</th><th>Kind</th><th>Sill at</th><th>Sill</th><th>Path</th><th>Cells to open, depth</th></tr></thead><tbody><tr><td>1</td><td>gap: another basin, 2 cells</td><td>11.720°E 55.123°N</td><td>3.4 m</td><td>0.35 km</td><td>1: 4.3 m</td></tr><tr><td>2</td><td>gap: another basin, 25 cells</td><td>11.723°E 55.128°N</td><td>2.2 m</td><td>0.36 km</td><td>1: 2.8 m</td></tr><tr><td>3</td><td>gap: another basin, 4 cells</td><td>11.745°E 55.080°N</td><td>1.5 m</td><td>0.10 km</td><td>1: 2.5 m</td></tr><tr><td>4</td><td>gap: another basin, 4 cells</td><td>11.586°E 54.654°N</td><td>0.7 m</td><td>0.16 km</td><td>1: 2.5 m</td></tr><tr><td>5</td><td>gap: another basin, 7 cells</td><td>11.654°E 54.650°N</td><td>0.5 m</td><td>0.51 km</td><td>1: 2.5 m</td></tr><tr><td>6</td><td>gap: another basin, 18 cells</td><td>11.468°E 55.194°N</td><td>0.4 m</td><td>0.52 km</td><td>2: 2.5, 2.5 m</td></tr></tbody></table></div>
 <details><summary>Waypoints and channels (nesting-thalwegs output)</summary><pre><code># nesting-thalwegs: smaalandsfarvandet (min_depth 0.5 m, corridors deeper than 4.0 m, cell depths the p50 of the source along the path)
 # ocean-prep thalweg waypoints:
 thalweg:
   waypoints:
-  - name: smaalandsfarvandet_shortcut_1
-    begin: [11.8934, 54.9952]
-    end: [11.892, 54.9965]
+  - name: smaalandsfarvandet_gap_1
+    begin: [11.7179, 55.1225]
+    end: [11.7195, 55.1248]
     via:
-    - [11.8927, 54.9965]
-    bbox: [11.888, 11.897, 54.993, 54.999]
+    - [11.7195, 55.1234]
+    bbox: [11.714, 11.723, 55.12, 55.127]
     bbox_depth_percentile: 50
     auto:
-      kind: shortcut
-      sill_depth: 8.09
-      length_km: 0.23
+      kind: gap
+      sill_depth: 3.35
+      length_km: 0.35
       cells:
-      - [11.8944, 54.9967, 8.27]
+      - [11.7204, 55.1233, 4.31]
   - name: smaalandsfarvandet_gap_2
-    begin: [11.7184, 55.1244]
-    end: [11.7191, 55.1248]
+    begin: [11.722, 55.1279]
+    end: [11.7253, 55.1293]
     via:
-    - [11.7191, 55.1244]
-    bbox: [11.715, 11.723, 55.122, 55.127]
+    - [11.7228, 55.1284]
+    bbox: [11.718, 11.729, 55.126, 55.131]
     bbox_depth_percentile: 50
     auto:
       kind: gap
-      sill_depth: 4.51
-      length_km: 0.09
-      cells:
-      - [11.7204, 55.1233, 4.51]
-  - name: smaalandsfarvandet_gap_3
-    begin: [11.7219, 55.1277]
-    end: [11.7253, 55.129]
-    via:
-    - [11.7233, 55.1285]
-    bbox: [11.718, 11.729, 55.125, 55.131]
-    bbox_depth_percentile: 50
-    auto:
-      kind: gap
-      sill_depth: 2.03
+      sill_depth: 2.18
       length_km: 0.36
       cells:
-      - [11.7241, 55.1278, 2.9]
-  - name: smaalandsfarvandet_gap_4
-    begin: [11.7559, 55.0752]
-    end: [11.7552, 55.0756]
+      - [11.7241, 55.1278, 2.79]
+  - name: smaalandsfarvandet_gap_3
+    begin: [11.7442, 55.0803]
+    end: [11.745, 55.0799]
     via:
-    - [11.7559, 55.0756]
-    bbox: [11.752, 11.76, 55.073, 55.078]
+    - [11.745, 55.0803]
+    bbox: [11.741, 11.749, 55.078, 55.083]
     bbox_depth_percentile: 50
     auto:
       kind: gap
-      sill_depth: 1.99
-      length_km: 0.09
+      sill_depth: 1.47
+      length_km: 0.1
       cells:
-      - [11.7574, 55.0767, 2.5]
-  - name: smaalandsfarvandet_gap_5
-    begin: [11.5865, 54.6531]
-    end: [11.5851, 54.6535]
+      - [11.7463, 55.0811, 2.5]
+  - name: smaalandsfarvandet_gap_4
+    begin: [11.5861, 54.6532]
+    end: [11.5845, 54.6536]
     via:
-    - [11.5865, 54.6535]
+    - [11.5861, 54.6536]
     bbox: [11.581, 11.59, 54.651, 54.656]
     bbox_depth_percentile: 50
     auto:
       kind: gap
-      sill_depth: 0.68
-      length_km: 0.14
+      sill_depth: 0.66
+      length_km: 0.16
       cells:
       - [11.587, 54.6544, 2.5]
-  - name: smaalandsfarvandet_gap_6
-    begin: [11.4705, 55.1931]
-    end: [11.4663, 55.1944]
+  - name: smaalandsfarvandet_gap_5
+    begin: [11.6537, 54.6487]
+    end: [11.6553, 54.6514]
     via:
-    - [11.4677, 55.1944]
-    bbox: [11.463, 11.474, 55.191, 55.197]
+    - [11.6537, 54.6496]
+    bbox: [11.65, 11.659, 54.646, 54.654]
+    bbox_depth_percentile: 50
+    auto:
+      kind: gap
+      sill_depth: 0.5
+      length_km: 0.51
+      cells:
+      - [11.6537, 54.65, 2.5]
+  - name: smaalandsfarvandet_gap_6
+    begin: [11.4709, 55.1926]
+    end: [11.4659, 55.1944]
+    via:
+    - [11.4676, 55.1944]
+    bbox: [11.462, 11.475, 55.19, 55.197]
     bbox_depth_percentile: 50
     auto:
       kind: gap
       sill_depth: 0.37
-      length_km: 0.41
+      length_km: 0.52
       cells:
       - [11.4685, 55.1922, 2.5]
       - [11.4685, 55.1944, 2.5]
 # design_neab_hierarchy / dkm.yaml: under the level&#x27;s active:
 channels:
 - path:
-  - [11.8944, 54.9967]
-  depth: 8.27
-- path:
   - [11.7204, 55.1233]
-  depth: 4.51
+  depth: 4.31
 - path:
   - [11.7241, 55.1278]
-  depth: 2.9
+  depth: 2.79
 - path:
-  - [11.7574, 55.0767]
+  - [11.7463, 55.0811]
   depth: 2.5
 - path:
   - [11.587, 54.6544]
+  depth: 2.5
+- path:
+  - [11.6537, 54.65]
   depth: 2.5
 - path:
   - [11.4685, 55.1922]
