@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipes — pyGETM nesting</title><meta name="description" content="Copy-and-paste recipes for the nested setups: IDEAL, NEAB, the Wadden level, DKm with TPXO, NEAB or CMEMS boundaries, ERA5 and 3D, processes and Slurm, restarts, comparisons, a new setup.">
+<link rel="icon" href="theme/logo_stacked.png">
+<link rel="stylesheet" href="theme/style.css"><link rel="stylesheet" href="theme/code.css">
+<script src="theme/mode.js"></script><style>[hidden]{display:none!important}</style><style>/* Layout: a single reading column (about 68ch) with figures that break out to a wider measure;
+   a sticky chapter bar. Colours from a sounding chart: deep-water ink, chart paper, bathymetric
+   teal for links, the interface magenta of the figures for emphasis. */
+/* Colours and fonts: the B&B docs-theme (theme/style.css); these are nesting-docs' own components. */
+html { scroll-behavior: smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--paper-2); padding: 0.05em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 4rem; }
+h1, h2 { color: var(--head); }
+h3 { color: var(--teal); }
+main > *, .chapter > * { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.chapter > .fig.wide, .chapter > .grid2, .chapter > .grid3, .chapter > .tablewrap, .chapter > .stepper,
+.chapter > .twocol, .chapter > .statusgrid, .hero { max-width: var(--wide); }
+
+/* hero */
+.hero { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.1rem; }
+.draft { font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+h1 {
+  font: 800 clamp(2.1rem, 5.4vw, 3.9rem)/1.02 var(--display); font-stretch: 78%;
+  margin: 0; max-width: 22ch; text-wrap: balance;
+}
+.lede { font-size: 1.18rem; color: var(--ink-2); max-width: var(--measure); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0; margin: 1rem 0 0; border-top: 2px solid var(--ink); }
+.facts > div { padding: 0.8rem 1rem 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.facts dt { font: 600 0.74rem/1.2 var(--display); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin: 0.15rem 0 0; font: 700 1.9rem/1.1 var(--display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.facts p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--ink-2); }
+
+/* chapters */
+.chapter { padding-block: 3rem 1rem; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.3rem; }
+.chapter > * { width: 100%; }
+.chap { display: grid; gap: 0.3rem; }
+.eyebrow { font: 700 0.76rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+h2 { font: 800 clamp(1.7rem, 3.6vw, 2.5rem)/1.08 var(--display); font-stretch: 80%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.35rem/1.2 var(--display); font-stretch: 85%; margin: 1.4rem auto 0; text-wrap: balance; }
+h4 { font: 700 1.02rem/1.3 var(--display); margin: 0 0 0.4rem; }
+p { margin: 0; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.small { font-size: 0.92rem; color: var(--ink-2); }
+.ok { color: var(--ok); font-weight: 600; }
+
+/* figures: white plates, so the white-background figures read in both themes */
+.fig { margin: 0; display: grid; gap: 0.55rem; min-width: 0; }
+.plate {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--plate); cursor: zoom-in; overflow: hidden;
+}
+.plate.static { cursor: default; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
+figcaption strong { font: 700 0.98rem/1.3 var(--display); color: var(--ink); }
+.grid2, .grid3 { display: grid; gap: 1.6rem 1.4rem; align-items: start; }
+.grid2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.grid3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.twocol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.6rem; align-items: start; }
+.twocol > *, .grid2 > *, .grid3 > * { min-width: 0; }
+.statusgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.6rem; }
+.statusgrid > div { border-top: 2px solid var(--ink); padding-top: 0.7rem; }
+
+/* tables */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { font: 700 0.78rem/1.2 var(--display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); text-align: left; padding: 0.5rem 0.7rem 0.4rem 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+td { padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.num td { font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; }
+
+.callout { border-left: 3px solid var(--magenta); padding: 0.2rem 0 0.2rem 1rem; display: grid; gap: 0.7rem; }
+pre { margin: 0; padding: 0.8rem 1rem; background: var(--paper-2); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+pre code { background: none; padding: 0; }
+
+/* stepper */
+.stepper { display: grid; gap: 0.8rem; }
+.stepper-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; align-items: center; }
+.stepnav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.step, .stepctl button, #lbclose {
+  font: 600 0.9rem/1 var(--display); border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  border-radius: 3px; min-width: 2.3rem; height: 2.3rem; padding: 0 0.7rem; cursor: pointer;
+}
+.step[aria-current="step"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.stepctl { display: flex; gap: 0.4rem; }
+.step:hover, .stepctl button:hover { border-color: var(--teal); }
+.steptext { display: grid; gap: 0.2rem; max-width: var(--measure); }
+.stepno { font: 600 0.78rem/1 var(--mono); color: var(--magenta); }
+.steptext h4 { margin: 0; font-size: 1.15rem; }
+
+/* lightbox */
+dialog#lightbox { border: none; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+dialog#lightbox::backdrop { background: rgb(8 14 18 / 0.86); }
+#lbimg { display: block; max-width: 96vw; max-height: 88vh; background: #fff; border-radius: 4px; }
+#lbclose { margin: 0 0 0.5rem auto; display: block; }
+
+.chapter > .chap { margin-left: 0; }
+</style><style>main > .chapter { max-width: var(--wide); }
+.topbar nav { align-items: center; }
+.menu > summary[aria-current="page"] { color: var(--teal); border-bottom: 2px solid var(--teal); }
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; font: 600 0.98rem/1.4 var(--display); color: var(--head); padding: 0.2rem 0; border-bottom: 2px solid transparent; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary::after { content: " ▾"; font-size: 0.8em; }
+.menu > summary:hover { color: var(--teal); }
+.menu-items { position: absolute; top: 1.9rem; left: -0.6rem; min-width: 11rem; z-index: 6; display: grid;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 0.35rem 0; box-shadow: 0 6px 18px rgb(0 0 0 / 0.12); }
+.menu-items a { padding: 0.35rem 0.9rem; }
+.menu-items a:hover { background: var(--paper-2); }
+.crumbs { max-width: var(--wide); margin: 0 auto; padding: 0.9rem 0 0; font: 600 0.85rem/1.4 var(--display); color: var(--ink-2); }
+.crumbs a { text-decoration: none; }
+.subnav { max-width: var(--wide); margin: 0.4rem auto 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font: 500 0.82rem/1.4 var(--display); }
+.subnav a { color: var(--ink-2); text-decoration: none; }
+.subnav a:hover { color: var(--teal); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.2rem; max-width: var(--wide); }
+.card { display: grid; gap: 0.4rem; padding: 1rem 1.1rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); text-decoration: none; color: var(--ink); }
+.card:hover { border-color: var(--teal); }
+.card h3 { margin: 0; font-size: 1.15rem; }
+.card p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+.issue { border-top: 1px solid var(--rule); padding-top: 1rem; display: grid; gap: 0.7rem; }
+.issue > h3 { margin: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; font: 600 0.75rem/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; }
+.tags span { padding: 0.25rem 0.5rem; border-radius: 3px; background: var(--paper-2); color: var(--ink-2); }
+.tags .solved { background: color-mix(in srgb, var(--ok) 18%, var(--paper)); color: var(--ok); }
+.tags .open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
+.issuegroup { display: grid; gap: 0.5rem; max-width: var(--wide); }
+.issuegroup > h3 { margin: 0.6rem 0 0; display: flex; align-items: baseline; gap: 0.5rem; }
+.issuegroup > h3 .count { font: 500 0.9rem/1 var(--display); color: var(--ink-2); }
+.issuelist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+.issuelist li { display: grid; grid-template-columns: 5.2rem 1fr; gap: 0.7rem; align-items: baseline; }
+.issuelist .affects { color: var(--ink-2); font-size: 0.85rem; }
+.badge { justify-self: start; padding: 0.2rem 0.45rem; border-radius: 3px; font: 600 0.7rem/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; }
+.badge.solved { background: color-mix(in srgb, var(--ok) 18%, var(--paper)); color: var(--ok); }
+.badge.open { background: color-mix(in srgb, var(--magenta) 15%, var(--paper)); color: var(--magenta); }
+.chapter > pre { max-width: var(--wide); width: 100%; }
+.seeissues { font-size: 0.92rem; color: var(--ink-2); border-left: 3px solid var(--teal); padding: 0.1rem 0 0.1rem 0.8rem; }
+
+.toc { margin: 0.6rem auto 1.4rem; padding: 0.6rem 1rem; border: 1px solid var(--rule, #cfd8d6); border-radius: 8px;
+       max-width: var(--wide); background: var(--paper-2, transparent); }
+.toc > summary { cursor: pointer; font: 600 0.9rem/1.4 var(--display); color: var(--ink-2); }
+.toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; columns: 2 22rem; column-gap: 2rem; font-size: 0.9rem; line-height: 1.45; }
+.toc ol.toc-sub { columns: 1; margin: 0.1rem 0 0.3rem; font-size: 0.85rem; list-style: lower-alpha; }
+.toc li { break-inside: avoid; }
+.toc a { color: var(--teal); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+h2[id], h3[id] { scroll-margin-top: 4.5rem; }
+</style></head>
+<body>
+<header class="topbar"><div class="topin"><a class="brand" href="index.html"><img src="theme/logo_wide.png" alt="Bolding &amp; Bruggeman"><span>pyGETM nesting</span></a><nav aria-label="Site"><a href="methods.html">Methods</a><details class="menu"><summary>Examples</summary><div class="menu-items"><a href="ideal.html">IDEAL</a><a href="dkm.html">DKm</a><a href="neab.html">NEAB</a></div></details><a href="guides.html">Guides</a><a href="issues.html">Issues</a><a href="status.html">Status</a></nav></div></header>
+<main id="top">
+<div class="crumbs"><a href="guides.html">← Guides</a> · <a href="methods.html#names">Names used (rim, ring, ...)</a></div>
+<nav class="subnav" aria-label="On this page"><a href="#1-ideal">IDEAL</a><a href="#2-neab-coarse-2d-tides">NEAB coarse, 2D tides</a><a href="#3-neab-with-the-wadden-level">NEAB with the Wadden level</a><a href="#4-dkm-with-tpxo">DKm with TPXO</a><a href="#5-dkm-forced-by-neab">DKm forced by NEAB</a><a href="#6-dkm-forced-by-cmems">DKm forced by CMEMS</a><a href="#7-era5-and-3d">ERA5 and 3D</a><a href="#8-processes-per-level-pinning-slurm">Processes per level, pinning, Slurm</a><a href="#9-restarts">Restarts</a><a href="#10-comparing-with-tide-gauges-and-tpxo">Comparing with tide gauges and TPXO</a><a href="#11-a-new-setup">A new setup</a></nav>
+<details class="toc" open><summary>Contents</summary><ol><li><a href="#ideal">IDEAL</a><li><a href="#neab-coarse-2d-tides">NEAB coarse, 2D tides</a><li><a href="#neab-with-the-wadden-level">NEAB with the Wadden level</a><li><a href="#dkm-with-tpxo">DKm with TPXO</a><li><a href="#dkm-forced-by-neab">DKm forced by NEAB</a><li><a href="#dkm-forced-by-cmems">DKm forced by CMEMS</a><li><a href="#era5-and-3d">ERA5 and 3D</a><li><a href="#processes-per-level-pinning-slurm">Processes per level, pinning, Slurm</a><li><a href="#restarts">Restarts</a><li><a href="#comparing-with-tide-gauges-and-tpxo">Comparing with tide gauges and TPXO</a><li><a href="#a-new-setup">A new setup</a></ol></details>
+<header class="hero"><p class="draft">Recipes</p><h1>Copy and paste</h1>
+<div class="lede"><p>Short recipes to copy and paste. Every section starts with a block that sets what it needs (the environment, the
+repository, the data paths, the run folder), so each section works on its own. Every path is a variable set in that
+first block: change them there for another machine (the ones below are the development machine's; on the 64-core server ERA5 is
+<code>/data/ERA5/Europe</code>). Background, design and
+checks: the setups' READMEs (<code>IDEAL/</code>, <code>NEAB/</code>, <code>DKm/</code>) and pygetm-config's <code>docs/nesting.md</code>.</p>
+<p>How a run is made (all setups but IDEAL's own experiments): <code>make_master.py</code> writes a master file from the layout and
+the level bathymetries, <code>pygetm-config nest</code> turns it into one run script per level and a launch script, the launch
+runs all levels as one MPI job, and <code>nesting-m2</code> fits M2 afterwards. To change a run, change the master (the
+<code>make_master.py</code> options), not the generated scripts. Each level writes into <code>$RUN/out/&lt;level&gt;/</code>.</p>
+<p>Runs of several days belong on the 64-core server (64 cores; the development machine has 20): <code>tools/setup_machine.sh HOST</code> brings the code
+and the environment there, TPXO9 is <code>/data/TPXO9</code> and the inputs that live only in the development machine's <code>/data/kb</code> have to be copied.
+For scale, on the 64-core server: DKm 8 days about 3 h (two runs side by side), NEAB coarse 31 days about 30 min with 60
+processes.</p>
+<p>Checked on 19 November 2026 on the development machine: every block run in a shortened form (hours instead of days), except section 6
+(it needs CMEMS access), the <code>sbatch</code> submission in section 8 (no Slurm there; the job file was written) and the
+bathymetry download in section 11.</p></div></header>
+<section id="1-ideal" class="chapter"><header class="chap"><span class="eyebrow">1</span><h2 id="ideal">IDEAL</h2></header>
+<p>An idealised nest of three Cartesian levels (channel, shelf, strait) with an analytic depth: no external data, a few
+minutes on 5 cores. A good first run, and a check of the installation.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+RUN=$DATA/IDEAL/runs/howto_cfg
+OWN=$DATA/IDEAL/runs/howto_own                  # IDEAL's own models
+</code></pre>
+<p><strong>Through pygetm-config</strong> (a closed basin driven by a wind stress: pygetm-config cannot express IDEAL's tide):</p>
+<pre><code class="language-bash">python IDEAL/scripts/ideal_bathymetry_files.py IDEAL/config/ideal.yaml --out $RUN/bathymetry
+python IDEAL/config/pygetm-config/make_master.py --out $RUN
+pygetm-config nest $RUN/ideal.yaml --out $RUN/gen
+$RUN/gen/run_ideal.sh --stop 2000-01-01T06:00:00 \
+    --data-root IDEAL_BATHYMETRY=$RUN/bathymetry --data-root OUTPUT_FOLDER=$RUN/out
+</code></pre>
+<p><strong>IDEAL's own models</strong> (<code>IDEAL/models/ideal2d.py</code>, <code>ideal3d.py</code>): the tide, the 3D experiments, the sluice and the fjord.
+<code>run_ideal.py</code> builds the launch, runs it and summarises volume, heat and timings; arguments after <code>--</code> go to every level.</p>
+<pre><code class="language-bash"># 2D, the tide
+python IDEAL/scripts/run_ideal.py --ranks channel=2,shelf=2,strait=1 --out $OWN/tide -- --hours 48
+# 3D with temperature
+python IDEAL/scripts/run_ideal.py --layout IDEAL/config/ideal3d.yaml --script run3d.py \
+    --ranks channel=2,shelf=2,strait=2 --out $OWN/3d -- --hours 48
+</code></pre></section>
+<section id="2-neab-coarse-2d-tides" class="chapter"><header class="chap"><span class="eyebrow">2</span><h2 id="neab-coarse-2d-tides">NEAB coarse, 2D tides</h2></header>
+<p>The North-East Atlantic–Baltic nest (5 levels), TPXO9 at the root's open boundaries, 9 processes.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+RUN=$DATA/NEAB/runs/howto_coarse
+</code></pre>
+<pre><code class="language-bash">python NEAB/config/pygetm-config/make_master.py --out $RUN
+pygetm-config nest $RUN/neab_coarse.yaml --out $RUN/gen
+$RUN/gen/run_neab_coarse.sh --stop 2020-01-04T00:00:00 --data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse \
+    --data-root TPXO_FOLDER=$TPXO --data-root OUTPUT_FOLDER=$RUN/out
+nesting-m2 $RUN/out --layout NEAB/config/coarse.yaml --bathymetry NEAB/Bathymetry/coarse --spinup 1
+</code></pre>
+<p><code>nesting-m2</code> writes <code>$RUN/out/&lt;level&gt;/m2.npz</code> (M2 amplitude and phase of every cell a level computes, the gauges'
+series) after a spin-up of one day.</p></section>
+<section id="3-neab-with-the-wadden-level" class="chapter"><header class="chap"><span class="eyebrow">3</span><h2 id="neab-with-the-wadden-level">NEAB with the Wadden level</h2></header>
+<p>The coarse NEAB levels plus the Wadden Sea (6 levels; its flats wet and dry). The time steps are 0.8 × pyGETM's CFL
+step per level.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+RUN=$DATA/NEAB/runs/howto_wadden
+</code></pre>
+<pre><code class="language-bash">python NEAB/config/pygetm-config/make_master.py --layout coarse_wadden --cores 16 --out $RUN
+pygetm-config nest $RUN/neab_coarse_wadden.yaml --out $RUN/gen
+$RUN/gen/run_neab_coarse_wadden.sh --stop 2020-01-04T00:00:00 \
+    --data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse_wadden \
+    --data-root TPXO_FOLDER=$TPXO --data-root OUTPUT_FOLDER=$RUN/out
+nesting-m2 $RUN/out --layout NEAB/config/coarse_wadden.yaml --bathymetry NEAB/Bathymetry/coarse_wadden --spinup 1
+</code></pre></section>
+<section id="4-dkm-with-tpxo" class="chapter"><header class="chap"><span class="eyebrow">4</span><h2 id="dkm-with-tpxo">DKm with TPXO</h2></header>
+<p>The Danish waters with their fjords (9 levels), TPXO9 at the open boundaries (the root, the Kattegat and the Belt
+Sea), 20 processes.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+RUN=$DATA/DKm/runs/howto_tpxo
+</code></pre>
+<pre><code class="language-bash">python DKm/config/pygetm-config/make_master.py --out $RUN
+pygetm-config nest $RUN/dkm_nested.yaml --out $RUN/gen
+$RUN/gen/run_dkm_nested.sh --stop 2020-01-08T00:00:00 --data-root DKM_BATHYMETRY=$NESTING/DKm/Bathymetry/nested \
+    --data-root TPXO_FOLDER=$TPXO --data-root OUTPUT_FOLDER=$RUN/out
+nesting-m2 $RUN/out --layout DKm/config/dkm_nested.yaml --bathymetry DKm/Bathymetry/nested --spinup 1
+</code></pre></section>
+<section id="5-dkm-forced-by-neab" class="chapter"><header class="chap"><span class="eyebrow">5</span><h2 id="dkm-forced-by-neab">DKm forced by NEAB</h2></header>
+<p>DKm's open boundaries from a NEAB run instead of TPXO9: NEAB writes hourly fields, <code>nesting-boundaries</code> samples them at
+DKm's boundary points (one file for the three levels with open boundaries), and DKm's master reads them (each level
+checks its points; the file is split per level next to it).</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+SRC=$DATA/NEAB/runs/howto_fields               # the NEAB run
+BDY=$DATA/DKm/boundaries/howto_neab_bdy.nc     # DKm's boundary file
+RUN=$DATA/DKm/runs/howto_neab
+</code></pre>
+<pre><code class="language-bash"># 1. NEAB with hourly fields (zt, U, V, u1, v1)
+python NEAB/config/pygetm-config/make_master.py --fields 60 --out $SRC
+pygetm-config nest $SRC/neab_coarse.yaml --out $SRC/gen
+$SRC/gen/run_neab_coarse.sh --stop 2020-01-09T00:00:00 --data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse \
+    --data-root TPXO_FOLDER=$TPXO --data-root OUTPUT_FOLDER=$SRC/out
+# 2. the values at DKm's boundary points
+nesting-boundaries $SRC/out/{north_sea_baltic,danish_straits}/fields.nc \
+    --like DKm/config/dkm_nested.yaml dkm_root,kattegat,belt_sea DKm/Bathymetry/nested --out $BDY
+# 3. DKm reading them
+python DKm/config/pygetm-config/make_master.py --boundaries $BDY --out $RUN
+pygetm-config nest $RUN/dkm_nested.yaml --out $RUN/gen
+$RUN/gen/run_dkm_nested.sh --stop 2020-01-08T00:00:00 --data-root DKM_BATHYMETRY=$NESTING/DKm/Bathymetry/nested \
+    --data-root OUTPUT_FOLDER=$RUN/out
+nesting-m2 $RUN/out --layout DKm/config/dkm_nested.yaml --bathymetry DKm/Bathymetry/nested --spinup 1
+</code></pre>
+<p>DKm's run must lie within the NEAB run's time (here 2020-01-01 to 01-09).</p></section>
+<section id="6-dkm-forced-by-cmems" class="chapter"><header class="chap"><span class="eyebrow">6</span><h2 id="dkm-forced-by-cmems">DKm forced by CMEMS</h2></header>
+<p>The open boundaries from CMEMS through ocean-prep (its own environment and CMEMS access). Not run for this HOWTO.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+SRC=$DATA/NEAB/runs/howto_fields               # any run with fields.nc (section 5): only for the points
+CMEMS=$DATA/DKm/boundaries/cmems_nested
+RUN=$DATA/DKm/runs/howto_cmems
+</code></pre>
+<pre><code class="language-bash"># 1. the boundary points of DKm's nested levels (a text file for ocean-prep; any fields.nc with zt, U, V as source)
+nesting-boundaries $SRC/out/north_sea_baltic/fields.nc \
+    --like DKm/config/dkm_nested.yaml dkm_root,kattegat,belt_sea DKm/Bathymetry/nested \
+    --write-points DKm/Bathymetry/dkm_nested_bdy_lonlat.txt --out $CMEMS/points_only.nc
+# 2. ocean-prep: point DKm/config/dkm_bdy_cmems.yaml at those points and at $CMEMS, then
+conda activate ocean-prep
+run-cmems-boundaries --config DKm/config/dkm_bdy_cmems.yaml
+conda activate pygetm-nesting
+# 3. DKm reading them (velocities: FLATHER_ELEV; the elevation corrected for the datum)
+python DKm/config/pygetm-config/make_master.py --boundaries $CMEMS/hourly_2020-01-01_to_2020-01-31.nc \
+    --boundary-elevation zos_datum_corrected --out $RUN
+pygetm-config nest $RUN/dkm_nested.yaml --out $RUN/gen
+$RUN/gen/run_dkm_nested.sh --stop 2020-01-08T00:00:00 --data-root DKM_BATHYMETRY=$NESTING/DKm/Bathymetry/nested \
+    --data-root OUTPUT_FOLDER=$RUN/out
+</code></pre></section>
+<section id="7-era5-and-3d" class="chapter"><header class="chap"><span class="eyebrow">7</span><h2 id="era5-and-3d">ERA5 and 3D</h2></header>
+<p>ERA5 atmospheric forcing, and a baroclinic run with the initial temperature and salinity from WOA (or CMEMS:
+<code>--hydrography CMEMS</code>). The 3D route needs pygetm-nesting's hydrography provider, set by the two variables below. The
+same options work for DKm's <code>make_master.py</code>.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+ERA5=/archive/ERA5/Europe          # the 64-core server: /data/ERA5/Europe
+WOA=/server/data/WOA
+M=$NESTING/lib/config_providers.py
+export PYGETM_CONFIG_PROVIDERS=$M:register_providers PYGETM_CONFIG_DATA_ASSIGNMENTS_DERIVERS=$M:derive_data_assignments
+RUN=$DATA/NEAB/runs/howto_3d
+</code></pre>
+<pre><code class="language-bash">python NEAB/config/pygetm-config/make_master.py --meteo era5 --3d --out $RUN
+pygetm-config nest $RUN/neab_coarse.yaml --out $RUN/gen
+$RUN/gen/run_neab_coarse.sh --stop 2020-01-02T00:00:00 --data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse \
+    --data-root TPXO_FOLDER=$TPXO --data-root ERA5_FOLDER=$ERA5 --data-root HYDROGRAPHY_FOLDER_WOA=$WOA \
+    --data-root OUTPUT_FOLDER=$RUN/out
+</code></pre>
+<p>Each level writes daily temperature and salinity (<code>ts.nc</code>) next to the hourly elevation. <code>--meteo era5</code> alone gives a
+2D run with ERA5.</p></section>
+<section id="8-processes-per-level-pinning-slurm" class="chapter"><header class="chap"><span class="eyebrow">8</span><h2 id="processes-per-level-pinning-slurm">Processes per level, pinning, Slurm</h2></header>
+<p><code>nesting-balance</code> divides the cores over the levels from their wet cells and a cost model; <code>make_master.py --cores N</code>
+takes them from it. <code>--bind core</code> pins every level to its own block of cores; <code>--slurm</code> also writes a Slurm job
+(<code>srun --multi-prog</code>).</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+CORES=18
+TPXO=/server/data/TPXO9
+RUN=$DATA/NEAB/runs/howto_slurm
+</code></pre>
+<pre><code class="language-bash">nesting-balance NEAB/config/coarse.yaml --bathymetry NEAB/Bathymetry/coarse --cores $CORES   # the table
+python NEAB/config/pygetm-config/make_master.py --cores $CORES --out $RUN
+pygetm-config nest $RUN/neab_coarse.yaml --out $RUN/gen --bind core \
+    --slurm --partition short --time 02:00:00 --setup 'conda activate pygetm-nesting'
+cd $RUN/gen &amp;&amp; sbatch run_neab_coarse.sbatch --stop 2020-01-04T00:00:00 \
+    --data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse \
+    --data-root TPXO_FOLDER=$TPXO --data-root OUTPUT_FOLDER=$RUN/out
+</code></pre>
+<p>Without Slurm, <code>$RUN/gen/run_neab_coarse.sh</code> starts the same run pinned with <code>mpiexec</code>.</p></section>
+<section id="9-restarts" class="chapter"><header class="chap"><span class="eyebrow">9</span><h2 id="restarts">Restarts</h2></header>
+<p>Every level writes its own restart file (<code>restart.nc</code> gives <code>restart_&lt;level&gt;.nc</code>); a restart written with another set
+of levels, windows or ratios is refused. <code>--stop</code> must fall on a whole root step.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+TPXO=/server/data/TPXO9
+RUN=$DATA/NEAB/runs/howto_restart
+A=&quot;--data-root NEAB_BATHYMETRY=$NESTING/NEAB/Bathymetry/coarse --data-root TPXO_FOLDER=$TPXO&quot;
+</code></pre>
+<pre><code class="language-bash">python NEAB/config/pygetm-config/make_master.py --out $RUN
+pygetm-config nest $RUN/neab_coarse.yaml --out $RUN/gen
+# the first day, saving the state at its end
+$RUN/gen/run_neab_coarse.sh --stop 2020-01-02T00:00:00 --save-restart $RUN/restart.nc $A \
+    --data-root OUTPUT_FOLDER=$RUN/first
+# the second day, from it
+$RUN/gen/run_neab_coarse.sh --load-restart $RUN/restart.nc --stop 2020-01-03T00:00:00 $A \
+    --data-root OUTPUT_FOLDER=$RUN/second
+</code></pre></section>
+<section id="10-comparing-with-tide-gauges-and-tpxo" class="chapter"><header class="chap"><span class="eyebrow">10</span><h2 id="comparing-with-tide-gauges-and-tpxo">Comparing with tide gauges and TPXO</h2></header>
+<p>The M2 amplitude at the GESLA gauges (the finest level with water at a gauge; NEAB too, with <code>--layout
+NEAB/config/coarse.yaml</code>), and M2 against TPXO9 cell by cell. The gauges need <code>nesting-m2</code> first (sections 2–5), and
+where the tide is small (Skagerrak, Kattegat, Baltic) a week or more after the spin-up: with two days M2 and S2 are not
+separated. <code>neab_vs_tpxo_m2.py</code> fits nine constituents (M2, S2, N2, K2, K1, O1, P1, Q1, M4) and needs about a month
+(<code>--stop 2020-02-01T00:00:00</code> in section 2); after a few days its numbers are meaningless.</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+DKM_RUN=$DATA/DKm/runs/howto_tpxo/out          # section 4
+NEAB_RUN=$DATA/NEAB/runs/howto_coarse/out      # section 2
+GAUGES=$DATA/NEAB/runs/coarse_tides_all/base_gauges_stations.csv
+OUT=$DATA/NEAB/runs/howto_compare
+</code></pre>
+<pre><code class="language-bash">python DKm/scripts/dkm_gauges_m2.py --run $DKM_RUN --layout DKm/config/dkm_nested.yaml --gauges $GAUGES
+python NEAB/scripts/neab_vs_tpxo_m2.py --run generated $NEAB_RUN --out $OUT
+</code></pre></section>
+<section id="11-a-new-setup" class="chapter"><header class="chap"><span class="eyebrow">11</span><h2 id="a-new-setup">A new setup</h2></header>
+<p>A new nest is a layout file, the level bathymetries and a <code>make_master.py</code> (copy NEAB's or DKm's and change its
+constants). Bathymetry from GEBCO/EMODnet takes a while (NEAB coarse: about 45 minutes, once).</p>
+<pre><code class="language-bash">conda activate pygetm-nesting; export PYTHONNOUSERSITE=1
+NESTING=~/source/repos/bolding/pygetm-nesting   # the repository
+DATA=/data/kb                                    # runs and boundary files
+cd $NESTING
+LAYOUT=NEAB/config/coarse.yaml       # your layout (the format: NEAB/README.md, pygetm-config docs/nesting.md)
+BATHY=NEAB/Bathymetry/howto_new
+</code></pre>
+<pre><code class="language-bash">python NEAB/scripts/design_neab_hierarchy.py evaluate --config $LAYOUT --save $DATA/new_setup.pkl   # grids, active regions, time steps
+# (the figure: conda activate ocean-plot; python NEAB/scripts/design_neab_hierarchy.py plot --load $DATA/new_setup.pkl --out FIGDIR)
+nesting-bathymetry $LAYOUT --outdir $BATHY --run                          # &lt;level&gt;_bathymetry.nc per level
+nesting-balance $LAYOUT --bathymetry $BATHY --cores 18                    # processes per level
+# then a make_master.py for the setup (from NEAB/config/pygetm-config/make_master.py), and sections 2 and 8
+</code></pre></section>
+</main>
+<footer class="foot"><div class="footin"><img src="theme/logo_stacked.png" alt="Bolding &amp; Bruggeman"><div><p>Bolding &amp; Bruggeman · <a href="https://www.bolding-bruggeman.com">www.bolding-bruggeman.com</a></p><p class="bb-related" data-self="nesting-docs"></p><p class="note">Two-way, multi-level nesting for pyGETM. Code: the fork <a href="https://github.com/bolding/pygetm"><code>bolding/pygetm</code></a> (branch <code>nesting-mpmd</code>); the setups and tools (<code>pygetm-nesting</code>) are not public yet.</p></div></div></footer><script src="theme/related.js" defer></script>
+<dialog id="lightbox" aria-label="Figure"><button type="button" id="lbclose" aria-label="Close">Close</button><img id="lbimg" alt=""></dialog>
+<script>(function () {
+  // stepper: build the nest one step at a time
+  var root = document.getElementById("stepper");
+  if (root) {
+    var steps = Array.prototype.slice.call(root.querySelectorAll("template"));
+    var btns = Array.prototype.slice.call(root.querySelectorAll(".step"));
+    var img = document.getElementById("stepimg"), plate = document.getElementById("stepplate");
+    var title = document.getElementById("steptitle"), desc = document.getElementById("stepdesc"), no = document.getElementById("stepno");
+    var k = 0;
+    steps.forEach(function (t) { var i = new Image(); i.src = t.dataset.src; });  // preload
+    function show(n) {
+      k = Math.max(0, Math.min(steps.length - 1, n));
+      var t = steps[k];
+      img.src = t.dataset.src; img.alt = t.dataset.title; plate.dataset.full = t.dataset.src;
+      title.textContent = t.dataset.title; desc.textContent = t.dataset.text;
+      no.textContent = (k + 1) + " / " + steps.length;
+      btns.forEach(function (b, i) { if (i === k) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+      document.getElementById("prev").disabled = k === 0;
+      document.getElementById("next").disabled = k === steps.length - 1;
+    }
+    btns.forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
+    document.getElementById("prev").addEventListener("click", function () { show(k - 1); });
+    document.getElementById("next").addEventListener("click", function () { show(k + 1); });
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { show(k + 1); e.preventDefault(); }
+      if (e.key === "ArrowLeft") { show(k - 1); e.preventDefault(); }
+    });
+    show(0);
+  }
+  // figures full size
+  var dlg = document.getElementById("lightbox"), lb = document.getElementById("lbimg");
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest && e.target.closest(".plate[data-full]");
+    if (!p || !dlg || typeof dlg.showModal !== "function") return;
+    lb.src = p.dataset.full; var im = p.querySelector("img"); lb.alt = im ? im.alt : "";
+    dlg.showModal();
+  });
+  if (dlg) {
+    document.getElementById("lbclose").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+})();
+
+document.addEventListener("click", function (e) {
+  document.querySelectorAll("details.menu[open]").forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute("open"); });
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") document.querySelectorAll("details.menu[open]").forEach(function (d) { d.removeAttribute("open"); });
+});
+</script>
+</body></html>
